@@ -1,12 +1,61 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nueralab</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeMaster AI</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <nav class="navbar">
+    <h1 class="logo">CodeMaster AI</h1>
+    <div class="nav-links">
+      <button onclick="goTo('profile')">Profile</button>
+      <button onclick="goTo('progress')">Progress</button>
+      <button onclick="goTo('courses')">Courses</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h2>Learn Every Programming Language Ever Created</h2>
+    <p>AI-powered roadmap, personalized courses, and full coding history.</p>
+    <div class="hero-buttons">
+      <button class="primary" onclick="startLearning()">Start Learning</button>
+      <button class="secondary" onclick="customCourse()">Customize Course</button>
+    </div>
+  </section>
+
+  <section class="ai-section">
+    <h2>AI Roadmap Generator</h2>
+    <input type="text" id="goalInput" placeholder="Enter your goal (e.g., Web Dev, AI, Game Dev)">
+    <button onclick="generateRoadmap()">Generate</button>
+    <div id="roadmapOutput"></div>
+  </section>
+
+  <section class="progress-section">
+    <h2>Your Progress</h2>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p id="progressText">0% Complete</p>
+  </section>
+
+  <section class="languages">
+    <h2>Explore Languages</h2>
+    <div class="grid">
+      <div class="card">C</div>
+      <div class="card">C++</div>
+      <div class="card">Python</div>
+      <div class="card">Java</div>
+      <div class="card">JavaScript</div>
+      <div class="card">Rust</div>
+      <div class="card">Go</div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
 </html>
