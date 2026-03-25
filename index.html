@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CodeMaster AI</title>
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Correct CSS Link -->
+  <link rel="stylesheet" href="./styles.css">
+
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
+  <!-- NAVBAR -->
   <nav class="navbar">
     <h1 class="logo">CodeMaster AI</h1>
     <div class="nav-links">
@@ -19,32 +23,40 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <h2>Learn Every Programming Language Ever Created</h2>
-    <p>AI-powered roadmap, personalized courses, and full coding history.</p>
-    <div class="hero-buttons">
-      <button class="primary" onclick="startLearning()">Start Learning</button>
-      <button class="secondary" onclick="customCourse()">Customize Course</button>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-content">
+      <h2>Master Coding with AI</h2>
+      <p>Learn every programming language with history, roadmap & AI guidance.</p>
+      <div class="hero-buttons">
+        <button class="primary" onclick="startLearning()">🚀 Start Learning</button>
+        <button class="secondary" onclick="customCourse()">⚙ Customize Course</button>
+      </div>
     </div>
-  </section>
+  </header>
 
+  <!-- AI ROADMAP -->
   <section class="ai-section">
-    <h2>AI Roadmap Generator</h2>
-    <input type="text" id="goalInput" placeholder="Enter your goal (e.g., Web Dev, AI, Game Dev)">
-    <button onclick="generateRoadmap()">Generate</button>
-    <div id="roadmapOutput"></div>
+    <h2>🤖 AI Roadmap Generator</h2>
+    <div class="ai-box">
+      <input type="text" id="goalInput" placeholder="Enter your goal (Web Dev, AI, Game Dev)">
+      <button onclick="generateRoadmap()">Generate Roadmap</button>
+    </div>
+    <div id="roadmapOutput" class="output"></div>
   </section>
 
+  <!-- PROGRESS -->
   <section class="progress-section">
-    <h2>Your Progress</h2>
+    <h2>📊 Your Progress</h2>
     <div class="progress-bar">
       <div class="progress-fill" id="progressFill"></div>
     </div>
     <p id="progressText">0% Complete</p>
   </section>
 
+  <!-- LANGUAGES -->
   <section class="languages">
-    <h2>Explore Languages</h2>
+    <h2>💻 Explore Languages</h2>
     <div class="grid">
       <div class="card">C</div>
       <div class="card">C++</div>
@@ -56,6 +68,8 @@
     </div>
   </section>
 
-  <script src="script.js"></script>
+  <!-- Correct JS Link -->
+  <script src="./script.js"></script>
+
 </body>
 </html>
