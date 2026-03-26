@@ -1,75 +1,631 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeMaster AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NueraLab | Master Every Programming Language</title>
+    <style>
+        /* --- DESIGN TOKENS & VARIABLES --- */
+        :root {
+            --bg-color: #f8fafc;
+            --surface-color: rgba(255, 255, 255, 0.7);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --border-color: rgba(15, 23, 42, 0.08);
+            --glass-blur: 24px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  <!-- Correct CSS Link -->
-  <link rel="stylesheet" href="./styles.css">
+        [data-theme="dark"] {
+            --bg-color: #020617;
+            --surface-color: rgba(15, 23, 42, 0.65);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #60a5fa;
+            --accent-hover: #3b82f6;
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
 
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+        /* --- BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            transition: background-color 0.5s var(--transition-smooth), color 0.5s var(--transition-smooth);
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: var(--surface-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
+
+        .logo span { color: var(--accent-primary); }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--accent-primary);
+        }
+
+        .nav-utils { display: flex; align-items: center; gap: 16px; }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s var(--transition-bounce);
+        }
+
+        .icon-btn:hover {
+            color: var(--text-primary);
+            background: var(--surface-color);
+            transform: scale(1.1);
+        }
+
+        .profile-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            padding: 2px;
+            background: var(--accent-gradient);
+            display: block;
+            transition: transform 0.3s var(--transition-bounce);
+        }
+
+        .profile-link:hover { transform: scale(1.1) rotate(5deg); }
+
+        .profile-inner {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- HERO --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            padding-top: 80px;
+            position: relative;
+        }
+
+        .hero-content { max-width: 800px; z-index: 2; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        h1 {
+            font-size: clamp(2.8rem, 7vw, 5rem);
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.05em;
+            font-weight: 900;
+        }
+
+        .gradient-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .btn-group { display: flex; gap: 16px; flex-wrap: wrap; }
+
+        .cta-btn {
+            padding: 1.2rem 2.4rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-bounce);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            text-decoration: none;
+        }
+
+        .cta-btn.primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 10px 30px -5px rgba(59, 130, 246, 0.5);
+        }
+
+        .cta-btn.secondary {
+            background: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .cta-btn:hover { transform: translateY(-5px); }
+
+        /* --- EXPLORATION TOGGLE SYSTEM --- */
+        .explore-section {
+            padding: 100px 5%;
+            background: rgba(15, 23, 42, 0.02);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+            position: sticky;
+            top: 100px;
+            z-index: 100;
+        }
+
+        .toggle-bar {
+            background: var(--surface-color);
+            padding: 8px;
+            border-radius: 100px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(20px);
+            overflow-x: auto;
+            max-width: 95vw;
+        }
+
+        .toggle-bar::-webkit-scrollbar { display: none; }
+
+        .toggle-opt {
+            padding: 12px 28px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s var(--transition-smooth);
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .toggle-opt.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        /* VERTICAL STACK FOR CONTENT */
+        .content-display {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 500px;
+        }
+
+        .feature-card {
+            background: var(--surface-color);
+            border-radius: 28px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            transition: all 0.5s var(--transition-bounce);
+            opacity: 0;
+            transform: translateY(30px);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 40px;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .feature-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            .nav-links { display: none; } /* Hide mid links on mobile for space */
+        }
+
+        .feature-card.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-lg);
+            background: var(--bg-color);
+        }
+
+        .icon-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s var(--transition-bounce);
+            flex-shrink: 0;
+        }
+
+        .icon-link:hover {
+            transform: scale(1.1);
+        }
+
+        .icon-circle {
+            font-size: 3.5rem;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 24px;
+        }
+
+        .card-top {
+            flex-grow: 1;
+        }
+
+        .card-top h3 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .card-top p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .lang-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            padding: 6px 14px;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            padding: 60px 5%;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            background: var(--surface-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .footer-brand {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* --- VISUAL ELEMENTS --- */
+        .hero-visual {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            height: 80%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .floating-code {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.2rem;
+            opacity: 0.15;
+            white-space: nowrap;
+            animation: float-code 20s linear infinite;
+        }
+
+        @keyframes float-code {
+            from { transform: translateY(100vh); }
+            to { transform: translateY(-100vh); }
+        }
+
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            z-index: 1;
+        }
+
+        /* --- UTILS --- */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 1s all ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 1024px) {
+            .hero-visual { display: none; }
+            .hero-content { max-width: 100%; text-align: center; }
+            .hero p { margin-left: auto; margin-right: auto; }
+            .btn-group { justify-content: center; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <h1 class="logo">CodeMaster AI</h1>
-    <div class="nav-links">
-      <button onclick="goTo('profile')">Profile</button>
-      <button onclick="goTo('progress')">Progress</button>
-      <button onclick="goTo('courses')">Courses</button>
-    </div>
-  </nav>
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            Nuera<span>Lab</span>
+        </a>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-content">
-      <h2>Master Coding with AI</h2>
-      <p>Learn every programming language with history, roadmap & AI guidance.</p>
-      <div class="hero-buttons">
-        <button class="primary" onclick="startLearning()">🚀 Start Learning</button>
-        <button class="secondary" onclick="customCourse()">⚙ Customize Course</button>
-      </div>
-    </div>
-  </header>
+        <!-- Added Navigation Links -->
+        <div class="nav-links">
+            <a href="neural-platform.html" class="nav-item">Neural Platform</a>
+            <a href="intelligence-ai.html" class="nav-item">Intelligence AI</a>
+            <a href="lab-research.html" class="nav-item">Lab Research</a>
+            <a href="code-editor.html" class="nav-item">Code Editor</a>
+        </div>
 
-  <!-- AI ROADMAP -->
-  <section class="ai-section">
-    <h2>🤖 AI Roadmap Generator</h2>
-    <div class="ai-box">
-      <input type="text" id="goalInput" placeholder="Enter your goal (Web Dev, AI, Game Dev)">
-      <button onclick="generateRoadmap()">Generate Roadmap</button>
-    </div>
-    <div id="roadmapOutput" class="output"></div>
-  </section>
+        <div class="nav-utils">
+            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+            </button>
+            <a href="profile.html" class="profile-link" title="User Profile">
+                <div class="profile-inner">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+            </a>
+        </div>
+    </nav>
 
-  <!-- PROGRESS -->
-  <section class="progress-section">
-    <h2>📊 Your Progress</h2>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <p id="progressText">0% Complete</p>
-  </section>
+    <main>
+        <section class="hero">
+            <div class="hero-content reveal active">
+                <div class="badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    250+ Languages | One AI Blueprint
+                </div>
+                <h1>The Future of <br><span class="gradient-text">Neural Learning.</span></h1>
+                <p>Welcome to <strong>NueraLab</strong>. We provide absolute mastery over every syntax ever written. From Web foundations to Mobile native and Deep-System Logic—learn it all through an AI that thinks like an Architect.</p>
+                <div class="btn-group">
+                    <a href="start-your-journey.html" class="cta-btn primary">
+                        Start Your Journey
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </a>
+                    <button class="cta-btn secondary" onclick="document.getElementById('explore').scrollIntoView()">
+                        Explore Our Ecosystem
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+                    </button>
+                </div>
+            </div>
 
-  <!-- LANGUAGES -->
-  <section class="languages">
-    <h2>💻 Explore Languages</h2>
-    <div class="grid">
-      <div class="card">C</div>
-      <div class="card">C++</div>
-      <div class="card">Python</div>
-      <div class="card">Java</div>
-      <div class="card">JavaScript</div>
-      <div class="card">Rust</div>
-      <div class="card">Go</div>
-    </div>
-  </section>
+            <div class="hero-visual">
+                <div class="floating-code" style="right: 10%; animation-duration: 15s;">const learn = () => "Mastery";</div>
+                <div class="floating-code" style="right: 40%; animation-duration: 25s; opacity: 0.1;">func main() { fmt.Println("Go") }</div>
+                <div class="floating-code" style="right: 20%; animation-duration: 18s; animation-delay: -5s;">&lt;section class="web"&gt;</div>
+                <div class="floating-code" style="right: 60%; animation-duration: 30s; opacity: 0.05;">while(true) { malloc(1); }</div>
+                
+                <div class="floating-orb" style="width: 400px; height: 400px; background: #3b82f6; top: 0; right: -100px;"></div>
+                <div class="floating-orb" style="width: 300px; height: 300px; background: #8b5cf6; bottom: 0; right: 100px; animation-delay: -3s;"></div>
+            </div>
+        </section>
 
-  <!-- Correct JS Link -->
-  <script src="./script.js"></script>
+        <section id="explore" class="explore-section">
+            <div class="section-header reveal">
+                <h2>Our Infinite Ecosystem</h2>
+                <p>Select a domain and click an icon to explore specific modules in the NueraLab.</p>
+            </div>
 
+            <div class="toggle-container reveal">
+                <div class="toggle-bar">
+                    <button class="toggle-opt active" data-target="frontend">Front-End</button>
+                    <button class="toggle-opt" data-target="backend">Back-End</button>
+                    <button class="toggle-opt" data-target="mobile">Mobile Native</button>
+                    <button class="toggle-opt" data-target="systems">Systems & Logic</button>
+                    <button class="toggle-opt" data-target="data">Data Science</button>
+                </div>
+            </div>
+
+            <div id="content-grid" class="content-display">
+                <!-- Content Injected via JS -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p class="footer-text">
+            Powered and made by <span class="footer-brand">Anay</span> and <span class="footer-brand">shadoworg</span> (founded by Anay)<br>
+            &copy; 2024 NueraLab Platform. All Rights Reserved.
+        </p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const sunPath = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+        const moonPath = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeIcon.innerHTML = theme === 'dark' ? sunPath : moonPath;
+            localStorage.setItem('theme', theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        applyTheme(localStorage.getItem('theme') || 'dark');
+
+        const exploreData = {
+            frontend: [
+                { title: "The Web Core", desc: "Foundational mastery of semantic structure, layout precision, and logical interactivity.", icon: "🌐", file: "webcore.html", langs: ["HTML5", "CSS3", "JS (ESNext)"] },
+                { title: "UI Frameworks", desc: "Build components for the modern world using reactive and declarative patterns.", icon: "🎨", file: "frameworks.html", langs: ["React", "Vue", "Angular", "Svelte"] },
+                { title: "Styled Systems", desc: "Modern styling at scale. Utility-first, CSS-in-JS, and Pre-processors.", icon: "✨", file: "styling.html", langs: ["Tailwind", "Sass", "Styled Components"] }
+            ],
+            backend: [
+                { title: "Server Runtime", desc: "High performance server-side logic and environment management.", icon: "🖥️", file: "runtime.html", langs: ["Node.js", "Bun", "Deno", "Go"] },
+                { title: "Enterprise Logic", desc: "Robust, typed architectures for large-scale distributed systems.", icon: "🏢", file: "enterprise.html", langs: ["Java", "C#", "Spring", ".NET"] },
+                { title: "API Design", desc: "Master communication protocols, GraphQL, and RESTful paradigms.", icon: "🔗", file: "apis.html", langs: ["GraphQL", "REST", "gRPC", "WebSockets"] }
+            ],
+            mobile: [
+                { title: "Android Native", desc: "Modern Android development with expressive, safe, and functional patterns.", icon: "🤖", file: "android.html", langs: ["Kotlin", "Jetpack Compose"] },
+                { title: "iOS Native", desc: "Elegant system-integrated app building with performance at the core.", icon: "🍎", file: "ios.html", langs: ["Swift", "SwiftUI", "Objective-C"] },
+                { title: "Cross-Platform", desc: "Write once, deploy everywhere. Unified codebases for mobile and web.", icon: "📱", file: "crossplatform.html", langs: ["Flutter", "React Native", "Dart"] }
+            ],
+            systems: [
+                { title: "Low-Level Safety", desc: "Hardware control with zero-cost abstractions and memory safety.", icon: "🦀", file: "rust-core.html", langs: ["Rust", "Zig", "Carbon"] },
+                { title: "The Classics", desc: "Foundational languages of all modern computing and operating systems.", icon: "💻", file: "cpp-foundation.html", langs: ["C", "C++", "Assembly"] },
+                { title: "Hardware Logic", desc: "Interfacing directly with chips, micro-controllers, and IoT.", icon: "🔌", file: "embedded.html", langs: ["Embedded C", "Arduino", "HDL"] }
+            ],
+            data: [
+                { title: "Scripting & Data", desc: "The gold-standard for automation, analysis, and scientific computing.", icon: "🐍", file: "python-data.html", langs: ["Python", "R", "Julia"] },
+                { title: "Database Architecture", desc: "Efficient data storage, retrieval, and relational modeling.", icon: "📊", file: "databases.html", langs: ["PostgreSQL", "MongoDB", "SQL", "Redis"] },
+                { title: "AI Engineering", desc: "Building neural networks, LLMs, and intelligent automation systems.", icon: "🧠", file: "ai-lab.html", langs: ["TensorFlow", "PyTorch", "OpenAI API"] }
+            ]
+        };
+
+        function updateExploreContent(category) {
+            const grid = document.getElementById('content-grid');
+            grid.innerHTML = '';
+            
+            exploreData[category].forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'feature-card';
+                card.innerHTML = `
+                    <a href="${item.file}" class="icon-link" title="Open ${item.title} module">
+                        <div class="icon-circle">${item.icon}</div>
+                    </a>
+                    <div class="card-top">
+                        <h3>${item.title}</h3>
+                        <p>${item.desc}</p>
+                        <div class="lang-pills">
+                            ${item.langs.map(l => `<span class="pill">${l}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+                
+                setTimeout(() => card.classList.add('show'), index * 100);
+            });
+        }
+
+        document.querySelectorAll('.toggle-opt').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateExploreContent(btn.dataset.target);
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        updateExploreContent('frontend');
+    </script>
 </body>
 </html>
