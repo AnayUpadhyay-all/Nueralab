@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NueraLab | Web Architect</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0f0f14;
+            --primary: #818cf8;
+            --accent: #c084fc;
+            --border-light: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --success: #34d399;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- NAVBAR --- */
+        .editor-nav {
+            height: 60px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 20px; }
+        
+        .brand {
+            font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em;
+            color: white; text-decoration: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .brand-icon {
+            width: 20px; height: 20px; border-radius: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+        }
+
+        .file-tab {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem; color: var(--primary);
+            background: rgba(129, 140, 248, 0.1);
+            padding: 6px 12px; border-radius: 6px;
+            border: 1px solid rgba(129, 140, 248, 0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+
+        .live-status {
+            font-size: 0.8rem; font-weight: 600;
+            color: var(--success);
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(52, 211, 153, 0.1);
+            padding: 6px 12px; border-radius: 20px;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .live-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; }
+        }
+
+        /* --- SPLIT WORKSPACE --- */
+        .workspace {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .editor-container {
+            width: 50%;
+            height: 100%;
+            border-right: 1px solid var(--border-light);
+            position: relative;
+        }
+
+        .monaco-editor { padding-top: 15px; }
+
+        .preview-container {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .preview-header {
+            padding: 10px 20px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-light);
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .browser-dots {
+            display: flex; gap: 6px;
+        }
+        .browser-dots div { width: 10px; height: 10px; border-radius: 50%; }
+        .browser-dots div:nth-child(1) { background: #ef4444; }
+        .browser-dots div:nth-child(2) { background: #f59e0b; }
+        .browser-dots div:nth-child(3) { background: #10b981; }
+
+        .browser-url {
+            flex: 1; margin-left: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 6px; padding: 4px 12px;
+            font-size: 0.75rem; color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="editor-nav">
+        <div class="nav-left">
+            <a href="neural-platform.html" class="brand">
+                <div class="brand-icon"></div> NueraLab
+            </a>
+            <div class="file-tab">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                index.html
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <div class="live-status">
+                <div class="live-dot"></div>
+                Live Server Active
+            </div>
+        </div>
+    </nav>
+
+    <div class="workspace">
+        <div class="editor-container" id="monaco-container"></div>
+        
+        <div class="preview-container">
+            <div class="preview-header">
+                <div class="browser-dots"><div></div><div></div><div></div></div>
+                <div class="browser-url">localhost:3000/preview</div>
+            </div>
+            <!-- CRITICAL FIX: Added allow-same-origin so Fetch APIs work! -->
+            <iframe id="live-preview" sandbox="allow-scripts allow-modals allow-popups allow-same-origin"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 1. FIREBASE AUTH GUARD
+        const firebaseConfig = {
+            apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
+            authDomain: "nueralab.firebaseapp.com",
+            projectId: "nueralab",
+            storageBucket: "nueralab.firebasestorage.app",
+            messagingSenderId: "365514463677",
+            appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user || !localStorage.getItem('onboarding_done')) {
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+                    window.location.replace("login.html");
+                }
+            }
+        });
+
+        // 2. DEFAULT CODE: Demonstrates a live API Fetch working inside the editor!
+        const starterCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; background: #0f172a;
+            font-family: sans-serif; color: white; flex-direction: column;
+        }
+        .container {
+            background: rgba(255,255,255,0.05); padding: 30px;
+            border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+            text-align: center; max-width: 80%;
+        }
+        button {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            border: none; padding: 12px 24px; border-radius: 8px;
+            color: white; font-weight: bold; cursor: pointer; margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(217, 70, 239, 0.4); }
+        #api-result { font-size: 1.1rem; line-height: 1.5; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>API Network Test</h2>
+        <button onclick="fetchData()">Fetch Live Data</button>
+        <div id="api-result">Awaiting network request...</div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const display = document.getElementById('api-result');
+            display.style.color = '#34d399';
+            display.innerText = "Connecting to API...";
+            
+            try {
+                // Hitting a real, external public API
+                const response = await fetch('https://uselessfacts.jsph.pl/api/v2/facts/random');
+                const data = await response.json();
+                
+                display.style.color = '#f8fafc';
+                display.innerText = '"' + data.text + '"';
+            } catch (err) {
+                display.style.color = '#ef4444';
+                display.innerText = "Connection Failed: " + err.message;
+            }
+        }
+    <\/script>
+</body>
+</html>`;
+
+        // 3. INITIALIZE MONACO EDITOR & LIVE SERVER
+        let monacoEditor;
+        let debounceTimer;
+
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
+        
+        require(['vs/editor/editor.main'], function () {
+            monacoEditor = monaco.editor.create(document.getElementById('monaco-container'), {
+                value: starterCode,
+                language: 'html',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                fontFamily: '"Fira Code", monospace',
+                wordWrap: 'on'
+            });
+
+            function renderLivePreview() {
+                const userCode = monacoEditor.getValue();
+                const iframe = document.getElementById('live-preview');
+                iframe.srcdoc = userCode;
+            }
+
+            renderLivePreview();
+
+            monacoEditor.onDidChangeModelContent(() => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    renderLivePreview();
+                }, 500); 
+            });
+        });
+    </script>
+</body>
+</html>

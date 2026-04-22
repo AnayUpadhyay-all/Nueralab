@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueralab | Identity Initialization</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #6d28d9;
+            --accent: #d946ef;
+            --bg: #030014;
+            --glass: rgba(30, 20, 50, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glow: rgba(139, 92, 246, 0.3);
+            --text-muted: #8b8a9d;
+            --error-red: #ef4444;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient Glows */
+        .ambient-glow {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(3, 0, 20, 0) 70%);
+            top: -100px;
+            left: -200px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 5%;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-logo-circle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 4px solid var(--accent);
+            background: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: white; }
+        
+        .contact-sales {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .contact-sales:hover { color: white; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex: 1;
+            padding: 0 8%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- LEFT HERO SECTION --- */
+        .hero-content {
+            flex: 1;
+            max-width: 550px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(217, 70, 239, 0.1);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+        }
+
+        .hero-title .highlight {
+            color: #b78aff;
+            display: block;
+        }
+
+        .hero-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            max-width: 480px;
+        }
+
+        /* --- THE LIQUID GLASS ARCHITECTURE --- */
+        .scene {
+            perspective: 2000px;
+            width: 460px;
+            margin-right: 2%;
+        }
+
+        .terminal-card {
+            background: linear-gradient(145deg, rgba(50, 30, 80, 0.4), rgba(20, 10, 30, 0.6));
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 36px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 40px 100px -20px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(139, 92, 246, 0.05);
+            transform-style: preserve-3d;
+            transition: transform 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-shine {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--mx) var(--my), rgba(255,255,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .liquid-border {
+            position: absolute;
+            inset: 0;
+            border-radius: 36px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 40%, rgba(139, 92, 246, 0.2));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        /* --- CARD UI COMPONENTS --- */
+        .card-header { text-align: center; margin-bottom: 30px; }
+        .card-header h2 { font-weight: 700; font-size: 1.8rem; margin-bottom: 5px; }
+        .card-header p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* New Error Box UI */
+        .error-box {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .google-btn {
+            background: white;
+            color: #111;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.95rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .google-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,255,255,0.1);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .divider span {
+            padding: 0 15px;
+            color: #5a5870;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #5a5870;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .input-neural {
+            width: 100%;
+            background: rgba(20, 15, 35, 0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 0.95rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-neural::placeholder { color: #4a4860; }
+        .input-neural:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+        }
+
+        .bottom-action-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-dark);
+            color: white;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .bottom-action-btn:hover { background: var(--primary); }
+
+        /* Vectorization Screen specific styles */
+        .level-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .level-node {
+            background: rgba(20, 15, 35, 0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 12px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .level-node.active {
+            background: var(--primary-dark);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        #auth-screen, #vector-screen { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+            .hero-title { font-size: 3rem; }
+            .hero-desc { margin: 0 auto; }
+            .scene { margin-right: 0; width: 100%; max-width: 460px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <!-- Navigation matched to image -->
+    <nav>
+        <div class="nav-logo">
+            <div class="nav-logo-circle"></div>
+            Nueralab
+        </div>
+        <div class="nav-links">
+            <a href="#">Neural Platform</a>
+            <a href="#">Architecture</a>
+            <a href="#">Intelligence API</a>
+            <a href="#">Lab Research</a>
+        </div>
+        <a href="#" class="contact-sales">Contact Sales</a>
+    </nav>
+
+    <div class="main-container">
+        
+        <!-- Left Hero Section matched to image -->
+        <div class="hero-content">
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                SYSTEM ONLINE: V2.4.0
+            </div>
+            <h1 class="hero-title">
+                Evolve Your<br>
+                <span class="highlight">Intelligence.</span>
+            </h1>
+            <p class="hero-desc">
+                Nueralab is the world's most advanced decentralized neural laboratory. We provide high-throughput computing power for large-scale AI research and cognitive modeling.
+            </p>
+        </div>
+
+        <!-- 3D Liquid Glass Interactive Card -->
+        <div class="scene" id="scene">
+            <div class="terminal-card" id="card">
+                <div class="liquid-border"></div>
+                <div class="card-shine" id="shine"></div>
+
+                <!-- Step 1: Auth Interface matched exactly to image -->
+                <div id="auth-screen">
+                    <div class="card-header">
+                        <h2>Initialize Session</h2>
+                        <p>Access the Nueralab Terminal</p>
+                    </div>
+                    
+                    <!-- NEW UI: Error Box -->
+                    <div id="error-box" class="error-box"></div>
+
+                    <button class="google-btn" onclick="initializeNeuralAuth()">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Authorize with Google Identity
+                    </button>
+
+                    <div class="divider"><span>PROTOCOL ALPHA</span></div>
+
+                    <div class="input-group">
+                        <label>RESEARCHER ID</label>
+                        <input type="email" class="input-neural" placeholder="email@nueralab.io" readonly>
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 30px;">
+                        <label>ACCESS KEY</label>
+                        <input type="password" class="input-neural" placeholder="••••••••••••" readonly>
+                    </div>
+
+                    <button class="bottom-action-btn" onclick="initializeNeuralAuth()">
+                        ESTABLISH CONNECTION
+                    </button>
+                </div>
+
+                <!-- Step 2: Vectorization / Data Collection -->
+                <div id="vector-screen" style="display: none;">
+                    <div class="card-header">
+                        <h2>Identity Vectorization</h2>
+                        <p>Configure Neural Parameters</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>RESEARCHER IDENTITY</label>
+                        <input type="text" id="node-name" class="input-neural" placeholder="Full Name">
+                    </div>
+
+                    <div class="input-group">
+                        <label>CHRONOLOGICAL AGE</label>
+                        <input type="number" id="node-age" class="input-neural" placeholder="Age (e.g. 24)">
+                    </div>
+
+                    <div class="input-group" style="margin-bottom: 30px;">
+                        <label>EXPERIENCE TIER</label>
+                        <div class="level-container">
+                            <div class="level-node" onclick="setNeuralLevel('beginner', this)">Beginner</div>
+                            <div class="level-node" onclick="setNeuralLevel('intermediate', this)">Intermediate</div>
+                            <div class="level-node" onclick="setNeuralLevel('advanced', this)">Advanced</div>
+                        </div>
+                    </div>
+
+                    <button class="bottom-action-btn" id="sync-btn" onclick="finalizeVectorSync()">
+                        FINALIZE & SYNC DATA
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- NEURALAB FIREBASE CORE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
+            authDomain: "nueralab.firebaseapp.com",
+            projectId: "nueralab",
+            storageBucket: "nueralab.firebasestorage.app",
+            messagingSenderId: "365514463677",
+            appId: "1:365514463677:web:46d424463e6f3dd4105ad4",
+            measurementId: "G-Y1LX34NT2G"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const RENDER_API = "https://nueralabback.onrender.com/api/v1/sync";
+
+        // UI Utility for Errors
+        function showAuthError(message) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.innerText = message;
+            errorBox.style.display = 'block';
+            
+            // Hide error after 6 seconds
+            setTimeout(() => {
+                errorBox.style.display = 'none';
+            }, 6000);
+        }
+
+        // --- NEW: AUTO-SKIP IF ALREADY LOGGED IN ---
+        auth.onAuthStateChanged((user) => {
+            if (user && localStorage.getItem('onboarding_done') === 'true') {
+                console.log("Session found. Redirecting to core ecosystem...");
+                // Ensure index.html exists in your folder before relying on this redirect
+                // window.location.replace("index.html"); 
+            }
+        });
+
+        let selectedTier = "";
+
+        // --- LIQUID PHYSICS ENGINE ---
+        const card = document.getElementById('card');
+        const scene = document.getElementById('scene');
+        
+        scene.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Mouse tracking for internal shine/glow
+            card.style.setProperty('--mx', `${x}px`);
+            card.style.setProperty('--my', `${y}px`);
+
+            // 3D Tilt calculation based on center point
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (centerY - y) / 25; // Adjusted sensitivity
+            const rotateY = (x - centerX) / 25;
+
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        scene.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+
+        // --- AUTH & DATA FLOW ---
+        async function initializeNeuralAuth() {
+            // Hide any previous errors
+            document.getElementById('error-box').style.display = 'none';
+            
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+
+                // 1. Silent Background Sync for Auth Event
+                await pushToNeuralCore('profiles', {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    event: 'auth_success'
+                });
+
+                // 2. Transition UI to Vectorization Setup
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('vector-screen').style.display = 'block';
+                document.getElementById('node-name').value = user.displayName;
+
+            } catch (err) {
+                console.error("Auth Protocol Interrupted", err);
+                
+                // Display specific error to user depending on code
+                if (err.code === 'auth/unauthorized-domain') {
+                    showAuthError("Security Block: This domain/IP is not authorized in Firebase Console -> Authentication -> Settings -> Authorized Domains.");
+                } else if (err.code === 'auth/popup-closed-by-user') {
+                    showAuthError("Popup was closed before completing login. Make sure you aren't opening this file via 'file://'. Use a Local Web Server.");
+                } else {
+                    showAuthError(`Connection Failed: ${err.message}`);
+                }
+            }
+        }
+
+        function setNeuralLevel(lvl, el) {
+            selectedTier = lvl;
+            document.querySelectorAll('.level-node').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function finalizeVectorSync() {
+            const user = auth.currentUser;
+            const name = document.getElementById('node-name').value;
+            const age = document.getElementById('node-age').value;
+            const btn = document.getElementById('sync-btn');
+
+            if (!user || !selectedTier || !age) {
+                btn.style.background = "#ef4444";
+                btn.innerText = "MISSING PARAMETERS";
+                setTimeout(() => { 
+                    btn.style.background = "var(--primary-dark)"; 
+                    btn.innerText = "FINALIZE & SYNC DATA";
+                }, 1500);
+                return;
+            }
+
+            btn.innerText = "INITIALIZING SYNC...";
+            btn.style.opacity = "0.7";
+
+            // --- DATA STRUCTURE FOR BACKEND ---
+            const identityVector = {
+                uid: user.uid,
+                name: name,
+                age: parseInt(age),
+                level: selectedTier,
+                isPremium: false,
+                courses: [],
+                syncDate: new Date().toISOString()
+            };
+
+            // 3. Persistent Database Storage to Render backend
+            const success = await pushToNeuralCore('user-profiles', identityVector);
+
+            if (success) {
+                localStorage.setItem('onboarding_done', 'true');
+                localStorage.setItem('user_level', selectedTier);
+                window.location.href = "index.html"; // Redirect to dashboard
+            } else {
+                btn.innerText = "SYNC FAILED - RETRY";
+                btn.style.background = "#ef4444";
+                btn.style.opacity = "1";
+            }
+        }
+
+        async function pushToNeuralCore(category, data) {
+            try {
+                const response = await fetch(`${RENDER_API}/${category}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return response.ok;
+            } catch (err) {
+                console.error("Core Link Failed", err);
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

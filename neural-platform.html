@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NueraLab | Professional Neural Pathway</title>
+    
+    <!-- Firebase SDKs (Auth Guard) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <!-- Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- HIGH-END DESIGN SYSTEM --- */
+        :root {
+            /* Palette: Deep Obsidian & Cyber Accents */
+            --bg-base: #030305;
+            --bg-surface: #0a0a0f;
+            --bg-panel: rgba(15, 15, 20, 0.6);
+            --border-dim: rgba(255, 255, 255, 0.06);
+            --border-bright: rgba(255, 255, 255, 0.15);
+            
+            --accent-primary: #6366f1;
+            --accent-primary-glow: rgba(99, 102, 241, 0.5);
+            --accent-secondary: #a855f7;
+            --accent-success: #10b981;
+            --accent-success-glow: rgba(16, 185, 129, 0.3);
+            --accent-locked: #3f3f46;
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-faint: #64748b;
+            
+            /* Professional Animation Curves */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-panel: rgba(255, 255, 255, 0.8);
+            --border-dim: rgba(0, 0, 0, 0.08);
+            --border-bright: rgba(0, 0, 0, 0.2);
+            
+            --accent-primary: #2563eb; /* True blue from screenshot */
+            --accent-primary-glow: rgba(37, 99, 235, 0.3);
+            --accent-secondary: #7c3aed;
+            --accent-success: #059669;
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-faint: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        h1, h2, h3, h4, .brand, .stat-val {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* --- UTILITIES & ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUpFade { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px var(--accent-primary-glow); }
+            50% { box-shadow: 0 0 30px var(--accent-primary-glow); }
+        }
+        @keyframes drawLine {
+            from { stroke-dashoffset: 1000; }
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes flowData {
+            to { stroke-dashoffset: -20; }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-dim);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+            text-decoration: none;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .brand svg {
+            color: var(--accent-primary);
+        }
+
+        .user-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: var(--border-bright);
+        }
+
+        .avatar {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            background: var(--border-dim);
+            overflow: hidden;
+            border: 1px solid var(--border-bright);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .user-details h4 { font-size: 0.9rem; margin-bottom: 4px; font-weight: 600; }
+        .user-tier {
+            font-size: 0.7rem;
+            color: var(--accent-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        
+        .nav-item {
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s var(--ease-out-expo);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item svg { stroke-width: 2px; width: 18px; height: 18px; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+        
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-dim);
+            color: var(--text-faint);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .logout-btn:hover { 
+            background: rgba(239, 68, 68, 0.05); 
+            color: #ef4444; 
+            border-color: rgba(239, 68, 68, 0.2); 
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-dim);
+            color: var(--text-muted);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+        .theme-toggle-btn:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.03);
+            border-color: var(--border-bright);
+        }
+        [data-theme="light"] .theme-toggle-btn:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        /* --- MAIN KNOWLEDGE GRAPH AREA --- */
+        .platform-core {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .core-header {
+            border-bottom: 1px solid var(--border-dim);
+            padding: 32px 48px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            z-index: 5;
+            animation: fadeIn 1s var(--ease-out-expo);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .header-title h1 { 
+            font-size: 1.75rem; 
+            font-weight: 700; 
+            letter-spacing: -0.02em;
+            margin-bottom: 8px; 
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .header-title h1 {
+            background: linear-gradient(to right, #0f172a, #475569);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-title p { color: var(--text-muted); font-size: 0.95rem; font-weight: 300;}
+
+        .progress-stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-val { 
+            font-size: 1.75rem; 
+            font-weight: 700; 
+            color: var(--text-main); 
+            display: flex; 
+            align-items: baseline;
+            letter-spacing: -0.02em;
+        }
+        .stat-val span { font-size: 0.9rem; margin-left: 2px; color: var(--text-muted); }
+        .stat-label { font-size: 0.7rem; color: var(--text-faint); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-top: 4px;}
+
+        /* Overall Progress Bar */
+        .progress-container { width: 100%; margin-top: 32px; }
+        .progress-bar-bg {
+            width: 100%; height: 4px;
+            background: var(--border-dim);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 1.5s var(--ease-out-expo);
+            border-radius: 4px;
+        }
+
+        /* --- THE SKILL TREE / GRAPH --- */
+        .neural-viewport {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+        }
+
+        /* Custom Scrollbar for Viewport */
+        .neural-viewport::-webkit-scrollbar { width: 8px; height: 8px; }
+        .neural-viewport::-webkit-scrollbar-track { background: var(--bg-base); }
+        .neural-viewport::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 4px; }
+        .neural-viewport::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+
+        .graph-canvas {
+            position: relative;
+            width: 1200px; /* Fixed canvas size to allow panning */
+            height: 800px;
+            margin: 0 auto; /* Center on large screens */
+            /* High-end dot grid */
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center center;
+        }
+
+        /* SVG Lines */
+        .connections {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .conn-path {
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        /* Background solid line */
+        .conn-bg { stroke: var(--border-dim); }
+        
+        /* Animated drawing line */
+        .conn-draw {
+            stroke: var(--accent-primary);
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s var(--ease-out-expo) forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* Flowing data particles */
+        .conn-flow {
+            stroke: #fff;
+            stroke-width: 3;
+            stroke-dasharray: 4 20;
+            opacity: 0.3;
+            animation: flowData 1s linear infinite;
+        }
+
+        /* Nodes */
+        .node {
+            position: absolute;
+            width: 260px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-dim);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 2;
+            cursor: pointer;
+            transition: all 0.3s var(--ease-out-expo);
+            /* Staggered entry animation */
+            opacity: 0;
+            animation: slideUpFade 0.8s var(--ease-out-expo) forwards;
+        }
+
+        /* Animation delays for nodes */
+        #node-web { animation-delay: 0.1s; }
+        #node-js { animation-delay: 0.3s; }
+        #node-react { animation-delay: 0.5s; }
+        #node-node { animation-delay: 0.4s; }
+        #node-db { animation-delay: 0.6s; }
+
+        .node:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-bright);
+            background: var(--bg-surface);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+        [data-theme="light"] .node:hover {
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.15);
+        }
+
+        .node-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .node-icon {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-dim);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        
+        .node-icon svg { width: 20px; height: 20px; }
+
+        .node-title { flex: 1; }
+        .node-title h3 { font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+        .node-status {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-faint);
+        }
+
+        .node p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* Node States */
+        .node.in-progress {
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .node.in-progress .node-icon { 
+            background: rgba(99, 102, 241, 0.1); 
+            border-color: rgba(99, 102, 241, 0.4);
+            color: var(--accent-primary); 
+            animation: pulseGlow 3s infinite;
+        }
+        .node.in-progress .node-status { color: var(--accent-primary); }
+
+        .node.active {
+            border-color: rgba(16, 185, 129, 0.3);
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.03) 0%, rgba(10, 10, 15, 0.85) 100%);
+        }
+        .node.active .node-icon { 
+            background: rgba(16, 185, 129, 0.1); 
+            border-color: rgba(16, 185, 129, 0.4);
+            color: var(--accent-success); 
+        }
+        .node.active .node-status { color: var(--accent-success); }
+
+        .node.locked { opacity: 0.5; cursor: not-allowed; }
+        .node.locked:hover { transform: none; border-color: var(--border-dim); background: rgba(10, 10, 15, 0.85); box-shadow: none; }
+        .node.locked .node-icon { background: transparent; }
+
+        /* Individual Progress */
+        .node-progress-wrapper {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .node-progress-bg {
+            flex: 1; height: 3px;
+            background: var(--border-dim);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .node-progress-fill {
+            height: 100%; width: 0%;
+            background: var(--text-muted);
+            transition: width 1s var(--ease-out-expo) 0.5s; /* Delayed fill */
+        }
+        .node.in-progress .node-progress-fill { background: var(--accent-primary); }
+        .node.active .node-progress-fill { background: var(--accent-success); }
+        
+        .node-progress-text {
+            font-size: 0.75rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            color: var(--text-muted);
+            width: 32px;
+            text-align: right;
+        }
+
+        /* Node Positioning (Adjusted for 1200x800 canvas) */
+        #node-web { top: 350px; left: 100px; }
+        #node-js { top: 150px; left: 450px; }
+        #node-react { top: 150px; left: 800px; }
+        #node-node { top: 550px; left: 450px; }
+        #node-db { top: 550px; left: 800px; }
+
+        /* Skeleton Loading State for DB sync */
+        .skeleton {
+            background: linear-gradient(90deg, var(--border-dim) 25%, var(--border-bright) 50%, var(--border-dim) 75%);
+            background-size: 200% 100%;
+            animation: loadingSkeleton 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+        }
+        @keyframes loadingSkeleton {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <a href="#" class="brand">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 21V3L19 21V3"/>
+            </svg>
+            NueraLab
+        </a>
+
+        <div class="user-card">
+            <div class="avatar" id="ws-avatar"></div>
+            <div class="user-details">
+                <h4 id="ws-name" class="skeleton">Loading User...</h4>
+                <div class="user-tier" id="ws-tier">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span class="skeleton">Syncing</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+                Pathway Graph
+            </a>
+            <a href="#" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Code Editor
+            </a>
+            <a href="#" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Intelligence AI
+            </a>
+            <a href="#" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                Lab Research
+            </a>
+        </nav>
+
+        <div class="sidebar-footer" style="margin-top: auto; display: flex; flex-direction: column; gap: 8px;">
+            <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+                <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                Toggle Theme
+            </button>
+            <button class="logout-btn" onclick="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Terminate Session
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Platform Core -->
+    <main class="platform-core">
+        <header class="core-header">
+            <div class="header-top">
+                <div class="header-title">
+                    <h1>Neural Architecture</h1>
+                    <p>Track your technical evolution and deploy new capabilities.</p>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="stat">
+                        <div class="stat-val"><span id="stat-nodes" class="skeleton">0</span></div>
+                        <div class="stat-label">Nodes Active</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-val"><span id="stat-xp" class="skeleton">0</span></div>
+                        <div class="stat-label">Neural XP</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-val"><span id="stat-sync" class="skeleton">0</span><span>%</span></div>
+                        <div class="stat-label">Global Sync</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="sync-progress-bar"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Pannable Viewport -->
+        <div class="neural-viewport">
+            <div class="graph-canvas">
+                
+                <!-- SVG Neural Connections -->
+                <svg class="connections">
+                    <!-- Web to JS (360, 410 -> 450, 210) -->
+                    <path class="conn-bg" d="M 360 410 C 400 410, 410 210, 450 210" />
+                    <path class="conn-draw" id="path-1" d="M 360 410 C 400 410, 410 210, 450 210" />
+                    <path class="conn-flow hidden-flow" id="flow-1" d="M 360 410 C 400 410, 410 210, 450 210" />
+
+                    <!-- Web to Node (360, 410 -> 450, 610) -->
+                    <path class="conn-bg" d="M 360 410 C 400 410, 410 610, 450 610" />
+                    <path class="conn-draw" id="path-2" d="M 360 410 C 400 410, 410 610, 450 610" />
+                    <path class="conn-flow hidden-flow" id="flow-2" d="M 360 410 C 400 410, 410 610, 450 610" />
+
+                    <!-- JS to React (710, 210 -> 800, 210) -->
+                    <path class="conn-bg" d="M 710 210 L 800 210" />
+                    <path class="conn-draw" id="path-3" d="M 710 210 L 800 210" />
+                    <path class="conn-flow hidden-flow" id="flow-3" d="M 710 210 L 800 210" />
+
+                    <!-- Node to DB (710, 610 -> 800, 610) -->
+                    <path class="conn-bg" d="M 710 610 L 800 610" />
+                    <path class="conn-draw" id="path-4" d="M 710 610 L 800 610" />
+                    <path class="conn-flow hidden-flow" id="flow-4" d="M 710 610 L 800 610" />
+                </svg>
+
+                <!-- Nodes -->
+                <div class="node locked" id="node-web">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        </div>
+                        <div class="node-title">
+                            <h3>Web Core</h3>
+                            <div class="node-status" id="stat-txt-web">Syncing...</div>
+                        </div>
+                    </div>
+                    <p>Foundation of DOM manipulation, semantic structures, and styling algorithms.</p>
+                    <div class="node-progress-wrapper">
+                        <div class="node-progress-bg"><div class="node-progress-fill" id="prog-web"></div></div>
+                        <div class="node-progress-text" id="prog-txt-web">0%</div>
+                    </div>
+                </div>
+
+                <div class="node locked" id="node-js">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        </div>
+                        <div class="node-title">
+                            <h3>Logic & Scripts</h3>
+                            <div class="node-status" id="stat-txt-js">Syncing...</div>
+                        </div>
+                    </div>
+                    <p>Asynchronous paradigms, functional state, and declarative UI interactions.</p>
+                    <div class="node-progress-wrapper">
+                        <div class="node-progress-bg"><div class="node-progress-fill" id="prog-js"></div></div>
+                        <div class="node-progress-text" id="prog-txt-js">0%</div>
+                    </div>
+                </div>
+
+                <div class="node locked" id="node-react">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/><polyline points="2 15.5 12 8.5 22 15.5"/><line x1="12" y1="2" x2="12" y2="8.5"/></svg>
+                        </div>
+                        <div class="node-title">
+                            <h3>Component Systems</h3>
+                            <div class="node-status" id="stat-txt-react">Syncing...</div>
+                        </div>
+                    </div>
+                    <p>Scalable UI architectures, virtual DOM reconciliation, and context providers.</p>
+                    <div class="node-progress-wrapper">
+                        <div class="node-progress-bg"><div class="node-progress-fill" id="prog-react"></div></div>
+                        <div class="node-progress-text" id="prog-txt-react">0%</div>
+                    </div>
+                </div>
+
+                <div class="node locked" id="node-node">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        </div>
+                        <div class="node-title">
+                            <h3>Server Runtimes</h3>
+                            <div class="node-status" id="stat-txt-node">Syncing...</div>
+                        </div>
+                    </div>
+                    <p>Event-driven backend architecture, API routing, and high-performance threading.</p>
+                    <div class="node-progress-wrapper">
+                        <div class="node-progress-bg"><div class="node-progress-fill" id="prog-node"></div></div>
+                        <div class="node-progress-text" id="prog-txt-node">0%</div>
+                    </div>
+                </div>
+
+                <div class="node locked" id="node-db">
+                    <div class="node-header">
+                        <div class="node-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                        </div>
+                        <div class="node-title">
+                            <h3>Data Persistence</h3>
+                            <div class="node-status" id="stat-txt-db">Syncing...</div>
+                        </div>
+                    </div>
+                    <p>Schema design, NoSQL document structures, and relational indexing optimization.</p>
+                    <div class="node-progress-wrapper">
+                        <div class="node-progress-bg"><div class="node-progress-fill" id="prog-db"></div></div>
+                        <div class="node-progress-text" id="prog-txt-db">0%</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. FIREBASE AUTH & DB SYNC ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
+            authDomain: "nueralab.firebaseapp.com",
+            projectId: "nueralab",
+            storageBucket: "nueralab.firebasestorage.app",
+            messagingSenderId: "365514463677",
+            appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const RENDER_API = "https://nueralabback.onrender.com/api/v1/sync";
+
+        auth.onAuthStateChanged((user) => {
+            const onboardingDone = localStorage.getItem('onboarding_done');
+            
+            if (!user || !onboardingDone) {
+                // Remove bypass for standard protocols in production
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+                    // window.location.replace("login.html");
+                    console.log("Dev environment bypass active. Simulate DB load.");
+                    simulateUserData(); // For demo/preview purposes
+                } else {
+                    simulateUserData(); // Ensure canvas preview works beautifully
+                }
+            } else {
+                populateUserUI(user);
+                fetchMongoDBUserData(user.uid);
+            }
+        });
+
+        function populateUserUI(user) {
+            const nameEl = document.getElementById('ws-name');
+            const tierEl = document.querySelector('#ws-tier span');
+            
+            nameEl.classList.remove('skeleton');
+            
+            // Extract real name using Firebase SDK properties
+            let realName = user.displayName;
+            if (!realName && user.email) {
+                // Intelligent fallback if profile name isn't fully set up yet
+                const emailPrefix = user.email.split('@')[0];
+                realName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+            }
+            nameEl.innerText = realName || 'Nuera Architect';
+            
+            if(user.photoURL) {
+                document.getElementById('ws-avatar').innerHTML = `<img src="${user.photoURL}" alt="User">`;
+            }
+            
+            const tier = localStorage.getItem('user_level') || 'Pro';
+            tierEl.classList.remove('skeleton');
+            tierEl.innerText = tier + " Tier";
+        }
+
+        async function fetchMongoDBUserData(uid) {
+            try {
+                const response = await fetch(`${RENDER_API}/user-profiles/${uid}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    processUserMetrics(data);
+                } else {
+                    console.warn("Failed to fetch DB. Applying default state.");
+                    simulateUserData();
+                }
+            } catch (error) {
+                console.error("MongoDB Sync Error:", error);
+                simulateUserData();
+            }
+        }
+
+        // Dummy data generator for demonstration in the preview
+        function simulateUserData() {
+            populateUserUI({ displayName: 'Alexander Pierce', photoURL: 'https://i.pravatar.cc/150?img=11' });
+            setTimeout(() => {
+                processUserMetrics({
+                    overallProgress: 42.5,
+                    nodesUnlocked: 3,
+                    xp: 14500,
+                    moduleProgress: { web: 100, js: 75, react: 10, node: 0, db: 0 }
+                });
+            }, 800);
+        }
+
+        // --- 2. PREMIUM UI UPDATES ---
+        function processUserMetrics(dbData) {
+            
+            // Remove top-level skeletons
+            ['stat-nodes', 'stat-xp', 'stat-sync'].forEach(id => {
+                document.getElementById(id).classList.remove('skeleton');
+            });
+
+            const overallSync = dbData.overallProgress || 0;
+            const rawXP = dbData.xp || 0;
+            const nodesUnlocked = dbData.nodesUnlocked || 1;
+
+            // Trigger Smooth Number Animations
+            animateValue("stat-nodes", 0, nodesUnlocked, 1200);
+            animateValue("stat-xp", 0, rawXP, 1800);
+            animateValue("stat-sync", 0, parseFloat(overallSync), 1500, true);
+
+            // Progress Bar Fill
+            setTimeout(() => {
+                document.getElementById('sync-progress-bar').style.width = `${overallSync}%`;
+            }, 500);
+
+            // Node Routing Data
+            const dbModules = dbData.moduleProgress || { web: 0, js: 0, react: 0, node: 0, db: 0 };
+            
+            const allNodes = [
+                { id: 'node-web', progId: 'prog-web', txtId: 'prog-txt-web', statId: 'stat-txt-web', dbKey: 'web' },
+                { id: 'node-js', progId: 'prog-js', txtId: 'prog-txt-js', statId: 'stat-txt-js', dbKey: 'js', flowIndex: 1 },
+                { id: 'node-react', progId: 'prog-react', txtId: 'prog-txt-react', statId: 'stat-txt-react', dbKey: 'react', flowIndex: 3 },
+                { id: 'node-node', progId: 'prog-node', txtId: 'prog-txt-node', statId: 'stat-txt-node', dbKey: 'node', flowIndex: 2 },
+                { id: 'node-db', progId: 'prog-db', txtId: 'prog-txt-db', statId: 'stat-txt-db', dbKey: 'db', flowIndex: 4 }
+            ];
+
+            allNodes.forEach((nodeData, index) => {
+                const nodeEl = document.getElementById(nodeData.id);
+                const progFill = document.getElementById(nodeData.progId);
+                const progTxt = document.getElementById(nodeData.txtId);
+                const statusTxt = document.getElementById(nodeData.statId);
+                
+                const trueProgress = dbModules[nodeData.dbKey] || 0;
+
+                // Reset
+                nodeEl.classList.remove('active', 'locked', 'in-progress');
+
+                // State logic
+                if (trueProgress >= 100) {
+                    nodeEl.classList.add('active');
+                    statusTxt.innerText = "Mastered";
+                    // Enable flow animation from this node if applicable
+                    if(nodeData.flowIndex) {
+                        const flowEl = document.getElementById(`flow-${nodeData.flowIndex}`);
+                        if(flowEl) flowEl.classList.remove('hidden-flow');
+                    }
+                } else if (trueProgress > 0) {
+                    nodeEl.classList.add('in-progress');
+                    statusTxt.innerText = "In Progress";
+                } else {
+                    nodeEl.classList.add('locked');
+                    statusTxt.innerText = "Locked";
+                }
+
+                // Smooth Bar & Text Fill
+                setTimeout(() => {
+                    progFill.style.width = `${trueProgress}%`;
+                    animateValue(nodeData.txtId, 0, trueProgress, 1000, false, "%");
+                }, 800 + (index * 150)); // Stagger bar fills
+            });
+            
+            // Handle Line Flows based on prerequisites (Web -> JS/Node)
+            if(dbModules['web'] >= 100) {
+                document.getElementById('flow-1').style.display = 'block';
+                document.getElementById('flow-2').style.display = 'block';
+            }
+        }
+
+        // --- 3. PROFESSIONAL ANIMATION ENGINE ---
+        // Uses ease-out logic instead of linear for premium feel
+        function animateValue(objId, start, end, duration, isDecimal = false, suffix = "") {
+            let startTimestamp = null;
+            const obj = document.getElementById(objId);
+            
+            // Easing function: easeOutExpo
+            const easeOut = (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easedProgress = easeOut(progress);
+                
+                let currentVal = easedProgress * (end - start) + start;
+                
+                if (isDecimal) {
+                    obj.innerHTML = currentVal.toFixed(1) + suffix;
+                } else {
+                    obj.innerHTML = Math.floor(currentVal) + suffix;
+                }
+
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = (isDecimal ? end.toFixed(1) : end) + suffix;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // --- 4. THEME TOGGLE LOGIC ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const moon = document.getElementById('moon-icon');
+            const sun = document.getElementById('sun-icon');
+            if (theme === 'dark') {
+                moon.style.display = 'none';
+                sun.style.display = 'block'; // Show sun to switch to light
+            } else {
+                sun.style.display = 'none';
+                moon.style.display = 'block'; // Show moon to switch to dark
+            }
+        }
+
+        // Initialize theme on load
+        initTheme();
+
+        function logout() {
+            auth.signOut().then(() => {
+                localStorage.removeItem('onboarding_done');
+                window.location.replace("login.html");
+            });
+        }
+    </script>
+</body>
+</html>
