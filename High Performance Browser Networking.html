@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuera Lab | High Performance Browser Networking</title>
+    
+    <style>
+        /* --- ENTERPRISE DESIGN TOKENS --- */
+        :root {
+            color-scheme: light;
+            --bg-color: #ffffff;
+            --surface-color: #f8fafc;
+            --surface-border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-blue: #2563eb;
+            --accent-purple: #8b5cf6;
+            --accent-success: #10b981;
+            --nav-glass: rgba(255, 255, 255, 0.85);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(15,23,42,0.05)"/></svg>');
+        }
+
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --bg-color: #09090b;
+            --surface-color: #18181b;
+            --surface-border: #27272a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #60a5fa;
+            --accent-purple: #c084fc;
+            --accent-success: #34d399;
+            --nav-glass: rgba(9, 9, 11, 0.85);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)"/></svg>');
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--grid-pattern);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: fixed; top: 0; width: 100%; height: 70px; padding: 0 6%;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+            background: var(--nav-glass); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface-border);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-text { font-size: 1.35rem; letter-spacing: -0.04em; }
+        .logo-text .brand-nuera { font-weight: 500; color: var(--text-primary); }
+        .logo-text .brand-lab { font-weight: 800; color: var(--accent-blue); margin-left: 2px; }
+        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-item { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.875rem; }
+        .nav-item:hover { color: var(--text-primary); }
+        .nav-utils { display: flex; align-items: center; gap: 20px; }
+        .icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .icon-btn:hover { color: var(--text-primary); background: var(--surface-color); }
+
+        /* --- MODULE HERO --- */
+        .module-hero { padding: 140px 5% 40px; max-width: 900px; margin: 0 auto; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 24px; }
+        .breadcrumb a { color: var(--accent-blue); text-decoration: none; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        
+        .module-hero h1 { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.1; margin-bottom: 1rem; letter-spacing: -0.04em; font-weight: 800; }
+        .gradient-text { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .module-hero p { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 30px;}
+
+        /* --- STAGE PIPELINE LAYOUT --- */
+        .pipeline-container {
+            max-width: 900px; margin: 0 auto; padding: 0 5% 100px;
+            display: flex; flex-direction: column; gap: 30px;
+            position: relative;
+        }
+
+        /* Connecting Line */
+        .pipeline-container::before {
+            content: ''; position: absolute; left: calc(5% + 32px); top: 20px; bottom: 80px;
+            width: 2px; background: var(--surface-border); z-index: 0;
+        }
+        @media (max-width: 768px) { .pipeline-container::before { display: none; } }
+
+        .stage-card {
+            background: var(--surface-color); border-radius: 16px; padding: 32px;
+            border: 1px solid var(--surface-border); transition: all 0.4s var(--transition-snappy);
+            display: flex; gap: 24px; text-decoration: none; color: var(--text-primary);
+            position: relative; overflow: hidden; z-index: 1;
+        }
+
+        .stage-card::before {
+            content: ""; position: absolute; inset: 0;
+            background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(37, 99, 235, 0.08), transparent 40%);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .stage-card:hover::before { opacity: 1; }
+        .stage-card:hover { transform: translateY(-4px); border-color: var(--accent-blue); box-shadow: var(--shadow-hover); }
+
+        .stage-indicator {
+            width: 64px; height: 64px; min-width: 64px; border-radius: 16px; 
+            background: var(--bg-color); border: 2px solid var(--surface-border); 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.5rem; font-weight: 800; color: var(--text-secondary);
+            transition: all 0.3s ease; position: relative; z-index: 2;
+        }
+        
+        .stage-card:hover .stage-indicator {
+            border-color: var(--accent-blue); color: var(--accent-blue);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .stage-content { flex-grow: 1; pointer-events: none; }
+        .stage-content h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; }
+        .stage-content p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;}
+        
+        .stage-meta {
+            display: flex; gap: 12px; align-items: center;
+        }
+        .badge {
+            font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+            background: var(--bg-color); border: 1px solid var(--surface-border); color: var(--text-secondary);
+        }
+
+        .action-arrow {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--bg-color); border: 1px solid var(--surface-border);
+            color: var(--text-secondary); transition: all 0.3s ease;
+        }
+        .stage-card:hover .action-arrow {
+            background: var(--accent-blue); border-color: var(--accent-blue); color: #fff;
+            transform: translateX(4px);
+        }
+
+        @media (max-width: 768px) {
+            .stage-card { flex-direction: column; padding: 24px; gap: 16px;}
+            .stage-indicator { width: 48px; height: 48px; min-width: 48px; font-size: 1.2rem; border-radius: 12px;}
+            .action-arrow { align-self: flex-start; }
+        }
+
+        /* --- UTILS --- */
+        .reveal { opacity: 0; transform: translateY(20px); transition: 0.8s all var(--transition-cinematic); }
+        .reveal.show { opacity: 1; transform: translateY(0); }
+
+        /* --- BATTERY SAVER MODE OVERRIDES --- */
+        body.battery-saver-mode * {
+            transition: none !important;
+            animation: none !important;
+        }
+        body.battery-saver-mode .reveal {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+        body.battery-saver-mode .stage-card::before {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-mark">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 26V7C8 5.89543 8.89543 5 10 5H13L24 20.5V26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M24 6V25C24 26.1046 23.1046 27 22 27H19L8 11.5V6" stroke="var(--accent-blue)" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="logo-text"><span class="brand-nuera">Nuera</span><span class="brand-lab">Lab</span></div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-item">Platform</a>
+            <a href="index.html" class="nav-item" style="color: var(--text-primary);">Curriculum</a>
+            <a href="#" class="nav-item">Editor</a>
+        </div>
+        <div class="nav-utils">
+            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <section class="module-hero reveal">
+            <div class="breadcrumb">
+                <a href="index.html">Nexus Systems</a> 
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg> 
+                <a href="index.html">The Web Core</a>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                <span>Performance</span>
+            </div>
+            <h1>High Performance <br><span class="gradient-text">Browser Networking.</span></h1>
+            <p>To optimize the web, you must first understand how a browser retrieves and processes it. This module dissects the Critical Rendering Path (CRP) into 4 chronological stages.</p>
+        </section>
+
+        <section class="pipeline-container">
+            
+            <!-- STAGE 1 REDIRECTION -->
+            <a href="hpbn-stage-1-handshake.html" class="stage-card reveal">
+                <div class="stage-indicator">01</div>
+                <div class="stage-content">
+                    <h3>The Network Handshake</h3>
+                    <p>Before a single byte of HTML is downloaded, the browser must negotiate a connection. Deep dive into DNS resolution algorithms, TCP 3-way handshakes, and TLS encryption costs.</p>
+                    <div class="stage-meta">
+                        <span class="badge">Protocols</span>
+                        <span class="badge">Latency</span>
+                        <span class="badge">DNS / TCP / TLS</span>
+                    </div>
+                </div>
+                <div class="action-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </a>
+
+            <!-- STAGE 2 REDIRECTION -->
+            <a href="hpbn-stage-2-http.html" class="stage-card reveal" style="transition-delay: 0.1s;">
+                <div class="stage-indicator">02</div>
+                <div class="stage-content">
+                    <h3>HTTP Data Streaming</h3>
+                    <p>Once the secure connection is established, the data flows. Analyze the mechanics of HTTP/2 multiplexing, HTTP/3 over QUIC, and how the browser begins streaming bytes into raw characters.</p>
+                    <div class="stage-meta">
+                        <span class="badge">Data Transfer</span>
+                        <span class="badge">HTTP/2 & 3</span>
+                        <span class="badge">QUIC</span>
+                    </div>
+                </div>
+                <div class="action-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </a>
+
+            <!-- STAGE 3 REDIRECTION -->
+            <a href="hpbn-stage-3-dom.html" class="stage-card reveal" style="transition-delay: 0.2s;">
+                <div class="stage-indicator">03</div>
+                <div class="stage-content">
+                    <h3>DOM & CSSOM Construction</h3>
+                    <p>The parser takes over. Learn how bytes are converted to characters, tokenized, lexed, and finally constructed into the Document Object Model (DOM) and CSS Object Model (CSSOM) trees.</p>
+                    <div class="stage-meta">
+                        <span class="badge">Parsing</span>
+                        <span class="badge">Main Thread</span>
+                        <span class="badge">Tokenization</span>
+                    </div>
+                </div>
+                <div class="action-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </a>
+
+            <!-- STAGE 4 REDIRECTION -->
+            <a href="hpbn-stage-4-render.html" class="stage-card reveal" style="transition-delay: 0.3s;">
+                <div class="stage-indicator">04</div>
+                <div class="stage-content">
+                    <h3>Layout, Paint & Composite</h3>
+                    <p>The final visual manifestation. The browser calculates the exact geometry of every node (Layout), rasterizes the pixels (Paint), and sends layers to the GPU (Composite) for high-framerate rendering.</p>
+                    <div class="stage-meta">
+                        <span class="badge">Graphics</span>
+                        <span class="badge">GPU Acceleration</span>
+                        <span class="badge">Rasterization</span>
+                    </div>
+                </div>
+                <div class="action-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </a>
+
+        </section>
+    </main>
+
+    <script>
+        // --- THEME LOGIC ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const sunPath = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+        const moonPath = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeIcon.innerHTML = theme === 'dark' ? sunPath : moonPath;
+            localStorage.setItem('theme', theme);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        });
+        applyTheme(localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+
+        // --- BATTERY SAVER STATUS LOGIC ---
+        let isBatterySaverEnabled = false;
+
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(function(battery) {
+                function updateBatteryStatus() {
+                    // Turn on battery saver if battery is at/under 20% and not currently charging
+                    if (battery.level <= 0.20 && !battery.charging) {
+                        document.body.classList.add('battery-saver-mode');
+                        isBatterySaverEnabled = true;
+                    } else {
+                        document.body.classList.remove('battery-saver-mode');
+                        isBatterySaverEnabled = false;
+                    }
+                }
+
+                updateBatteryStatus();
+                battery.addEventListener('levelchange', updateBatteryStatus);
+                battery.addEventListener('chargingchange', updateBatteryStatus);
+            }).catch(e => console.log('Battery Status API blocked/unavailable.'));
+        }
+
+        // --- RADIAL GLOW LOGIC ---
+        document.querySelectorAll('.pipeline-container').forEach(container => {
+            container.addEventListener('mousemove', (e) => {
+                // Skip JS execution to save CPU cycles if in battery saver mode
+                if (isBatterySaverEnabled) return; 
+
+                container.querySelectorAll('.stage-card').forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+            });
+        });
+
+        // --- SCROLL REVEAL ---
+        const observer = new IntersectionObserver((entries) => {
+            // Skip observer animations if battery saver is on
+            if (isBatterySaverEnabled) return;
+
+            entries.forEach(e => { 
+                if(e.isIntersecting) {
+                    e.target.classList.add('show'); 
+                } else {
+                    e.target.classList.remove('show');
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // --- ANTI-INSPECT LOGIC ---
+        // Disable Right Click (Context Menu)
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Disable Common Developer Tools Keyboard Shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Prevent F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+            }
+            // Prevent Ctrl+Shift+I (Inspect)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+                e.preventDefault();
+            }
+            // Prevent Ctrl+Shift+J (Console)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+                e.preventDefault();
+            }
+            // Prevent Ctrl+U (View Source)
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+            }
+            // Prevent Ctrl+Shift+C (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

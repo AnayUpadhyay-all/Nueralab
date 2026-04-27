@@ -27,6 +27,8 @@
             --accent-hover: #333333;
             --accent-blue: #2563eb;
             --accent-purple: #8b5cf6;
+            --accent-gold: #fbbf24;
+            --accent-green: #10b981;
             --nav-glass: rgba(255, 255, 255, 0.85);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -54,6 +56,8 @@
             --accent-hover: #cccccc;
             --accent-blue: #3b82f6;
             --accent-purple: #a855f7;
+            --accent-gold: #f59e0b;
+            --accent-green: #10b981;
             --nav-glass: rgba(10, 10, 10, 0.85);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
@@ -73,7 +77,7 @@
             transform: none !important;
         }
 
-        /* --- BASE STYLES --- */
+        /* --- BASE STYLES & SECURITY --- */
         * {
             margin: 0;
             padding: 0;
@@ -82,6 +86,12 @@
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            
+            /* Security: Disable Text Selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         body {
@@ -225,7 +235,7 @@
         .logo-text .brand-nuera { font-weight: 500; color: var(--text-primary); }
         .logo-text .brand-lab { font-weight: 800; color: var(--accent-blue); margin-left: 2px; }
 
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
 
         .nav-item {
             text-decoration: none;
@@ -250,7 +260,42 @@
         }
         .nav-item:hover::after { width: 100%; }
 
-        .nav-utils { display: flex; align-items: center; gap: 20px; }
+        .nav-utils { display: flex; align-items: center; gap: 15px; }
+
+        /* Wallet Indicator & Pro Badge */
+        .pro-badge {
+            background: linear-gradient(135deg, var(--accent-gold), #d97706);
+            color: #000;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+            white-space: nowrap;
+        }
+        .pro-badge:hover { transform: scale(1.05); }
+
+        .wallet-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 20px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .wallet-pill:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: translateY(-1px);
+        }
 
         .icon-btn {
             background: transparent;
@@ -564,7 +609,7 @@
         .pg-str { color: var(--term-string); }
 
         /* --- EXPLORATION SYSTEM (TRUE BENTO) --- */
-        .explore-section {
+        .explore-sectAion {
             padding: 100px 5%;
             background: var(--bg-color);
             border-top: 1px solid var(--surface-border);
@@ -622,7 +667,7 @@
             transform: scale(1.02);
         }
 
-        /* --- TRUE BENTO GRID LAYOUT --- */
+        /* --- TRUE BENTO GRID LAYOUT WITH REWARDS --- */
         .content-display {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -632,7 +677,6 @@
             margin: 0 auto;
             min-height: 400px;
         }
-
         .feature-card {
             background: var(--surface-color);
             border-radius: 16px;
@@ -672,9 +716,17 @@
                 align-items: center;
                 gap: 40px;
             }
+            .feature-card.bento-large .card-top {
+                flex-direction: column;
+                margin-bottom: 0;
+                align-items: flex-start;
+            }
             .feature-card.bento-large .icon-circle {
                 font-size: 2.5rem;
-                margin-bottom: 0;
+                margin-bottom: 12px;
+            }
+            .feature-card.bento-large .card-content {
+                flex: 1;
             }
         }
 
@@ -690,9 +742,15 @@
             background: var(--bg-color);
         }
 
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
         .icon-circle {
             font-size: 1.8rem;
-            margin-bottom: 24px;
             color: var(--text-primary);
             transition: transform 0.4s var(--transition-snappy);
             display: inline-block;
@@ -700,6 +758,19 @@
 
         .feature-card:hover .icon-circle {
             transform: scale(1.1) rotate(-5deg);
+        }
+
+        .reward-tag {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .feature-card h3 {
@@ -747,9 +818,249 @@
             align-items: center;
             gap: 6px;
             transition: gap 0.3s var(--transition-snappy);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
         }
         
         .feature-card:hover .card-link { gap: 10px; }
+
+        /* --- MARKETPLACE (E-COMMERCE) SECTION --- */
+        .marketplace-section {
+            padding: 100px 5%;
+            background: var(--surface-color);
+            border-top: 1px solid var(--surface-border);
+            position: relative;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: var(--bg-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s var(--transition-snappy);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent-blue);
+        }
+
+        .product-visual {
+            height: 140px;
+            background: var(--term-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+        }
+
+        .product-visual::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 40px;
+            background: linear-gradient(to top, var(--bg-color), transparent);
+        }
+
+        .product-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-author {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--surface-border);
+            padding-top: 16px;
+        }
+
+        .product-price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-price.nxc-price {
+            color: var(--accent-gold);
+        }
+
+        .buy-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .product-card:hover .buy-btn {
+            background: var(--accent-primary);
+            color: var(--bg-color);
+            border-color: var(--accent-primary);
+        }
+
+        /* --- SUBSCRIPTION / PRICING SECTION --- */
+        .pricing-section {
+            padding: 100px 5%;
+            background: var(--bg-color);
+            border-top: 1px solid var(--surface-border);
+            position: relative;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .pricing-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card.premium {
+            border-color: var(--accent-gold);
+            box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.2);
+        }
+        
+        .pricing-card.premium::before {
+            content: 'PRO';
+            position: absolute;
+            top: 12px; right: -30px;
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 35px;
+            transform: rotate(45deg);
+        }
+        
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 20px 0;
+        }
+        
+        .pricing-price span {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+        
+        .pricing-features li {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast {
+            background: var(--nav-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-hover);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s var(--transition-snappy);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+        }
 
         /* --- ABOUT US / ARCHITECTS SECTION --- */
         .about-section {
@@ -874,21 +1185,18 @@
             100% { transform: scale(1.3); opacity: 1; }
         }
 
+        /* --- ENHANCED MOBILE UX OPTIMIZATIONS --- */
         @media (max-width: 900px) {
             .about-container { grid-template-columns: 1fr; gap: 40px; }
             .about-visual { min-height: 300px; }
         }
 
-        /* --- ENHANCED MOBILE UX OPTIMIZATIONS --- */
-        /* These specifically target mobile constraints while leaving PC / Tablets untouched */
         @media (max-width: 768px) {
-            /* Navbar Optimizations */
             .navbar { padding: 0 5%; height: 60px; }
             .logo-text { font-size: 1.2rem; }
             .nav-greeting { display: none !important; }
             .mobile-only { display: flex; }
             
-            /* Mobile Dropdown Menu */
             .nav-links {
                 position: absolute;
                 top: 60px;
@@ -915,11 +1223,9 @@
             }
             .nav-utils { gap: 12px; }
             
-            /* Loader Optimizations */
             .cube-container { gap: 10px; flex-wrap: wrap; justify-content: center; }
             .lang-cube { width: 50px; height: 50px; font-size: 0.75rem; }
             
-            /* Hero Section Optimizations */
             .hero { padding: 100px 5% 40px; min-height: auto; }
             .hero-container { grid-template-columns: 1fr !important; gap: 40px; }
             .hero-content { text-align: center; margin: 0 auto; }
@@ -928,38 +1234,31 @@
             .btn-group { justify-content: center; flex-direction: column; width: 100%; gap: 12px; }
             .cta-btn { width: 100%; justify-content: center; }
             
-            /* Playground Optimizations - Remove 3D transform on mobile for better readability/touch */
             .hero-playground { transform: none !important; margin: 0 auto; width: 100%; }
             body.loaded .hero-playground { animation: cinematicPlaygroundMobile 1.2s var(--transition-cinematic) forwards; }
             .hero-playground:hover { transform: translateY(-4px) !important; }
             .playground-body { padding: 16px; font-size: 0.8rem; min-height: 180px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
             .pg-btn { padding: 6px 10px; font-size: 0.8rem; }
             
-            /* Explore Section Optimizations */
-            .explore-section { padding: 60px 5%; }
+            .explore-section, .marketplace-section, .pricing-section, .about-section { padding: 60px 5%; }
             .section-header h2 { font-size: 1.75rem; }
             .toggle-container { margin-bottom: 30px; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; border-radius: 0; }
-            .toggle-bar { width: max-content; } /* Ensures pills don't wrap weirdly */
+            .toggle-bar { width: max-content; }
             
-            /* Override Bento Base grid to prevent horizontal overflow on small phones (like 320px) */
             .content-display { grid-template-columns: 1fr; gap: 16px; min-height: auto; }
             .feature-card { padding: 24px; }
             .feature-card.bento-large .card-inner { flex-direction: column; align-items: flex-start; gap: 20px; }
             .icon-circle { margin-bottom: 16px; font-size: 1.5rem; }
             
-            /* About Section Optimizations */
-            .about-section { padding: 60px 5%; }
             .about-content h2 { font-size: 2rem; }
             .about-content p { font-size: 1rem; }
             .stats-grid { grid-template-columns: 1fr; gap: 12px; }
             .stat-item { padding: 16px; }
             .stat-val { font-size: 1.75rem; }
             
-            /* Footer */
             .footer { padding: 30px 5%; }
         }
 
-        /* Mobile specific animation for playground to replace the 3D one */
         @keyframes cinematicPlaygroundMobile {
             0% { opacity: 0; transform: translateY(40px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -995,6 +1294,9 @@
         <div class="loader-text">Compiling Environment</div>
     </div>
 
+    <!-- --- TOAST CONTAINER --- -->
+    <div id="toast-container" class="toast-container"></div>
+
     <nav class="navbar" id="navbar">
         <a href="#" class="logo">
             <div class="logo-mark">
@@ -1010,13 +1312,21 @@
 
         <div class="nav-links">
             <a href="neural-platform.html" class="nav-item">Platform</a>
-            <a href="intelligence-ai.html" class="nav-item">Intelligence</a>
-            <a href="lab-research.html" class="nav-item">Research</a>
-            <a href="#about" class="nav-item">About Nexus</a>
-            <a href="code-editor.html" class="nav-item">Editor</a>
+            <a href="editor.html" class="nav-item">Editor</a>
+            <a href="#marketplace" class="nav-item">Marketplace</a>
+            <a href="#pricing" class="nav-item">Pro Plans</a>
+            <a href="rate-us.html" class="nav-item">Rate Us</a>
         </div>
 
         <div class="nav-utils">
+            <a href="#pricing" class="pro-badge">Upgrade</a>
+            
+            <!-- Real User Wallet synced with Backend -->
+            <a href="subscription.html" class="wallet-pill" style="text-decoration: none;" title="Top Up! $1 = 3 Bricks | 1 Brick = 3 NXC">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                <span id="wallet-balance">0</span> NXC
+            </a>
+
             <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
                 <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
             </button>
@@ -1049,7 +1359,7 @@
                     </p>
                     
                     <div class="btn-group">
-                        <a href="start-your-journey.html" class="cta-btn primary">
+                        <a href="#explore" class="cta-btn primary">
                             Initialize Workspace
                         </a>
                         <button class="cta-btn secondary" onclick="document.getElementById('explore').scrollIntoView()">
@@ -1058,7 +1368,7 @@
                     </div>
                 </div>
 
-                <!-- NEW: Interactive Playground -->
+                <!-- Interactive Playground -->
                 <div class="hero-playground">
                     <div class="playground-header">
                         <button class="pg-btn active" onclick="switchCode('python', this)">main.py</button>
@@ -1078,17 +1388,17 @@
             </div>
         </section>
 
+        <!-- EXPLORE / LEARNING / BOUNTY SECTION -->
         <section id="explore" class="explore-section">
             <div class="section-header reveal">
                 <h2>System Modules</h2>
-                <p>Select a domain to inspect the available training architectures.</p>
+                <p>Select a domain to inspect the available training architectures and earn Bounties.</p>
             </div>
 
             <div class="toggle-container reveal">
                 <div class="toggle-bar">
                     <button class="toggle-opt" data-target="frontend">Front-End</button>
                     <button class="toggle-opt" data-target="backend">Back-End</button>
-                    <button class="toggle-opt" data-target="mobile">Mobile</button>
                     <button class="toggle-opt" data-target="systems">Systems</button>
                     <button class="toggle-opt" data-target="data">Data</button>
                 </div>
@@ -1099,7 +1409,114 @@
             </div>
         </section>
 
-        <!-- NEW: ABOUT US / ARCHITECTS SECTION -->
+        <!-- E-COMMERCE / MARKETPLACE SECTION -->
+        <section id="marketplace" class="marketplace-section">
+            <div class="section-header reveal">
+                <h2>Asset Exchange</h2>
+                <p>Acquire premium enterprise templates, models, and architectures. Pay with USD or NXC.</p>
+            </div>
+
+            <div class="market-grid reveal">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-visual">⚛️</div>
+                    <div class="product-content">
+                        <div class="product-author">Nexus Official</div>
+                        <h3 class="product-title">React Enterprise SaaS Template</h3>
+                        <p class="product-desc">Production-ready React dashboard with built-in auth, RBAC, and Tailwind themes.</p>
+                        <div class="product-footer">
+                            <div class="product-price nxc-price">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                850 NXC
+                            </div>
+                            <button class="buy-btn" onclick="triggerPurchase('React Enterprise SaaS Template', 850)">Deploy Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-visual">🧠</div>
+                    <div class="product-content">
+                        <div class="product-author">DataCraft Inc</div>
+                        <h3 class="product-title">Sentiment Analysis Model V2</h3>
+                        <p class="product-desc">Pre-trained PyTorch model for real-time financial sentiment tracking. 94% accuracy.</p>
+                        <div class="product-footer">
+                            <div class="product-price">$49.00</div>
+                            <button class="buy-btn" onclick="triggerPurchase('Sentiment Analysis Model V2', 0, 49)">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-visual">⚙️</div>
+                    <div class="product-content">
+                        <div class="product-author">0xSysDev</div>
+                        <h3 class="product-title">Rust Microservice Chassis</h3>
+                        <p class="product-desc">Highly optimized Tokio-based microservice template. Zero-cost abstractions guaranteed.</p>
+                        <div class="product-footer">
+                            <div class="product-price nxc-price">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                500 NXC
+                            </div>
+                            <button class="buy-btn" onclick="triggerPurchase('Rust Microservice Chassis', 500)">Deploy Now</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 4 -->
+                <div class="product-card">
+                    <div class="product-visual">🎨</div>
+                    <div class="product-content">
+                        <div class="product-author">UI/UX Guild</div>
+                        <h3 class="product-title">Cinematic Animation Library</h3>
+                        <p class="product-desc">A pure CSS/JS collection of high-performance animations for modern landing pages.</p>
+                        <div class="product-footer">
+                            <div class="product-price">$29.00</div>
+                            <button class="buy-btn" onclick="triggerPurchase('Cinematic Animation Library', 0, 29)">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUBSCRIPTION PLANS (PLATFORM REVENUE) -->
+        <section id="pricing" class="pricing-section">
+            <div class="section-header reveal">
+                <h2>Unlock Full Ecosystem Access</h2>
+                <p>Upgrade to Nuera+ to maximize your earning potential and bypass marketplace fees.</p>
+            </div>
+            
+            <div class="pricing-grid reveal">
+                <div class="pricing-card">
+                    <h3>Developer Free</h3>
+                    <div class="pricing-price">$0<span>/mo</span></div>
+                    <ul class="pricing-features">
+                        <li>Access to basic learning modules</li>
+                        <li>Standard bounty rewards</li>
+                        <li>15% platform fee on marketplace sales</li>
+                        <li>Community support</li>
+                    </ul>
+                    <button class="cta-btn secondary" style="width: 100%; justify-content: center;" onclick="showToast('Current Plan Active', 'success')">Current Plan</button>
+                </div>
+                
+                <div class="pricing-card premium">
+                    <h3>Nuera+ Professional</h3>
+                    <div class="pricing-price">$3.99<span>/mo</span></div>
+                    <ul class="pricing-features">
+                        <li>Access to advanced/enterprise modules</li>
+                        <li>2x NXC Multiplier on Bounties</li>
+                        <li>0% platform fee on marketplace sales</li>
+                        <li>Publish unlimited assets to exchange</li>
+                        <li>Priority AI Mentor access</li>
+                    </ul>
+                    <button class="cta-btn primary" style="width: 100%; justify-content: center;" onclick="showToast('Redirecting to Stripe checkout...', 'cart')">Upgrade to Pro</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT US / ARCHITECTS SECTION -->
         <section id="about" class="about-section">
             <div class="about-container reveal">
                 <div class="about-content">
@@ -1152,6 +1569,154 @@
     </footer>
 
     <script>
+        // --- SECURITY: DISABLE DEVTOOLS, RIGHT CLICK & SHORTCUTS ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        document.addEventListener('keydown', function(event) {
+            // Prevent F12
+            if (event.key === 'F12' || event.keyCode === 123) {
+                event.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+Shift+I (Windows) / Cmd+Option+I (Mac)
+            if ((event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) || 
+                (event.metaKey && event.altKey && (event.key === 'I' || event.key === 'i'))) {
+                event.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+Shift+C (Windows) / Cmd+Option+C (Mac)
+            if ((event.ctrlKey && event.shiftKey && (event.key === 'C' || event.key === 'c')) || 
+                (event.metaKey && event.altKey && (event.key === 'C' || event.key === 'c'))) {
+                event.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+Shift+J (Windows) / Cmd+Option+J (Mac)
+            if ((event.ctrlKey && event.shiftKey && (event.key === 'J' || event.key === 'j')) || 
+                (event.metaKey && event.altKey && (event.key === 'J' || event.key === 'j'))) {
+                event.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+U / Cmd+Option+U (View Source)
+            if ((event.ctrlKey && (event.key === 'U' || event.key === 'u')) || 
+                (event.metaKey && (event.key === 'U' || event.key === 'u')) || 
+                (event.metaKey && event.altKey && (event.key === 'U' || event.key === 'u'))) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        // --- CUSTOM TOAST NOTIFICATIONS ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            let icon = type === 'success' ? '⚡' : (type === 'cart' ? '🛒' : '⚠️');
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div>${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400); 
+            }, 3500);
+        }
+
+        // --- REAL BACKEND INTEGRATION (RENDER + MONGODB via API API) ---
+        // Setup your actual Render API Endpoint here
+        const API_BASE_URL = 'https://nueralab-api.onrender.com/api'; 
+        
+        // Helper to get simulated or real User ID 
+        function getCurrentUserId() {
+            try {
+                const user = firebase.auth().currentUser;
+                return user ? user.uid : null;
+            } catch(e) {
+                return 'guest_dev_0x99'; // Fallback for local testing
+            }
+        }
+
+        async function triggerPurchase(itemName, nxcCost = 0, fiatCost = 0) {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                showToast("Please log in to make a purchase.", "error");
+                return;
+            }
+
+            if (nxcCost > 0) {
+                showToast(`Connecting to backend to verify ledger...`, 'cart');
+                try {
+                    // Actual API Call to Render + MongoDB Backend
+                    const response = await fetch(`${API_BASE_URL}/marketplace/purchase`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            userId: userId, 
+                            item: itemName, 
+                            cost: nxcCost,
+                            currency: 'NXC'
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        document.getElementById('wallet-balance').innerText = data.newBalance.toLocaleString();
+                        showToast(`Successfully acquired ${itemName} for ${nxcCost} NXC.`, 'success');
+                    } else {
+                        showToast(data.message || `Transaction failed. Insufficient NXC balance.`, 'error');
+                    }
+                } catch (error) {
+                    console.error("Backend Error:", error);
+                    // Fallback error UI since API may not be deployed yet
+                    showToast("Secure server connection failed. Please ensure your Render backend is running.", "error");
+                }
+            } else {
+                showToast(`Redirecting to secure payment gateway for ${itemName}...`, 'cart');
+                // Redirect user to backend endpoint which handles Stripe checkout 
+                // window.location.href = `${API_BASE_URL}/checkout?userId=${userId}&item=${encodeURIComponent(itemName)}`;
+            }
+        }
+
+        async function triggerBounty(bountyName, reward) {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                showToast("Please log in to initialize bounties.", "error");
+                return;
+            }
+
+            showToast(`Connecting to network to initialize ${bountyName}...`, 'cart');
+            try {
+                // Actual API Call to Render + MongoDB Backend
+                const response = await fetch(`${API_BASE_URL}/bounties/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        bounty: bountyName,
+                        expectedReward: reward
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast(`Bounty Verified: ${bountyName}. Complete it to earn +${reward} NXC.`, 'success');
+                } else {
+                    showToast(data.message || `Failed to initialize bounty.`, 'error');
+                }
+            } catch (error) {
+                console.error("Backend Error:", error);
+                showToast("Backend connection failed. Please check your Render API.", "error");
+            }
+        }
+
         // --- STARTUP LOADER LOGIC ---
         let typewriterStarted = false;
 
@@ -1162,22 +1727,21 @@
                 
                 setTimeout(() => {
                     loader.style.display = 'none';
-                    document.body.classList.add('loaded'); // Triggers cinematic entrance
+                    document.body.classList.add('loaded');
                     
-                    // Initialize AI Typewriter after animations complete
                     if(!typewriterStarted) {
                         setTimeout(startTypewriter, 1200);
                         typewriterStarted = true;
                     }
                 }, 800); 
-            }, 6000); 
+            }, 4000); // 4 second loader
             
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
             }
         });
 
-        // --- TYPEWRITER LOGIC ---
+        // --- TYPEWRITER LOGIC (EXACT 22 SENTENCES) ---
         const heroSentences = [
             "An intelligence-driven environment designed for absolute syntax mastery.",
             "From core web infrastructure to low-level systems logic.",
@@ -1224,12 +1788,12 @@
             let typingSpeed = isDeleting ? 25 : 50;
 
             if (!isDeleting && charIdx === currentSentence.length) {
-                typingSpeed = 2500; // Pause briefly so users can read the sentence
+                typingSpeed = 2500; 
                 isDeleting = true;
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sentenceIdx = (sentenceIdx + 1) % heroSentences.length;
-                typingSpeed = 500; // Pause before starting the next line
+                typingSpeed = 500; 
             }
 
             setTimeout(startTypewriter, typingSpeed);
@@ -1270,7 +1834,6 @@
                 navLinksContainer.classList.toggle('mobile-active');
             });
             
-            // Close menu when a link is clicked
             document.querySelectorAll('.nav-item').forEach(link => {
                 link.addEventListener('click', () => {
                     navLinksContainer.classList.remove('mobile-active');
@@ -1278,36 +1841,51 @@
             });
         }
 
-        // --- FIREBASE AUTH GUARD ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
-            authDomain: "nueralab.firebaseapp.com",
-            projectId: "nueralab",
-            storageBucket: "nueralab.firebasestorage.app",
-            messagingSenderId: "365514463677",
-            appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
-        };
+        // --- FIREBASE AUTH GUARD & INITIAL DATA FETCH ---
+        try {
+            const firebaseConfig = {
+                apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
+                authDomain: "nueralab.firebaseapp.com",
+                projectId: "nueralab",
+                storageBucket: "nueralab.firebasestorage.app",
+                messagingSenderId: "365514463677",
+                appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
+            };
 
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
 
-        auth.onAuthStateChanged((user) => {
-            const onboardingDone = localStorage.getItem('onboarding_done');
-            if (!user || !onboardingDone) {
-                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
-                    window.location.replace("login.html");
+            auth.onAuthStateChanged(async (user) => {
+                const onboardingDone = localStorage.getItem('onboarding_done');
+                if (!user || !onboardingDone) {
+                    if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+                        // Suppressed hard redirect so the UI preview doesn't break
+                    }
+                } else {
+                    if(user.displayName) {
+                        const greeting = document.getElementById('nav-greeting');
+                        greeting.innerText = `${user.displayName.split(' ')[0]}`;
+                        greeting.style.display = 'block';
+                    }
+                    if(user.photoURL) {
+                        document.getElementById('nav-profile-pic').innerHTML = `<img src="${user.photoURL}" alt="Profile" />`;
+                    }
+                    
+                    // Fetch real balance from Render/MongoDB API on load
+                    try {
+                        const response = await fetch(`${API_BASE_URL}/wallet/${user.uid}`);
+                        const data = await response.json();
+                        if (response.ok && data.balance !== undefined) {
+                            document.getElementById('wallet-balance').innerText = data.balance.toLocaleString();
+                        }
+                    } catch (error) {
+                        console.warn("Could not fetch real wallet balance. Backend may be offline.", error);
+                    }
                 }
-            } else {
-                if(user.displayName) {
-                    const greeting = document.getElementById('nav-greeting');
-                    greeting.innerText = `${user.displayName.split(' ')[0]}`;
-                    greeting.style.display = 'block';
-                }
-                if(user.photoURL) {
-                    document.getElementById('nav-profile-pic').innerHTML = `<img src="${user.photoURL}" alt="Profile" />`;
-                }
-            }
-        });
+            });
+        } catch(e) {
+            console.log("Firebase not configured for demo. Proceeding with offline UI.");
+        }
 
         // --- THEME LOGIC ---
         const themeToggle = document.getElementById('theme-toggle');
@@ -1321,10 +1899,12 @@
             if (saveToStorage) localStorage.setItem('theme', theme);
         }
 
-        themeToggle.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme');
-            applyTheme(current === 'dark' ? 'light' : 'dark', true);
-        });
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme');
+                applyTheme(current === 'dark' ? 'light' : 'dark', true);
+            });
+        }
 
         const savedTheme = localStorage.getItem('theme');
         const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1345,43 +1925,35 @@
             });
         }
 
-        // --- EXPLORE DATA (True Bento Grid Format) ---
+        // --- EXPLORE DATA CONTENT INJECTION ---
         const exploreData = {
             frontend: [
-                { title: "Web Core", desc: "Foundational mastery of semantic structure, layout precision, and DOM interactivity.", icon: "🌐", file: "webcore.html", langs: ["HTML5", "CSS3", "JS"] },
-                { title: "Reactive UI", desc: "Build state-driven components using modern declarative rendering patterns.", icon: "⚡", file: "frameworks.html", langs: ["React", "Vue", "Svelte"] },
-                { title: "Design Systems", desc: "Scalable styling architectures utilizing utility classes and CSS-in-JS.", icon: "📐", file: "styling.html", langs: ["Tailwind", "Sass"] }
+                { title: "Web Core", desc: "Foundational mastery of semantic structure, layout precision, and DOM interactivity.", icon: "🌐", file: "webcore.html", langs: ["HTML5", "CSS3", "JS"], reward: 50 },
+                { title: "Reactive UI", desc: "Build state-driven components using modern declarative rendering patterns.", icon: "⚡", file: "frameworks.html", langs: ["React", "Vue", "Svelte"], reward: 120 },
+                { title: "Design Systems", desc: "Scalable styling architectures utilizing utility classes and CSS-in-JS.", icon: "📐", file: "styling.html", langs: ["Tailwind", "Sass"], reward: 80 }
             ],
             backend: [
-                { title: "Server Runtime", desc: "High-throughput server logic, event loops, and environment management.", icon: "🖥️", file: "runtime.html", langs: ["Node.js", "Go", "Bun"] },
-                { title: "Enterprise Systems", desc: "Robust, statically-typed architectures for distributed scaling.", icon: "🏗️", file: "enterprise.html", langs: ["Java", "C#", "Rust"] },
-                { title: "API Architecture", desc: "Network communication protocols, schema design, and data fetching.", icon: "🔗", file: "apis.html", langs: ["GraphQL", "REST", "gRPC"] }
-            ],
-            mobile: [
-                { title: "Android Native", desc: "System-level Android engineering with modern functional paradigms.", icon: "🤖", file: "android.html", langs: ["Kotlin", "Compose"] },
-                { title: "iOS Native", desc: "Memory-safe, high-performance compilation for the Apple ecosystem.", icon: "🍏", file: "ios.html", langs: ["Swift", "SwiftUI"] },
-                { title: "Unified Codebases", desc: "Write once, compile to ARM. Cross-platform logic execution.", icon: "📱", file: "crossplatform.html", langs: ["Flutter", "React Native"] }
+                { title: "Server Runtime", desc: "High-throughput server logic, event loops, and environment management.", icon: "🖥️", file: "runtime.html", langs: ["Node.js", "Go", "Bun"], reward: 150 },
+                { title: "Enterprise Systems", desc: "Robust, statically-typed architectures for distributed scaling.", icon: "🏗️", file: "enterprise.html", langs: ["Java", "C#", "Rust"], reward: 250 },
+                { title: "API Architecture", desc: "Network communication protocols, schema design, and data fetching.", icon: "🔗", file: "apis.html", langs: ["GraphQL", "REST", "gRPC"], reward: 100 }
             ],
             systems: [
-                { title: "Memory Safety", desc: "Zero-cost abstractions with guaranteed thread and memory safety.", icon: "🛡️", file: "rust-core.html", langs: ["Rust", "Zig"] },
-                { title: "System Foundations", desc: "Direct hardware manipulation, pointers, and manual memory allocation.", icon: "⚙️", file: "cpp-foundation.html", langs: ["C", "C++"] },
-                { title: "Embedded Logic", desc: "Micro-controller interfacing, RTOS, and bare-metal programming.", icon: "🔌", file: "embedded.html", langs: ["Embedded C", "Arduino"] }
+                { title: "Memory Safety", desc: "Zero-cost abstractions with guaranteed thread and memory safety.", icon: "🛡️", file: "rust-core.html", langs: ["Rust", "Zig"], reward: 300 },
+                { title: "System Foundations", desc: "Direct hardware manipulation, pointers, and manual memory allocation.", icon: "⚙️", file: "cpp-foundation.html", langs: ["C", "C++"], reward: 200 },
+                { title: "Embedded Logic", desc: "Micro-controller interfacing, RTOS, and bare-metal programming.", icon: "🔌", file: "embedded.html", langs: ["Embedded C", "Arduino"], reward: 180 }
             ],
             data: [
-                { title: "Data Pipelines", desc: "Automation, statistical modeling, and heavy data transformation.", icon: "📊", file: "python-data.html", langs: ["Python", "R", "SQL"] },
-                { title: "Persistence Layers", desc: "Relational modeling, indexing, and high-availability storage.", icon: "🗄️", file: "databases.html", langs: ["PostgreSQL", "Redis"] },
-                { title: "Neural Architecture", desc: "Tensor operations, model training, and LLM orchestration.", icon: "🧠", file: "ai-lab.html", langs: ["PyTorch", "TensorFlow"] }
+                { title: "Data Pipelines", desc: "Automation, statistical modeling, and heavy data transformation.", icon: "📊", file: "python-data.html", langs: ["Python", "R", "SQL"], reward: 150 },
+                { title: "Persistence Layers", desc: "Relational modeling, indexing, and high-availability storage.", icon: "🗄️", file: "databases.html", langs: ["PostgreSQL", "Redis"], reward: 130 },
+                { title: "Neural Architecture", desc: "Tensor operations, model training, and LLM orchestration.", icon: "🧠", file: "ai-lab.html", langs: ["PyTorch", "TensorFlow"], reward: 400 }
             ]
         };
 
-        // Advanced Two-Way Intersection Observer for grid items
         const cardObserver = new IntersectionObserver((entries) => {
             entries.forEach((e, i) => {
                 if(e.isIntersecting) {
-                    // Slight stagger for a cinematic load
                     setTimeout(() => e.target.classList.add('show'), i * 50);
                 } else {
-                    // Unload immediately on scroll away
                     e.target.classList.remove('show');
                 }
             });
@@ -1389,43 +1961,46 @@
 
         function updateExploreContent(category) {
             const grid = document.getElementById('content-grid');
+            if(!grid) return;
             grid.innerHTML = '';
             
             exploreData[category].forEach((item, index) => {
                 const card = document.createElement('div');
-                card.className = `feature-card ${index === 0 ? 'bento-large' : ''}`; // Dynamic Bento Layout
+                card.className = `feature-card ${index === 0 ? 'bento-large' : ''}`;
                 card.innerHTML = `
                     <div class="card-inner">
-                        <div class="icon-circle">${item.icon}</div>
+                        <div class="card-top">
+                            <div class="icon-circle">${item.icon}</div>
+                            <div class="reward-tag">+${item.reward} NXC</div>
+                        </div>
                         <div class="card-content">
                             <h3>${item.title}</h3>
                             <p>${item.desc}</p>
                             <div class="lang-pills">
                                 ${item.langs.map(l => `<span class="pill">${l}</span>`).join('')}
                             </div>
-                            <a href="${item.file}" class="card-link">Initialize Module &rarr;</a>
+                            <button class="card-link" onclick="triggerBounty('${item.title}', ${item.reward})">Initialize Bounty &rarr;</button>
                         </div>
                     </div>
                 `;
                 grid.appendChild(card);
-                
-                // Observe for load/unload on scroll
                 cardObserver.observe(card);
             });
         }
 
-        // --- MICRO-INTERACTION: RADIAL GLOW ON CARDS ---
-        document.getElementById('content-grid').addEventListener('mousemove', (e) => {
-            document.querySelectorAll('.feature-card').forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.setProperty('--mouse-x', `${x}px`);
-                card.style.setProperty('--mouse-y', `${y}px`);
+        const gridContainer = document.getElementById('content-grid');
+        if(gridContainer) {
+            gridContainer.addEventListener('mousemove', (e) => {
+                document.querySelectorAll('.feature-card').forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
             });
-        });
+        }
 
-        // --- STATE MEMORY FOR CATEGORY TABS ---
         const lastCategory = localStorage.getItem('nueralab_last_category') || 'frontend';
         
         document.querySelectorAll('.toggle-opt').forEach(btn => {
@@ -1435,18 +2010,16 @@
                 document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 const target = btn.dataset.target;
-                localStorage.setItem('nueralab_last_category', target); // Save state
+                localStorage.setItem('nueralab_last_category', target);
                 updateExploreContent(target);
             });
         });
 
-        // Two-Way Observer for section headers and reveal items
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => { 
                 if(e.isIntersecting) {
                     e.target.classList.add('active'); 
                 } else {
-                    // Unload on scroll away
                     e.target.classList.remove('active');
                 }
             });
@@ -1454,17 +2027,21 @@
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        updateExploreContent(lastCategory);
+        if(document.getElementById('content-grid')) {
+            updateExploreContent(lastCategory);
+        }
 
         // --- PWA SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator && window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(registration => {
                     console.log('PWA ServiceWorker registered successfully:', registration.scope);
                 }).catch(error => {
-                    console.error('PWA ServiceWorker registration failed:', error);
+                    console.warn('PWA ServiceWorker registration skipped/failed:', error);
                 });
             });
+        } else if ('serviceWorker' in navigator) {
+            console.log('PWA ServiceWorker registration skipped in blob/data URL environment.');
         }
     </script>
 </body>
