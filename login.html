@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueralab | Identity Initialization</title>
+    <title>Nueralab | Identity & Access Management</title>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -67,12 +67,6 @@
             transition: all 0.2s ease;
         }
 
-        .saas-input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-            outline: none;
-        }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -81,6 +75,16 @@
 
         /* Loader */
         .spinner {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-left-color: #8b5cf6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        .spinner-small {
             border: 2px solid rgba(0,0,0,0.1);
             border-left-color: #000;
             border-radius: 50%;
@@ -89,6 +93,7 @@
             animation: spin 1s linear infinite;
             display: inline-block;
         }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -96,16 +101,23 @@
 
     <!-- Navigation -->
     <nav class="w-full px-8 py-6 flex justify-between items-center z-10">
-        <div class="flex items-center gap-3">
-            <div class="w-6 h-6 rounded-full border-[3px] border-brand-500"></div>
-            <span class="font-bold text-lg tracking-tight">Nueralab</span>
-        </div>
+        <a href="#" class="flex items-center gap-3 group">
+            <div class="text-white group-hover:text-gray-200 transition-colors">
+                <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 26V7C8 5.89543 8.89543 5 10 5H13L24 20.5V26" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M24 6V25C24 26.1046 23.1046 27 22 27H19L8 11.5V6" stroke="#8b5cf6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="font-bold text-xl tracking-tight">
+                <span class="text-white">Nuera</span><span class="text-brand-500">Lab</span>
+            </div>
+        </a>
         <div class="hidden md:flex gap-8 text-sm font-medium text-gray-400">
             <a href="#" class="hover:text-white transition">Platform</a>
             <a href="#" class="hover:text-white transition">Architecture</a>
-            <a href="#" class="hover:text-white transition">API</a>
+            <a href="#" class="hover:text-white transition">Security</a>
         </div>
-        <a href="#" class="text-sm font-semibold text-gray-300 hover:text-white transition">Contact Sales</a>
+        <a href="#" class="text-sm font-semibold text-gray-300 hover:text-white transition">Terminal Help</a>
     </nav>
 
     <!-- Main Content -->
@@ -115,101 +127,115 @@
         <div class="flex-1 max-w-xl">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-bold tracking-widest uppercase mb-8">
                 <div class="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse-slow"></div>
-                System Online: v2.4.0
+                Gateway Protected: v3.1.0
             </div>
             
             <h1 class="text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight mb-6">
-                Evolve Your <br>
+                Secure Core <br>
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-fuchsia-400">
-                    Intelligence.
+                    Authentication.
                 </span>
             </h1>
             
             <p class="text-gray-400 text-lg leading-relaxed mb-8 max-w-md">
-                Nueralab is the world's most advanced decentralized neural laboratory. Access high-throughput computing power for large-scale AI research.
+                Nueralab enforces strict centralized identity verification. All accounts must be verified through the central Render database prior to ecosystem entry.
             </p>
-            
         </div>
 
-        <!-- Right: Auth / Vectorization Card -->
+        <!-- Right: Auth / State Card -->
         <div class="w-full max-w-[420px]">
-            <div class="saas-card rounded-2xl p-8 w-full relative overflow-hidden">
+            <div class="saas-card rounded-2xl p-8 w-full relative overflow-hidden min-h-[400px] flex flex-col justify-center">
                 
                 <!-- Error Alert Box -->
-                <div id="error-box" class="hidden mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center"></div>
+                <div id="error-box" class="hidden mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center absolute top-4 left-4 right-4 z-20"></div>
 
-                <!-- STEP 1: LOGIN -->
-                <div id="auth-screen" class="transition-opacity duration-300">
+                <!-- STATE 1: LOADING (Checking Auth & DB) -->
+                <div id="loading-screen" class="flex flex-col items-center justify-center transition-opacity duration-300">
+                    <div class="spinner mb-4"></div>
+                    <h2 class="text-lg font-bold text-white mb-1">Verifying Identity</h2>
+                    <p class="text-gray-400 text-sm text-center">Checking credentials with Nueralab Central Core...</p>
+                </div>
+
+                <!-- STATE 2: LOGIN -->
+                <div id="auth-screen" class="hidden transition-opacity duration-300">
                     <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold mb-2">Welcome back</h2>
-                        <p class="text-gray-400 text-sm">Sign in to access the Nueralab Terminal</p>
+                        <div class="w-12 h-12 bg-dark-800 rounded-xl border border-gray-700 flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-6 h-6 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold mb-2">System Login</h2>
+                        <p class="text-gray-400 text-sm">Authenticate to access the Neural Terminal</p>
                     </div>
 
                     <!-- Google SSO Button -->
                     <button id="google-btn" class="w-full bg-white text-gray-900 font-semibold rounded-xl py-3.5 px-4 flex items-center justify-center gap-3 hover:bg-gray-100 transition duration-200 shadow-lg mb-6">
                         <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                        <span id="google-btn-text">Continue with Google</span>
+                        <span id="google-btn-text">Authenticate with Google</span>
                     </button>
-
-                    <div class="relative flex items-center py-2 mb-6">
-                        <div class="flex-grow border-t border-gray-700"></div>
-                        <span class="flex-shrink-0 mx-4 text-gray-500 text-xs font-semibold uppercase tracking-wider">Or continue with email</span>
-                        <div class="flex-grow border-t border-gray-700"></div>
-                    </div>
-
-                    <form onsubmit="event.preventDefault(); showError('Email authentication requires Google SSO in this environment.');" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Email Address</label>
-                            <input type="email" class="saas-input w-full rounded-xl py-3 px-4 text-sm text-white placeholder-gray-600" placeholder="researcher@nueralab.io">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1.5">
-                                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide">Password</label>
-                                <a href="#" class="text-xs text-brand-400 hover:text-brand-300">Forgot?</a>
-                            </div>
-                            <input type="password" class="saas-input w-full rounded-xl py-3 px-4 text-sm text-white placeholder-gray-600" placeholder="••••••••">
-                        </div>
-                        <button type="submit" class="w-full bg-dark-700 hover:bg-dark-600 border border-gray-700 text-white font-semibold rounded-xl py-3.5 mt-2 transition duration-200 text-sm">
-                            Sign In with Email
-                        </button>
-                    </form>
                     
                     <p class="text-center text-xs text-gray-500 mt-6">
-                        By continuing, you agree to our <a href="#" class="text-gray-300 hover:text-white underline">Terms</a> & <a href="#" class="text-gray-300 hover:text-white underline">Privacy</a>.
+                        Access is restricted to authorized personnel.
                     </p>
                 </div>
 
-                <!-- STEP 2: VECTORIZATION (ONBOARDING) -->
-                <div id="vector-screen" class="hidden transition-opacity duration-300">
-                    <div class="text-center mb-8">
-                        <h2 class="text-2xl font-bold mb-2">Identity Vectorization</h2>
-                        <p class="text-gray-400 text-sm">Configure your neural parameters</p>
+                <!-- STATE 3: UNREGISTERED (Force Registration) -->
+                <div id="unregistered-screen" class="hidden transition-opacity duration-300">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-orange-500/20">
+                            <svg class="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Unregistered Account</h2>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                            Your Google account was authenticated successfully, but you are not registered in the central Nueralab MongoDB database. Access to the ecosystem is suspended until registration is complete.
+                        </p>
                     </div>
 
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Researcher Name</label>
-                            <input type="text" id="node-name" class="saas-input w-full rounded-xl py-3 px-4 text-sm text-white" placeholder="Full Name">
-                        </div>
+                    <a href="https://anayupadhyay-all.github.io/Nueralab-registration/" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl py-4 flex items-center justify-center transition duration-200 shadow-lg shadow-brand-500/20 text-sm tracking-wide">
+                        REGISTER ACCOUNT NOW
+                    </a>
+                    
+                    <button id="logout-btn" class="w-full mt-4 text-xs font-semibold text-gray-500 hover:text-white uppercase tracking-wider py-2">
+                        Sign Out
+                    </button>
+                </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Chronological Age</label>
-                            <input type="number" id="node-age" class="saas-input w-full rounded-xl py-3 px-4 text-sm text-white" placeholder="e.g. 28">
+                <!-- STATE 4: PROFILE INFO (Auto-Redirecting) -->
+                <div id="profile-screen" class="hidden transition-opacity duration-300">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/20">
+                            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         </div>
-
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Experience Tier</label>
-                            <div class="grid grid-cols-3 gap-2" id="tier-container">
-                                <button type="button" data-tier="beginner" class="tier-btn py-2.5 px-2 rounded-lg border border-gray-700 bg-dark-800 text-gray-400 text-xs font-bold uppercase tracking-wide hover:border-gray-500 transition">Beginner</button>
-                                <button type="button" data-tier="intermediate" class="tier-btn py-2.5 px-2 rounded-lg border border-gray-700 bg-dark-800 text-gray-400 text-xs font-bold uppercase tracking-wide hover:border-gray-500 transition">Intermediate</button>
-                                <button type="button" data-tier="advanced" class="tier-btn py-2.5 px-2 rounded-lg border border-gray-700 bg-dark-800 text-gray-400 text-xs font-bold uppercase tracking-wide hover:border-gray-500 transition">Advanced</button>
-                            </div>
-                        </div>
-
-                        <button id="sync-btn" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl py-4 mt-4 transition duration-200 shadow-lg shadow-brand-500/20 text-sm tracking-wide">
-                            FINALIZE & SYNC DATA
-                        </button>
+                        <h2 class="text-xl font-bold text-white mb-1">Identity Verified</h2>
+                        <p class="text-green-400 text-xs font-bold uppercase tracking-widest">Clearance Granted</p>
                     </div>
+
+                    <div class="bg-dark-800 border border-gray-700 rounded-xl p-5 mb-6 space-y-3">
+                        <div class="flex justify-between items-center border-b border-gray-700/50 pb-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">User ID</span>
+                            <span class="text-sm text-gray-200 font-mono" id="disp-id">***</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-700/50 pb-2">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Phone</span>
+                            <span class="text-sm text-gray-200 font-mono" id="disp-phone">***</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Age Profile</span>
+                            <span class="text-sm text-gray-200 font-mono" id="disp-age">--</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-full bg-dark-800 h-1.5 rounded-full overflow-hidden mb-3">
+                            <div class="h-full bg-brand-500 w-full animate-[progress_2s_ease-in-out_forwards]" style="transform-origin: left; animation-name: progress;"></div>
+                        </div>
+                        <p class="text-xs text-gray-400">Initializing Ecosystem. Please wait...</p>
+                    </div>
+                    
+                    <style>
+                        @keyframes progress {
+                            0% { transform: scaleX(0); }
+                            100% { transform: scaleX(1); }
+                        }
+                    </style>
                 </div>
 
             </div>
@@ -219,7 +245,7 @@
     <!-- Modern Firebase v11 Modular SDK Implementation -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Environment Firebase Config or Fallback to User provided Config
         const fallbackConfig = {
@@ -237,24 +263,26 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // Define Custom Provider - FIXES ACCOUNT SELECTION ISSUE
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ 
-            prompt: 'select_account' // Forces the account selection popup
+            prompt: 'select_account' 
         });
 
+        // The Render API base URL
         const RENDER_API = "https://nueralabback.onrender.com/api/v1/sync";
-        let selectedTier = "";
-        let globalUser = null;
 
         // UI Elements
-        const authScreen = document.getElementById('auth-screen');
-        const vectorScreen = document.getElementById('vector-screen');
+        const screens = {
+            loading: document.getElementById('loading-screen'),
+            auth: document.getElementById('auth-screen'),
+            unregistered: document.getElementById('unregistered-screen'),
+            profile: document.getElementById('profile-screen')
+        };
+        
         const errorBox = document.getElementById('error-box');
         const googleBtn = document.getElementById('google-btn');
         const googleBtnText = document.getElementById('google-btn-text');
-        const syncBtn = document.getElementById('sync-btn');
-        const tierBtns = document.querySelectorAll('.tier-btn');
+        const logoutBtn = document.getElementById('logout-btn');
 
         // Global Error Utility
         window.showError = function(message) {
@@ -263,42 +291,83 @@
             setTimeout(() => errorBox.classList.add('hidden'), 5000);
         }
 
-        // Auto-Skip logic
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                globalUser = user;
-                if (localStorage.getItem('onboarding_done') === 'true') {
-                    console.log("Session found. Ready for ecosystem.");
-                    window.location.href = "index.html"; 
+        // Screen Manager
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(screen => {
+                if(screen) screen.classList.add('hidden');
+            });
+            if(screens[screenName]) screens[screenName].classList.remove('hidden');
+        }
+
+        // ------------------------------------------------------------
+        // BACKEND VERIFICATION LOGIC (Replaces LocalStorage check)
+        // ------------------------------------------------------------
+        async function verifyUserWithRender(uid) {
+            try {
+                // We check the specific 'user-profiles' endpoint in your MongoDB backend
+                // Adjust the exact route structure if your backend expects query params e.g. ?uid=... 
+                const response = await fetch(`${RENDER_API}/user-profiles/${uid}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                // If backend returns 404 or non-ok status, they are NOT registered
+                if (!response.ok) {
+                    return null; 
                 }
+
+                const userData = await response.json();
+                
+                // Ensure the response isn't technically OK but completely empty
+                if (!userData || Object.keys(userData).length === 0) {
+                    return null;
+                }
+
+                return userData;
+            } catch (err) {
+                console.error("Render Verification Failed:", err);
+                return null; // Assume unregistered on fail to enforce strict security
+            }
+        }
+
+        // ------------------------------------------------------------
+        // AUTHENTICATION STATE OBSERVER
+        // ------------------------------------------------------------
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is logged in via Firebase. Now verify with Render DB.
+                switchScreen('loading');
+                
+                const dbProfile = await verifyUserWithRender(user.uid);
+
+                if (dbProfile) {
+                    // USER IS REGISTERED
+                    // Immediately redirect to ecosystem
+                    window.location.href = "index.html"; 
+                } else {
+                    // USER IS NOT IN MONGODB (New user OR old user who was suspended/cleared)
+                    // We DO NOT let them proceed. We show the external registration link.
+                    switchScreen('unregistered');
+                }
+            } else {
+                // No user found, show login button
+                switchScreen('auth');
             }
         });
 
-        // Google Authentication
+        // ------------------------------------------------------------
+        // LOGIN ACTION
+        // ------------------------------------------------------------
         googleBtn.addEventListener('click', async () => {
-            // FIXES MULTIPLE CLICK / FREEZE ISSUE
             googleBtn.disabled = true;
-            googleBtnText.innerHTML = '<span class="spinner mr-2"></span> Authenticating...';
+            googleBtnText.innerHTML = '<span class="spinner-small mr-2"></span> Authenticating...';
             googleBtn.classList.add('opacity-80', 'cursor-not-allowed');
             errorBox.classList.add('hidden');
 
             try {
-                const result = await signInWithPopup(auth, provider);
-                globalUser = result.user;
-
-                // 1. Silent Background Sync for Auth Event
-                pushToNeuralCore('profiles', {
-                    uid: globalUser.uid,
-                    email: globalUser.email,
-                    displayName: globalUser.displayName,
-                    event: 'auth_success'
-                }).catch(e => console.warn("Background analytics sync issue", e));
-
-                // 2. Transition UI
-                authScreen.classList.add('hidden');
-                vectorScreen.classList.remove('hidden');
-                document.getElementById('node-name').value = globalUser.displayName || '';
-
+                // This triggers the popup. 
+                // Once successful, onAuthStateChanged (above) will automatically fire and handle the DB check.
+                await signInWithPopup(auth, provider);
             } catch (err) {
                 console.error("Auth Error", err);
                 if (err.code === 'auth/unauthorized-domain') {
@@ -306,92 +375,27 @@
                 } else if (err.code !== 'auth/popup-closed-by-user') {
                     window.showError(`Authentication Failed: ${err.message}`);
                 }
-            } finally {
-                // Reset Button state
+                
+                // Reset Button state on error
                 googleBtn.disabled = false;
-                googleBtnText.innerText = 'Continue with Google';
+                googleBtnText.innerText = 'Authenticate with Google';
                 googleBtn.classList.remove('opacity-80', 'cursor-not-allowed');
             }
         });
 
-        // Tier Selection Logic
-        tierBtns.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // Reset all
-                tierBtns.forEach(b => {
-                    b.classList.remove('bg-brand-500/20', 'border-brand-500', 'text-brand-400');
-                    b.classList.add('bg-dark-800', 'border-gray-700', 'text-gray-400');
-                });
-                
-                // Highlight selected
-                const target = e.target;
-                target.classList.remove('bg-dark-800', 'border-gray-700', 'text-gray-400');
-                target.classList.add('bg-brand-500/20', 'border-brand-500', 'text-brand-400');
-                
-                selectedTier = target.getAttribute('data-tier');
-            });
-        });
-
-        // Finalize Sync
-        syncBtn.addEventListener('click', async () => {
-            const name = document.getElementById('node-name').value;
-            const age = document.getElementById('node-age').value;
-
-            if (!globalUser || !selectedTier || !age || !name) {
-                window.showError("Please complete all parameters before syncing.");
-                return;
-            }
-
-            const originalText = syncBtn.innerText;
-            syncBtn.innerText = "INITIALIZING SYNC...";
-            syncBtn.disabled = true;
-            syncBtn.classList.add('opacity-70');
-
-            const identityVector = {
-                uid: globalUser.uid,
-                name: name,
-                age: parseInt(age),
-                level: selectedTier,
-                isPremium: false,
-                courses: [],
-                syncDate: new Date().toISOString()
-            };
-
-            const success = await pushToNeuralCore('user-profiles', identityVector);
-
-            if (success) {
-                localStorage.setItem('onboarding_done', 'true');
-                localStorage.setItem('user_level', selectedTier);
-                syncBtn.innerText = "SYNC COMPLETE ✓";
-                syncBtn.classList.remove('bg-brand-600');
-                syncBtn.classList.add('bg-green-600');
-                
-                setTimeout(() => {
-                    // Redirect logic
-                    window.location.href = "index.html"; 
-                }, 1000);
-            } else {
-                window.showError("Database sync failed. Please check network connection.");
-                syncBtn.innerText = "RETRY SYNC";
-                syncBtn.disabled = false;
-                syncBtn.classList.remove('opacity-70');
-            }
-        });
-
-        // API Caller
-        async function pushToNeuralCore(category, data) {
+        // ------------------------------------------------------------
+        // LOGOUT ACTION (For suspended users wanting to switch accounts)
+        // ------------------------------------------------------------
+        logoutBtn.addEventListener('click', async () => {
             try {
-                const response = await fetch(`${RENDER_API}/${category}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                return response.ok;
-            } catch (err) {
-                console.error("Core Link Failed", err);
-                return false;
+                switchScreen('loading');
+                await signOut(auth);
+                // The observer will catch this and switch back to 'auth' screen
+            } catch (error) {
+                window.showError("Sign out failed.");
             }
-        }
+        });
+
     </script>
 </body>
 </html>
