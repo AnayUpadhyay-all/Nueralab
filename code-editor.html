@@ -196,7 +196,7 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         firebase.auth().onAuthStateChanged((user) => {
             if (!user || !localStorage.getItem('onboarding_done')) {
-                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+
                     window.location.replace("login.html");
                 }
             }
