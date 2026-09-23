@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Center | Neuralab</title>
+  <meta name="description" content="Administrative control center for managing courses, tracking enrollment metrics, and inspecting security audit trails.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body style="background:var(--bg-primary);">
+
+  <!-- Admin Navbar -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon" style="background:linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));">🛡️</div>
+      <span>Neuralab Admin Matrix</span>
+    </a>
+    <div style="display:flex; align-items:center; gap:1.25rem;">
+      <a href="/" class="btn btn-secondary btn-sm">Public Portal</a>
+      <span style="font-size:0.85rem; color:var(--text-secondary);">Logged in as: <strong id="adminUserName" style="color:#fff;">Admin</strong></span>
+      <button id="adminLogoutBtn" class="btn btn-secondary btn-sm" onclick="localStorage.removeItem('neuralab_jwt'); window.location.href='/login.html';">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="container" style="padding-top:2.5rem; padding-bottom:5rem;">
+    <!-- Admin Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 style="font-size:2rem; font-weight:800; letter-spacing:-0.5px;">Matrix Course Administration</h1>
+        <p style="color:var(--text-secondary); font-size:0.95rem;">Manage core technical tracks, audit enrollments, and configure curriculum nodes.</p>
+      </div>
+      <button id="openAddCourseModalBtn" class="btn btn-primary">
+        <span>+ Add New Course Track</span>
+      </button>
+    </div>
+
+    <!-- Live Statistics Cards -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">Registered Tracks</div>
+        <div id="statTotalCourses" style="font-size:2rem; font-weight:800; color:var(--accent-cyan); margin:0.35rem 0;">-</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Active production courses</div>
+      </div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">Active Students</div>
+        <div id="statTotalStudents" style="font-size:2rem; font-weight:800; color:var(--accent-green); margin:0.35rem 0;">-</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Verified engineering accounts</div>
+      </div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">Gross PayPal Revenue</div>
+        <div id="statTotalRevenue" style="font-size:2rem; font-weight:800; color:var(--accent-blue); margin:0.35rem 0;">$0</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Server-verified captures</div>
+      </div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); text-transform:uppercase;">Core System Health</div>
+        <div id="statSystemHealth" style="font-size:1.4rem; font-weight:800; color:#fff; margin:0.6rem 0;">Nominal</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Zero security vulnerabilities</div>
+      </div>
+    </div>
+
+    <!-- Course Management Section -->
+    <div class="card" style="margin-bottom:3rem; padding:1.75rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+        <h2 style="font-size:1.3rem; font-weight:700;">Curriculum Nodes</h2>
+        <input type="text" id="adminCourseSearch" class="form-input" placeholder="Filter courses by name, category, or ID..." style="max-width:350px;">
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Course Title</th>
+              <th>Category</th>
+              <th>Level</th>
+              <th>Price</th>
+              <th>Students</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminCourseTableBody">
+            <tr>
+              <td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading matrix database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Real-time Security Audit Log -->
+    <div class="card" style="padding:1.75rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="font-size:1.3rem; font-weight:700;">Cryptographic Audit Logs</h2>
+        <span class="badge badge-purple">Zero-Trust Event Stream</span>
+      </div>
+      <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:1rem;">
+        Every course creation, deletion, authentication attempt, and PayPal transaction is immutably logged with client IP and cryptographic verification.
+      </p>
+      <div id="auditLogsContainer" style="max-height:300px; overflow-y:auto; background:var(--bg-tertiary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+        <div style="color:var(--text-muted); font-size:0.85rem;">Retrieving log stream...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Course Modal -->
+  <div id="addCourseModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:680px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New Course Track</h3>
+        <button id="closeAddModalBtn" class="modal-close">&times;</button>
+      </div>
+      <form id="addCourseForm">
+        <div class="modal-body" style="max-height:75vh; overflow-y:auto;">
+          <div class="form-group">
+            <label class="form-label" for="addTitle">Course Title *</label>
+            <input type="text" id="addTitle" class="form-input" placeholder="e.g. Linux Kernel Internals & eBPF" required>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="addCategory">Category *</label>
+              <select id="addCategory" class="form-select">
+                <option value="Systems Programming">Systems Programming</option>
+                <option value="Distributed Systems">Distributed Systems</option>
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Web Architecture">Web Architecture</option>
+                <option value="Compilers & Runtimes">Compilers & Runtimes</option>
+                <option value="Backend Architecture">Backend Architecture</option>
+                <option value="Hardware & Embedded">Hardware & Embedded</option>
+                <option value="Cyber Security">Cyber Security</option>
+                <option value="Quantum & Physics">Quantum & Physics</option>
+                <option value="Infrastructure & SRE">Infrastructure & SRE</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="addLevel">Level *</label>
+              <select id="addLevel" class="form-select">
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced" selected>Advanced</option>
+                <option value="Expert">Expert (Staff+)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="addPrice">Price (USD) *</label>
+              <input type="number" id="addPrice" class="form-input" placeholder="149" min="0" step="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="addDuration">Duration</label>
+              <input type="text" id="addDuration" class="form-input" placeholder="10 Weeks">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="addIcon">Icon Emoji</label>
+              <input type="text" id="addIcon" class="form-input" placeholder="⚡">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="addBadge">Badge</label>
+            <input type="text" id="addBadge" class="form-input" placeholder="e.g. Flagship, Core Track, New">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="addDescription">Course Description *</label>
+            <textarea id="addDescription" class="form-textarea" rows="3" placeholder="Deep dive architectural description..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="addPrereq">Prerequisites</label>
+            <input type="text" id="addPrereq" class="form-input" placeholder="e.g. C/C++ foundations, OS concepts">
+          </div>
+        </div>
+        <div style="padding:1.25rem 1.75rem; border-top:1px solid var(--border-subtle); display:flex; justify-content:flex-end; gap:0.75rem; background:var(--bg-tertiary);">
+          <button type="button" id="cancelAddModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="submitAddCourseBtn" class="btn btn-primary">Create Course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Course Confirmation Modal -->
+  <div id="deleteCourseModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color:var(--accent-red);">Purge Course from Matrix</h3>
+        <button id="closeDeleteModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary); margin-bottom:1rem;">
+          Are you sure you want to permanently delete this course?
+        </p>
+        <div style="background:var(--bg-tertiary); padding:1rem; border-radius:var(--radius-sm); font-weight:bold; color:#fff;" id="deleteCourseTitle">
+          Course Title
+        </div>
+        <p style="font-size:0.82rem; color:var(--accent-red); margin-top:1rem;">
+          ⚠️ This action will remove the curriculum node from the public matrix and create a permanent audit log entry.
+        </p>
+      </div>
+      <div style="padding:1.25rem 1.75rem; border-top:1px solid var(--border-subtle); display:flex; justify-content:flex-end; gap:0.75rem; background:var(--bg-tertiary);">
+        <button type="button" id="cancelDeleteModalBtn" class="btn btn-secondary">Cancel</button>
+        <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Yes, Delete Course</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/admin.js"></script>
+</body>
+</html>

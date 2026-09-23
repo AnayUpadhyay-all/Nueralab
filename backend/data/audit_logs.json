@@ -1,0 +1,11 @@
+[
+  {
+    "id": "log_init_001",
+    "timestamp": "2026-09-23T10:00:00.000Z",
+    "action": "SYSTEM_INITIALIZED",
+    "performedBy": "system",
+    "details": "Neuralab high-security core initialized with Zero Trust architecture and 18 deep-tech courses.",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  }
+]

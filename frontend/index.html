@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neuralab | Deep Tech & Systems Engineering Platform</title>
+  <meta name="description" content="Master first-principles computer science, low-level systems, distributed consensus, compilers, and neural architectures. Founded by Anay Upadhyay.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon">⚡</div>
+      <span>Neuralab</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#courses" class="nav-link">Courses</a></li>
+        <li><a href="#philosophy" class="nav-link">Philosophy & Journey</a></li>
+        <li><a href="/code-editor.html" class="nav-link">Code Studio</a></li>
+        <li><a href="/ai-lab.html" class="nav-link">Neural Lab</a></li>
+        <li><a href="/neural-platform.html" class="nav-link">Dashboard</a></li>
+      </ul>
+    </nav>
+    <div id="navActions" class="nav-actions">
+      <!-- Injected dynamically by app.js -->
+    </div>
+  </header>
+
+  <!-- 3D Hero Section -->
+  <section class="hero-wrapper">
+    <canvas id="neural3dCanvas"></canvas>
+    <div class="container hero-content">
+      <div class="badge badge-cyan">First-Principles Engineering • No Vibe Coding</div>
+      <h1 class="hero-title">From Bare Metal to Neural Synapses.</h1>
+      <p class="hero-subtitle">
+        Neuralab is an engineering academy for software developers who refuse to settle for superficial abstraction. Master C++, Rust, browser rendering engines, distributed consensus, and transformer architectures.
+      </p>
+      <div class="hero-buttons">
+        <a href="#courses" class="btn btn-primary">Explore Engineering Tracks</a>
+        <a href="/code-editor.html" class="btn btn-secondary">Launch Code Sandbox</a>
+        <a href="#philosophy" class="btn btn-secondary">The Creator's Journey</a>
+      </div>
+      <div style="margin-top:2.5rem; display:flex; gap:2rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">
+        <div><strong style="color:#fff; font-size:1.1rem; display:block;">18</strong> Systems Courses</div>
+        <div><strong style="color:var(--accent-cyan); font-size:1.1rem; display:block;">20,000+</strong> Hours of Systems Lab</div>
+        <div><strong style="color:var(--accent-green); font-size:1.1rem; display:block;">100%</strong> Zero-Trust Security</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Anay Upadhyay's Journey & Philosophy Section -->
+  <section id="philosophy" class="section" style="background:var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-purple">The Architectural Vision</div>
+        <h2 class="section-title">Beyond "Vibe Coding": Why Neuralab Exists</h2>
+        <p class="section-desc">
+          A note from founder and lead systems architect Anay Upadhyay on reclaiming depth, rigor, and technical sovereignty in software engineering.
+        </p>
+      </div>
+
+      <div class="journey-card">
+        <span class="journey-badge">// THE FOUNDER'S JOURNEY • ANAY UPADHYAY</span>
+        <blockquote class="journey-quote">
+          "The modern engineering ecosystem is intoxicated by superficiality. Copying snippets, relying on autocomplete hallucinations, and treating the runtime as magic works right up until your distributed storage deadlocks or your cache line thrashing kills production."
+        </blockquote>
+        <div class="journey-body">
+          <p style="margin-bottom:1.25rem;">
+            My journey began like many others: writing high-level web applications and marveling at how fast something could appear on screen. But as I pushed deeper into large-scale distributed systems and high-throughput networking, the cracks in shallow knowledge became undeniable. A framework will not save you when your V8 garbage collector freezes the event loop for 400ms. An ORM will not rescue your latency when an unindexed LSM-tree write-ahead log saturates disk I/O.
+          </p>
+          <p style="margin-bottom:1.25rem;">
+            I realized that the distinction between an average developer and a staff-level systems architect is not how many frameworks they have memorized, but whether they understand the machine down to the silicon: memory layout, CPU cache hierarchies, OS kernel interrupts, TCP/QUIC state machines, and mathematical linear algebra.
+          </p>
+          <p>
+            I built <strong>Neuralab</strong> to be the platform I wished I had: an uncompromising, rigorous, first-principles curriculum where you write memory allocators in C++, understand the borrow checker's graph theory in Rust, disassemble V8 bytecode, build Raft consensus engines from scratch, and derive FlashAttention-2 kernels. No superficial tutorials. No hand-waving. Pure, unapologetic technical mastery.
+          </p>
+        </div>
+        <div class="journey-author">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Anay Upadhyay" class="journey-avatar">
+          <div>
+            <div class="author-name">Anay Upadhyay</div>
+            <div class="author-role">Founder, Neuralab • Systems & Neural Architect</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Sandbox Teaser Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-cyan">In-Browser Compilation & Execution</div>
+        <h2 class="section-title">Zero-Setup Systems Sandbox</h2>
+        <p class="section-desc">
+          Test algorithms, inspect memory layouts, and experiment with reactive signals directly in your browser.
+        </p>
+      </div>
+
+      <div class="sandbox-card">
+        <div class="sandbox-header">
+          <div class="window-dots">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+          </div>
+          <span style="color:var(--text-muted); font-size:0.8rem;">distributed_raft_consensus.cpp — C++20 / Thread Sanitizer</span>
+          <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.6rem;">Open in Studio →</a>
+        </div>
+        <pre class="sandbox-content"><code><span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;iostream&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;vector&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;atomic&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;chrono&gt;</span>
+
+<span style="color:#64748b;">// High-Performance Zero-Allocation Raft State Machine</span>
+<span style="color:#4facfe;">enum class</span> <span style="color:#ffb800;">NodeRole</span> { FOLLOWER, CANDIDATE, LEADER };
+
+<span style="color:#4facfe;">struct</span> <span style="color:#ffb800;">LogEntry</span> {
+    <span style="color:#4facfe;">uint64_t</span> term;
+    <span style="color:#4facfe;">uint64_t</span> index;
+    <span style="color:#4facfe;">std::vector&lt;uint8_t&gt;</span> command;
+};
+
+<span style="color:#4facfe;">int</span> <span style="color:#00f2fe;">main</span>() {
+    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Neuralab Engine] Initializing Raft Cluster (Node 01)..."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
+    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Term 1] Heartbeat acknowledged via zero-copy RDMA."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
+    <span style="color:#4facfe;">return</span> <span style="color:#ff3366;">0</span>;
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Courses Catalog Section -->
+  <section id="courses" class="section" style="background:var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-green">Production Curriculum</div>
+        <h2 class="section-title">The Engineering Curriculum</h2>
+        <p class="section-desc">
+          18 comprehensive tracks covering the full modern engineering spectrum. Verified with official PayPal checkout and instant sandbox access.
+        </p>
+      </div>
+
+      <!-- Controls: Search & Category Filter -->
+      <div style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2.5rem;">
+        <div style="position:relative; max-width:600px; margin:0 auto; width:100%;">
+          <input type="text" id="courseSearchInput" class="form-input" placeholder="Search systems, protocols, compilers, algorithms..." style="padding-left:1.2rem; font-size:1rem; border-radius:999px;">
+        </div>
+
+        <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
+          <button class="badge filter-pill active" data-category="all" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">All Tracks</button>
+          <button class="badge badge-cyan filter-pill" data-category="Systems Programming" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Systems & C++/Rust</button>
+          <button class="badge badge-purple filter-pill" data-category="Distributed Systems" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Distributed & Storage</button>
+          <button class="badge badge-green filter-pill" data-category="Artificial Intelligence" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">AI & Tensors</button>
+          <button class="badge filter-pill" data-category="Web Architecture" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,255,255,0.05); color:#fff;">Web Core & V8</button>
+          <button class="badge filter-pill" data-category="Cyber Security" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,51,102,0.15); color:var(--accent-red);">Security & Exploits</button>
+          <button class="badge filter-pill" data-category="Quantum & Physics" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(139,92,246,0.15); color:#d8b4fe;">Quantum Computing</button>
+        </div>
+      </div>
+
+      <!-- Dynamic Course Grid -->
+      <div id="coursesGrid" class="grid-cards">
+        <!-- Rendered dynamically by app.js from /api/courses -->
+      </div>
+    </div>
+  </section>
+
+  <!-- PayPal Checkout Modal -->
+  <div id="paypalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.3rem;">💳</span>
+          <h3 class="modal-title">Secure PayPal Checkout</h3>
+        </div>
+        <button id="closePaypalModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-tertiary); padding:1.25rem; border-radius:var(--radius-sm); margin-bottom:1.5rem;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono);">Selected Track</div>
+          <h4 id="paypalCourseTitle" style="font-size:1.2rem; margin:0.35rem 0 0.75rem;">Loading course...</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+            <span style="color:var(--text-secondary); font-size:0.9rem;">Duration: <span id="paypalCourseDuration">-</span></span>
+            <div id="paypalCoursePrice" style="font-size:1.35rem; font-weight:700; color:var(--accent-cyan);">$0 USD</div>
+          </div>
+        </div>
+
+        <div style="border:1px solid rgba(0,242,254,0.2); background:rgba(0,242,254,0.03); padding:1rem; border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+          🔒 <strong>Server-Verified Transaction:</strong> Order prices are verified on the backend core. Includes lifetime access, source repositories, interactive labs, and completion credentials.
+        </div>
+
+        <!-- PayPal Button Mock/Live Container -->
+        <div id="paypalButtonContainer" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <button id="confirmPaypalBtn" class="btn btn-primary" style="width:100%; padding:0.85rem; font-size:1rem;">
+            Complete PayPal Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt / Confirmation Modal -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Enrollment Confirmation</h3>
+        <button id="closeReceiptModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div id="receiptBody" class="modal-body">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
+            <div class="brand-icon">⚡</div>
+            <span style="font-weight:700; font-size:1.2rem; color:#fff;">Neuralab</span>
+          </div>
+          <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            The deep-tech engineering and systems academy architected by Anay Upadhyay. High-security, zero-dependency runtime core built for serious software craftsmen.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Engineering</h4>
+          <ul>
+            <li><a href="/courses/cpp-foundation.html">C++ Systems</a></li>
+            <li><a href="/courses/rust-core.html">Rust Core</a></li>
+            <li><a href="/courses/databases.html">Storage Engines</a></li>
+            <li><a href="/courses/intelligence-ai.html">Transformers & AI</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Platforms & Tools</h4>
+          <ul>
+            <li><a href="/code-editor.html">Code Studio IDE</a></li>
+            <li><a href="/ai-lab.html">Interactive Neural Lab</a></li>
+            <li><a href="/admin.html">Admin Portal</a></li>
+            <li><a href="/neural-platform.html">Student Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Security & Architecture</h4>
+          <ul>
+            <li><span style="color:var(--accent-green); font-size:0.85rem;">● Zero Dependencies</span></li>
+            <li><span style="color:var(--accent-cyan); font-size:0.85rem;">● CSRF Protected</span></li>
+            <li><span style="color:var(--accent-purple); font-size:0.85rem;">● OWASP Hardened</span></li>
+            <li><a href="https://github.com/anayupadhyay-all" target="_blank" rel="noopener">GitHub: anayupadhyay-all</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 Neuralab Core by Anay Upadhyay. All systems operational.</div>
+        <div style="font-family:var(--font-mono); font-size:0.8rem;">SHA-256 Verified • Node 18 Native Core</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/assets/js/three-neural.js"></script>
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>

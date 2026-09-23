@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Portal | Neuralab</title>
+  <meta name="description" content="Secure Zero-Trust authentication portal for Neuralab learners and systems architects.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+</head>
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1.5rem; background:radial-gradient(circle at 50% 20%, rgba(0,242,254,0.06), var(--bg-primary) 70%);">
+
+  <div class="card" style="max-width:440px; width:100%; padding:2.25rem; box-shadow: 0 0 40px rgba(0,0,0,0.6);">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <a href="/" style="display:inline-flex; align-items:center; gap:0.6rem; text-decoration:none; color:#fff; font-size:1.4rem; font-weight:700;">
+        <div class="brand-icon">⚡</div>
+        <span>Neuralab</span>
+      </a>
+      <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem;">Zero-Trust Systems Access</p>
+    </div>
+
+    <!-- Tab Selector -->
+    <div style="display:flex; background:var(--bg-tertiary); padding:0.25rem; border-radius:var(--radius-sm); margin-bottom:1.75rem;">
+      <button id="tabLogin" class="btn" style="flex:1; background:var(--bg-card); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">Sign In</button>
+      <button id="tabRegister" class="btn" style="flex:1; background:transparent; color:var(--text-muted); border-radius:var(--radius-sm); font-size:0.88rem;">Register</button>
+    </div>
+
+    <!-- Error / Success Alert -->
+    <div id="authAlert" style="display:none; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-size:0.85rem; margin-bottom:1.25rem;"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="engineer@neuralab.dev" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">
+        Authenticate Session
+      </button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" style="display:none;">
+      <div class="form-group">
+        <label class="form-label" for="regName">Full Name</label>
+        <input type="text" id="regName" class="form-input" placeholder="Ada Lovelace" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="regEmail">Email Address</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="ada@systems.org" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="regPassword">Password (Min. 8 chars)</label>
+        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" minlength="8" required>
+      </div>
+
+      <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">
+        Create Engineering Account
+      </button>
+    </form>
+
+    <!-- One-Click Demo Credentials for Quick Testing -->
+    <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border-subtle); text-align:center;">
+      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem; text-transform:uppercase; font-family:var(--font-mono);">Preconfigured Roles</div>
+      <div style="display:flex; gap:0.5rem; justify-content:center;">
+        <button id="quickAdminBtn" class="btn btn-secondary btn-sm" style="font-size:0.78rem; border-color:var(--accent-purple); color:#d8b4fe;">
+          ⚡ Admin (Anay)
+        </button>
+        <button id="quickStudentBtn" class="btn btn-secondary btn-sm" style="font-size:0.78rem;">
+          👤 Student Demo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const authAlert = document.getElementById('authAlert');
+
+    function showAlert(msg, isSuccess = false) {
+      authAlert.style.display = 'block';
+      authAlert.style.background = isSuccess ? 'rgba(0, 245, 160, 0.1)' : 'rgba(255, 51, 102, 0.1)';
+      authAlert.style.border = `1px solid ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}`;
+      authAlert.style.color = isSuccess ? 'var(--accent-green)' : 'var(--accent-red)';
+      authAlert.textContent = msg;
+    }
+
+    tabLogin.addEventListener('click', () => {
+      tabLogin.style.background = 'var(--bg-card)';
+      tabLogin.style.color = '#fff';
+      tabRegister.style.background = 'transparent';
+      tabRegister.style.color = 'var(--text-muted)';
+      loginForm.style.display = 'block';
+      registerForm.style.display = 'none';
+      authAlert.style.display = 'none';
+    });
+
+    tabRegister.addEventListener('click', () => {
+      tabRegister.style.background = 'var(--bg-card)';
+      tabRegister.style.color = '#fff';
+      tabLogin.style.background = 'transparent';
+      tabLogin.style.color = 'var(--text-muted)';
+      registerForm.style.display = 'block';
+      loginForm.style.display = 'none';
+      authAlert.style.display = 'none';
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'register') {
+      tabRegister.click();
+    }
+
+    // Quick demo buttons
+    document.getElementById('quickAdminBtn').addEventListener('click', () => {
+      document.getElementById('loginEmail').value = 'admin@neuralab.dev';
+      document.getElementById('loginPassword').value = 'NeuralabAdmin@2026!';
+      loginForm.dispatchEvent(new Event('submit'));
+    });
+
+    document.getElementById('quickStudentBtn').addEventListener('click', () => {
+      document.getElementById('loginEmail').value = 'student@neuralab.dev';
+      document.getElementById('loginPassword').value = 'Student@2026!';
+      loginForm.dispatchEvent(new Event('submit'));
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Verifying cryptographic signature...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value.trim(),
+            password: document.getElementById('loginPassword').value
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.token) {
+          throw new Error(data.message || 'Authentication failed.');
+        }
+
+        localStorage.setItem('neuralab_jwt', data.token);
+        localStorage.setItem('neuralab_csrf', data.csrfToken);
+
+        showAlert('Access Granted. Redirecting...', true);
+        const redirect = urlParams.get('redirect') || (data.user.role === 'admin' ? '/admin.html' : '/');
+        setTimeout(() => window.location.href = redirect, 800);
+      } catch (err) {
+        showAlert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Authenticate Session';
+      }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Registering credentials...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('regName').value.trim(),
+            email: document.getElementById('regEmail').value.trim(),
+            password: document.getElementById('regPassword').value
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.token) {
+          throw new Error(data.message || 'Registration failed.');
+        }
+
+        localStorage.setItem('neuralab_jwt', data.token);
+        localStorage.setItem('neuralab_csrf', data.csrfToken);
+
+        showAlert('Account created. Redirecting...', true);
+        const redirect = urlParams.get('redirect') || '/';
+        setTimeout(() => window.location.href = redirect, 800);
+      } catch (err) {
+        showAlert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Engineering Account';
+      }
+    });
+  </script>
+</body>
+</html>

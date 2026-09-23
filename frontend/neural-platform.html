@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Learning OS | Neuralab</title>
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body style="background:var(--bg-primary);">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon">⚡</div>
+      <span>Neuralab Learning OS</span>
+    </a>
+    <div id="navActions" class="nav-actions">
+      <!-- Injected by app.js -->
+    </div>
+  </header>
+
+  <div class="container" style="padding:3rem 1.5rem 5rem;">
+    <!-- Welcome Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem; flex-wrap:wrap; gap:1.5rem;">
+      <div>
+        <div class="badge badge-cyan">Engineer Workspace</div>
+        <h1 id="welcomeUser" style="font-size:2.2rem; font-weight:800; margin:0.5rem 0;">Systems Mastery Track</h1>
+        <p style="color:var(--text-secondary);">Track enrolled tracks, hands-on lab progress, and compiler milestones.</p>
+      </div>
+      <div style="display:flex; gap:0.75rem;">
+        <a href="/code-editor.html" class="btn btn-secondary">Open Code Studio</a>
+        <a href="/ai-lab.html" class="btn btn-primary">Launch Neural Lab</a>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);">ENROLLED TRACKS</div>
+        <div id="enrolledCount" style="font-size:2rem; font-weight:800; color:var(--accent-cyan); margin:0.35rem 0;">0</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Active systems courses</div>
+      </div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);">SYSTEMS LAB STREAK</div>
+        <div style="font-size:2rem; font-weight:800; color:var(--accent-green); margin:0.35rem 0;">14 Days</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Consecutive commits & builds</div>
+      </div>
+      <div class="card" style="padding:1.25rem;">
+        <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);">ARCHITECTURAL LEVEL</div>
+        <div style="font-size:1.6rem; font-weight:800; color:var(--accent-blue); margin:0.5rem 0;">L5 (Systems)</div>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">Memory & Concurrency Certified</div>
+      </div>
+    </div>
+
+    <!-- Enrolled Tracks -->
+    <h2 style="font-size:1.5rem; margin-bottom:1.5rem;">Active Enrolled Tracks</h2>
+    <div id="enrolledTracksGrid" class="grid-cards" style="margin-bottom:3.5rem;">
+      <div style="grid-column:1/-1; padding:3rem; text-align:center; color:var(--text-muted);">
+        Loading enrolled tracks...
+      </div>
+    </div>
+
+    <!-- Recommended Systems Modules -->
+    <h2 style="font-size:1.5rem; margin-bottom:1.5rem;">Recommended Next Steps</h2>
+    <div class="grid-cards">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3 class="card-title">C++23 Memory Layout & SIMD</h3>
+        <p class="card-desc">Inspect memory alignment, cache lines, and vectorization primitives in our interactive compiler explorer.</p>
+        <a href="/courses/cpp-foundation.html" class="btn btn-secondary btn-sm" style="margin-top:1rem;">Launch Lab Module</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">🦀</div>
+        <h3 class="card-title">Rust Fearless Concurrency & Pin</h3>
+        <p class="card-desc">Understand memory safety without garbage collection, non-lexical lifetimes, and async state machines.</p>
+        <a href="/courses/rust-core.html" class="btn btn-secondary btn-sm" style="margin-top:1rem;">Launch Lab Module</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">🗄️</div>
+        <h3 class="card-title">LSM-Trees vs B+Trees Internals</h3>
+        <p class="card-desc">Write-Ahead Logs, SSTables, Bloom filters, and compaction strategies in high-throughput storage engines.</p>
+        <a href="/courses/databases.html" class="btn btn-secondary btn-sm" style="margin-top:1rem;">Launch Lab Module</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/js/app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('neuralab_jwt');
+      if (!token) {
+        window.location.href = '/login.html?redirect=neural-platform.html';
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/payments/my-enrollments', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const grid = document.getElementById('enrolledTracksGrid');
+        const count = document.getElementById('enrolledCount');
+
+        if (data.enrollments && data.enrollments.length > 0) {
+          count.textContent = data.enrollments.length;
+          grid.innerHTML = data.enrollments.map(c => `
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon">${c.icon || '📘'}</div>
+                <span class="badge badge-green">Enrolled</span>
+              </div>
+              <h3 class="card-title">${c.title}</h3>
+              <p class="card-desc">${c.description}</p>
+              <div class="card-meta">
+                <span>Progress: 35% Completed</span>
+                <span style="color:var(--accent-cyan); font-weight:bold;">${c.duration}</span>
+              </div>
+              <a href="/courses/${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-primary btn-sm" style="margin-top:1.25rem;">Resume Course Material →</a>
+            </div>
+          `).join('');
+        } else {
+          count.textContent = '0';
+          grid.innerHTML = `
+            <div style="grid-column:1/-1; padding:3rem; text-align:center; background:var(--bg-tertiary); border-radius:var(--radius-md);">
+              <h3 style="margin-bottom:0.5rem;">No Active Enrollments</h3>
+              <p style="color:var(--text-secondary); margin-bottom:1.5rem;">You have not enrolled in any systems engineering tracks yet.</p>
+              <a href="/#courses" class="btn btn-primary">Browse Curriculum</a>
+            </div>
+          `;
+        }
+      } catch (e) {
+        console.error('Error fetching enrollments:', e);
+      }
+    });
+  </script>
+</body>
+</html>

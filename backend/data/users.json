@@ -1,0 +1,38 @@
+[
+  {
+    "id": "usr_admin_01",
+    "email": "admin@neuralab.dev",
+    "name": "Anay Upadhyay",
+    "role": "admin",
+    "headline": "Founder & Lead Systems Architect",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80",
+    "password": {
+      "salt": "93b4fe03208487bfeea727504aacf02e8b96af3e6875f1043c277f8fdd90ee4b",
+      "hash": "39146b24f14d78db5488807b0087431a017ae9def0d1899f709b0ee76e2c319aacd86009f7df5e5de5f25fe36bf0687e4076d5b702d74191a7321e2800cddd12"
+    },
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "enrolledCourses": [
+      "cpp-foundation",
+      "rust-core",
+      "databases",
+      "intelligence-ai"
+    ]
+  },
+  {
+    "id": "usr_student_01",
+    "email": "student@neuralab.dev",
+    "name": "Elena Rostova",
+    "role": "student",
+    "headline": "Junior Distributed Systems Engineer",
+    "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80",
+    "password": {
+      "salt": "7a5692e8702fc6559283ddff533ee1ac9af54b5a8e224567fd3cedea11421db8",
+      "hash": "ffadbd28e3001a8c3d2f3886dd3e43c88407196444e55687d09e06d695c7daddd4245e03d60ac3a9f92e392dd1fcda44d5defbee795fe7fb33d2bc53bd7c4ad3"
+    },
+    "createdAt": "2026-03-15T00:00:00.000Z",
+    "enrolledCourses": [
+      "webcore",
+      "frameworks"
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "nueralab-backend",
+  "version": "2.0.0",
+  "description": "Production-grade, high-security backend for Neuralab learning platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/security_test.js"
+  },
+  "author": "Anay Upadhyay",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
