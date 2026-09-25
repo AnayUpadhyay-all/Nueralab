@@ -1,484 +1,213 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NueraLab | Intelligence AI</title>
-
-    <!-- Firebase SDKs for Auth Guard -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --bg-base: #030305;
-            --bg-surface: rgba(15, 15, 20, 0.7);
-            --primary: #818cf8;
-            --primary-glow: rgba(129, 140, 248, 0.4);
-            --accent: #c084fc;
-            --accent-glow: rgba(192, 132, 252, 0.4);
-            --border-light: rgba(255, 255, 255, 0.06);
-            --border-strong: rgba(255, 255, 255, 0.12);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #34d399;
-            
-            --glass-blur: 25px;
-            --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg-base);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            background-image: 
-                radial-gradient(circle at 10% 10%, rgba(129, 140, 248, 0.08), transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(192, 132, 252, 0.08), transparent 40%),
-                radial-gradient(circle at 50% 50%, #030305, #000);
-        }
-
-        /* --- AI CHAT INTERFACE --- */
-        .chat-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            max-width: 1100px;
-            margin: 0 auto;
-            width: 100%;
-            background: rgba(10, 10, 15, 0.3);
-            border-left: 1px solid var(--border-light);
-            border-right: 1px solid var(--border-light);
-            box-shadow: 20px 0 80px rgba(0,0,0,0.4), -20px 0 80px rgba(0,0,0,0.4);
-        }
-
-        .chat-header {
-            padding: 24px 48px;
-            border-bottom: 1px solid var(--border-light);
-            background: rgba(5, 5, 7, 0.75);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            display: flex; justify-content: space-between; align-items: center;
-            z-index: 10;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-        }
-
-        .back-btn {
-            color: var(--text-muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border-light);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-right: 24px;
-        }
-
-        .back-btn:hover {
-            color: white;
-            background: rgba(255,255,255,0.08);
-            transform: translateX(-4px);
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .header-title h1 { 
-            font-size: 1.5rem; 
-            font-weight: 800; 
-            letter-spacing: -0.04em;
-            background: linear-gradient(to right, #fff, var(--text-muted));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header-title p { color: var(--text-muted); font-size: 0.85rem; margin-top: 2px; font-weight: 500;}
-
-        .status-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .ai-status-pill {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(52, 211, 153, 0.05);
-            color: var(--success); font-size: 0.75rem; font-weight: 800;
-            padding: 6px 14px; border-radius: 20px;
-            border: 1px solid rgba(52, 211, 153, 0.15);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .ai-pulse {
-            width: 8px; height: 8px; background: var(--success);
-            border-radius: 50%; box-shadow: 0 0 12px var(--success);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        /* Chat History Area */
-        .chat-history {
-            flex: 1;
-            padding: 40px 60px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-            scroll-behavior: smooth;
-        }
-
-        .chat-history::-webkit-scrollbar { width: 6px; }
-        .chat-history::-webkit-scrollbar-track { background: transparent; }
-        .chat-history::-webkit-scrollbar-thumb { 
-            background: rgba(255,255,255,0.05); 
-            border-radius: 10px; 
-        }
-
-        .message {
-            max-width: 85%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            animation: messageEntry 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes messageEntry {
-            from { opacity: 0; transform: translateY(20px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .message.ai { align-self: flex-start; }
-        .message.user { align-self: flex-end; align-items: flex-end; }
-
-        .msg-sender {
-            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
-            letter-spacing: 0.1em; color: var(--text-muted);
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: 2px;
-        }
-
-        .ai .msg-sender::before {
-            content: '';
-            width: 12px; height: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 3px;
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-
-        .msg-bubble {
-            padding: 18px 24px;
-            border-radius: 20px;
-            font-size: 0.98rem;
-            line-height: 1.65;
-            position: relative;
-            box-shadow: var(--shadow-premium);
-        }
-
-        /* AI Message Styling */
-        .ai .msg-bubble {
-            background: rgba(20, 20, 25, 0.6);
-            border: 1px solid var(--border-light);
-            color: var(--text-main);
-            border-top-left-radius: 4px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
-        .ai .msg-bubble code {
-            background: rgba(0,0,0,0.4);
-            padding: 3px 7px; border-radius: 6px;
-            font-family: 'Fira Code', monospace; color: var(--accent);
-            font-size: 0.88em;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* User Message Styling */
-        .user .msg-bubble {
-            background: linear-gradient(145deg, rgba(129, 140, 248, 0.12), rgba(129, 140, 248, 0.05));
-            border: 1px solid rgba(129, 140, 248, 0.25);
-            color: #fff;
-            border-top-right-radius: 4px;
-            box-shadow: 0 10px 30px rgba(129, 140, 248, 0.1), inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        /* Input Area */
-        .chat-input-area {
-            padding: 20px 60px 50px 60px;
-            background: linear-gradient(to top, var(--bg-base) 70%, transparent);
-            z-index: 10;
-        }
-
-        .input-container {
-            position: relative;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            display: flex; align-items: center;
-            padding: 10px 10px 10px 28px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(20px);
-        }
-
-        .input-container:focus-within {
-            border-color: rgba(129, 140, 248, 0.5);
-            box-shadow: 0 0 40px rgba(129, 140, 248, 0.1);
-            background: rgba(255,255,255,0.05);
-            transform: translateY(-2px);
-        }
-
-        .chat-input {
-            flex: 1;
-            background: transparent; border: none; outline: none;
-            color: white; font-size: 1rem;
-            font-family: inherit;
-            padding: 14px 0;
-            font-weight: 500;
-        }
-        .chat-input::placeholder { color: #4b5563; }
-
-        .send-btn {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border: none; border-radius: 14px;
-            width: 48px; height: 48px;
-            display: flex; justify-content: center; align-items: center;
-            color: white; cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 8px 20px rgba(129, 140, 248, 0.2);
-        }
-        .send-btn:hover { 
-            transform: scale(1.05) rotate(-5deg); 
-            box-shadow: 0 12px 25px rgba(129, 140, 248, 0.4); 
-        }
-        .send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* Typing Indicator Styling */
-        .typing-indicator {
-            display: none; align-items: center; gap: 6px;
-            padding: 0 0 16px 8px;
-        }
-        .typing-indicator span {
-            width: 5px; height: 5px; background: var(--primary);
-            border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both;
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Foundations & Transformer Architectures | Neuralab Systems Academy</title>
+  <meta name="description" content="Mathematical foundations of deep learning, multi-head self-attention, FlashAttention-2, KV-Cache optimization, and CUDA kernels.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+  <style>
+    .course-header {
+      background: radial-gradient(circle at 70% 30%, rgba(0, 242, 254, 0.08), var(--bg-primary) 60%);
+      padding: 4.5rem 0 3rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .module-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      transition: var(--transition);
+    }
+    .module-item:hover {
+      border-color: var(--border-glow);
+    }
+  </style>
 </head>
 <body>
 
-    <main class="chat-wrapper">
-        <header class="chat-header">
-            <div class="header-left">
-                <a href="index.html" class="back-btn" title="Return to Ecosystem">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </a>
-                <div class="header-title">
-                    <h1>Nuera Intelligence</h1>
-                    <p>Google Gemini Powered Architect</p>
-                </div>
-            </div>
-            <div class="status-container">
-                <div class="ai-status-pill">
-                    <div class="ai-pulse"></div> Active
-                </div>
-            </div>
-        </header>
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon">🧠</div>
+      <span>Neuralab</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="/#courses" class="nav-link">All Tracks</a></li>
+        <li><a href="/#philosophy" class="nav-link">Philosophy</a></li>
+        <li><a href="/code-editor.html" class="nav-link">Code Studio</a></li>
+        <li><a href="/ai-lab.html" class="nav-link">Neural Lab</a></li>
+      </ul>
+    </nav>
+    <div id="navActions" class="nav-actions"></div>
+  </header>
 
-        <div class="chat-history" id="chat-history">
-            <!-- Initial AI Greeting -->
-            <div class="message ai">
-                <div class="msg-sender">Nuera AI</div>
-                <div class="msg-bubble" id="greeting-bubble">
-                    Establishing neural uplink... Synchronizing local database vectors.
-                </div>
-            </div>
+  <!-- Breadcrumbs & Course Header -->
+  <section class="course-header">
+    <div class="container">
+      <div style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+        <a href="/" style="color:var(--text-muted); text-decoration:none;">Home</a> &gt;
+        <a href="/#courses" style="color:var(--text-muted); text-decoration:none;">Curriculum</a> &gt;
+        <span style="color:var(--accent-cyan);">Neural Foundations & Transformer Architectures</span>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
+        <span class="badge badge-cyan">Artificial Intelligence</span>
+        <span class="badge badge-purple">Expert</span>
+        <span class="badge badge-green">Verified PayPal Track</span>
+      </div>
+
+      <h1 style="font-size:2.8rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:1rem;">Neural Foundations & Transformer Architectures</h1>
+      <p style="font-size:1.15rem; color:var(--text-secondary); max-width:800px; line-height:1.6; margin-bottom:2rem;">
+        Mathematical foundations of deep learning, multi-head self-attention, FlashAttention-2, KV-Cache optimization, and CUDA kernels.
+      </p>
+
+      <div style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
+        <div style="font-size:1.8rem; font-weight:800; color:var(--accent-cyan);">$199 <span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">USD</span></div>
+        <button class="btn btn-primary" onclick="App.openPayPalCheckout('intelligence-ai')">Enroll with PayPal ($199 USD)</button>
+        <a href="/code-editor.html" class="btn btn-secondary">Open Interactive Sandbox</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Content & Syllabus -->
+  <section class="section">
+    <div class="container" style="display:grid; grid-template-columns:2fr 1fr; gap:3rem;">
+      <!-- Left Column: Syllabus -->
+      <div>
+        <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1.5rem;">Curriculum Modules</h2>
+        <div>
+
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 01: Mathematical Foundations: Matrix Calculus & Backprop</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Jacobians, chain rule in tensor spaces, automatic differentiation graphs.</p>
+        </div>
+        
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 02: Attention Mechanism & Transformer Internals</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Multi-Head Attention (MHA), Query/Key/Value matrix projections, positional encodings.</p>
+        </div>
+        
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 03: FlashAttention-2 & IO-Aware Algorithm Design</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">SRAM vs HBM memory hierarchy, tiling, fusing softmax to minimize memory bandwidth.</p>
         </div>
 
-        <div class="chat-input-area">
-            <div class="typing-indicator" id="typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
-            <div class="input-container">
-                <input type="text" id="user-input" class="chat-input" placeholder="Inquire about architecture, debug logic, or seek guidance..." autocomplete="off">
-                <button class="send-btn" id="send-btn" onclick="handleSend()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </div>
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 04: KV-Cache Optimization & PagedAttention</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Autoregressive decoding bottleneck, memory fragmentation, vLLM virtual paging.</p>
         </div>
-    </main>
-
-    <script>
-        // --- 1. CONFIGURATION & STATE ---
-        const RENDER_BASE_API = "https://nueralabback.onrender.com/api/v1";
         
-        let currentUser = null;
-        let dbProfile = null;
-        let chatContext = []; // Google Gemini Format: {role: "user/model", parts: [{text: "..."}]}
-
-        // --- 2. AUTHENTICATION & DATA SYNC ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
-            authDomain: "nueralab.firebaseapp.com",
-            projectId: "nueralab",
-            storageBucket: "nueralab.firebasestorage.app",
-            messagingSenderId: "365514463677",
-            appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
-        };
-
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 05: Quantization & Tensor Cores (AWQ, GPTQ, FP8/FP4)</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Symmetric vs asymmetric quantization, zero-points, scale factors, and CUDA kernels.</p>
+        </div>
         
-        firebase.auth().onAuthStateChanged(async (user) => {
-            if (!user) {
-                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
-                    window.location.replace("login.html");
-                }
-                return;
-            }
-            currentUser = user;
-            await fetchUserDatabaseProfile(user.uid);
-            initChat();
-        });
+        </div>
 
-        async function fetchUserDatabaseProfile(uid) {
-            try {
-                const response = await fetch(`${RENDER_BASE_API}/sync/user-profiles/${uid}`);
-                if (response.ok) {
-                    dbProfile = await response.json();
-                }
-            } catch (err) {
-                console.warn("Could not fetch DB profile for AI context.");
-            }
-        }
+        <!-- Interactive Architecture / Sample Code -->
+        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Core Architecture & Implementation</h2>
+        <div class="sandbox-card">
+          <div class="sandbox-header">
+            <span style="color:var(--text-muted); font-size:0.8rem;">Neural Foundations & Transformer Architectures — Key Production Primitive</span>
+            <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;">Test in Studio</a>
+          </div>
+          <pre class="sandbox-content"><code>// IO-Aware FlashAttention Kernel Pseudocode
+// Tiling Query, Key, and Value blocks into high-speed GPU SRAM
+__global__ void flash_attention_kernel(float* Q, float* K, float* V, float* O, int N, int d) {
+    extern __shared__ float sram[];
+    // Load block of Q into SRAM
+    // Load block of K, V and accumulate online softmax without writing NxN matrix to HBM!
+}</code></pre>
+        </div>
 
-        // --- 3. AI INITIALIZATION ---
-        function initChat() {
-            // FIX: Using the optional chaining (?.) and fallback operator (||) 
-            // guarantees it defaults to a number if undefined in the DB!
-            const progressLevel = dbProfile?.overallProgress || 0;
-            const nodes = dbProfile?.nodesUnlocked || 1;
-            const userName = currentUser?.displayName || "Researcher";
+        <!-- Hands-On Capstone Project -->
+        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
+        <div class="card" style="border-left:4px solid var(--accent-cyan);">
+          <h3 style="font-size:1.2rem; margin-bottom:0.5rem;">Implement a GPU-Accelerated Transformer Decoder in C++ with custom CUDA Kernels.</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7;">
+            You will implement, benchmark, and stress-test this system under adversarial workloads, memory pressure, and network partitions. Evaluated with automated sanitizers (ASan, TSan, MSan) and zero warnings.
+          </p>
+        </div>
+      </div>
 
-            // Save the system instruction separate from the chat context array
-            window.aiSystemPrompt = `You are Nuera AI, a premium architecture mentor for NueraLab. 
-            User: ${userName}. Progress: ${progressLevel}%. Nodes: ${nodes}. 
-            Be concise, professional, and format code clearly.`;
+      <!-- Right Column: Meta & Instructor -->
+      <div>
+        <div class="card" style="position:sticky; top:90px;">
+          <h3 style="font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem;">Track Specifications</h3>
 
-            chatContext = []; // Start with clean context for Gemini
+          <div style="font-size:0.9rem; line-height:2; color:var(--text-secondary);">
+            <div>⏱️ <strong>Duration:</strong> 12 Weeks</div>
+            <div>📊 <strong>Difficulty:</strong> Expert</div>
+            <div>⚡ <strong>Lab Access:</strong> Interactive Browser Sandbox</div>
+            <div>🔒 <strong>Payment:</strong> Official PayPal Order Checkout</div>
+            <div>📜 <strong>Certificate:</strong> Cryptographically Signed Hash</div>
+            <div>💡 <strong>Prerequisites:</strong> Linear algebra, calculus, and Python</div>
+          </div>
 
-            document.getElementById('greeting-bubble').innerText = `Uplink established, ${userName}. System sync complete at ${progressLevel}%. How may I assist your architectural evolution today?`;
-        }
+          <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border-subtle);">
+            <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; font-family:var(--font-mono); margin-bottom:0.5rem;">Lead Architect</div>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" style="width:42px; height:42px; border-radius:50%;" alt="Anay Upadhyay">
+              <div>
+                <strong style="color:#fff; font-size:0.92rem; display:block;">Anay Upadhyay</strong>
+                <span style="color:var(--accent-cyan); font-size:0.8rem;">Systems Architect</span>
+              </div>
+            </div>
+          </div>
 
-        // --- 4. CHAT LOGIC ---
-        const inputField = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const chatHistory = document.getElementById('chat-history');
-        const indicator = document.getElementById('typing-indicator');
+          <button class="btn btn-primary" style="width:100%; margin-top:1.5rem;" onclick="App.openPayPalCheckout('intelligence-ai')">
+            Enroll Now ($199 USD)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        inputField.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') handleSend();
-        });
+  <!-- PayPal Modal -->
+  <div id="paypalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Secure PayPal Checkout</h3>
+        <button id="closePaypalModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-tertiary); padding:1rem; border-radius:var(--radius-sm); margin-bottom:1rem;">
+          <h4 id="paypalCourseTitle" style="font-size:1.15rem; margin-bottom:0.25rem;">Neural Foundations & Transformer Architectures</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-secondary); font-size:0.85rem;">Lifetime Lab Access</span>
+            <span id="paypalCoursePrice" style="font-size:1.3rem; font-weight:bold; color:var(--accent-cyan);">$199 USD</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+          🔒 Secure server-side PayPal order checkout. No client-side price tampering is possible.
+        </p>
+        <button id="confirmPaypalBtn" class="btn btn-primary" style="width:100%;">Complete PayPal Checkout</button>
+      </div>
+    </div>
+  </div>
 
-        async function handleSend() {
-            const text = inputField.value.trim();
-            if (!text) return;
+  <!-- Receipt Modal -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Enrollment Verified</h3>
+        <button id="closeReceiptModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div id="receiptBody" class="modal-body"></div>
+    </div>
+  </div>
 
-            appendMsg(text, 'user');
-            inputField.value = '';
-            inputField.disabled = true;
-            sendBtn.disabled = true;
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container" style="text-align:center;">
+      <p style="color:var(--text-secondary); font-size:0.88rem;">&copy; 2026 Neuralab Systems Academy by Anay Upadhyay. All systems operational.</p>
+    </div>
+  </footer>
 
-            // Format specifically for Gemini
-            chatContext.push({ role: "user", parts: [{ text: text }] });
-
-            indicator.style.display = 'flex';
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-
-            await fetchAIResponse();
-        }
-
-        function appendMsg(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            
-            const senderName = sender === 'user' ? (currentUser ? currentUser.displayName : 'You') : 'Nuera AI';
-            
-            // Format basic markdown (code blocks)
-            const formattedText = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-            msgDiv.innerHTML = `
-                <div class="msg-sender">${senderName}</div>
-                <div class="msg-bubble">${formattedText}</div>
-            `;
-            
-            chatHistory.appendChild(msgDiv);
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-
-        // --- 5. SECURE BACKEND INTEGRATION (Gemini Format) ---
-        async function fetchAIResponse() {
-            const url = `${RENDER_BASE_API}/ai/chat`;
-            
-            try {
-                // Send system instructions and the last 6 messages to save bandwidth
-                const optimizedContext = chatContext.slice(-6);
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        systemInstruction: window.aiSystemPrompt,
-                        contents: optimizedContext 
-                    })
-                });
-
-                if (!response.ok) throw new Error("Backend AI Proxy Error");
-                const data = await response.json();
-                
-                if (data.reply) {
-                    indicator.style.display = 'none';
-                    appendMsg(data.reply, 'ai');
-                    // Add Gemini's response to the memory array using 'model'
-                    chatContext.push({ role: "model", parts: [{ text: data.reply }] });
-                } else {
-                    throw new Error("Invalid response format");
-                }
-
-            } catch (error) {
-                indicator.style.display = 'none';
-                appendMsg("System error. Check your Gemini API Key in the server environment.", 'ai');
-                console.error(error);
-                chatContext.pop(); // Remove failed user message from context so they can retry
-            } finally {
-                inputField.disabled = false;
-                sendBtn.disabled = false;
-                inputField.focus();
-            }
-        }
-    </script>
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>

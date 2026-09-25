@@ -1,439 +1,210 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuera Lab | Proprietary Web Core</title>
-    
-    <style>
-        /* --- ENTERPRISE DESIGN TOKENS --- */
-        :root {
-            color-scheme: light;
-            --bg-color: #ffffff;
-            --surface-color: #f8fafc;
-            --surface-border: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --accent-blue: #2563eb;
-            --accent-purple: #8b5cf6;
-            --accent-success: #10b981;
-            --nav-glass: rgba(255, 255, 255, 0.85);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            --transition-snappy: cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
-            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(15,23,42,0.05)"/></svg>');
-        }
-
-        [data-theme="dark"] {
-            color-scheme: dark;
-            --bg-color: #09090b;
-            --surface-color: #18181b;
-            --surface-border: #27272a;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-blue: #60a5fa;
-            --accent-purple: #c084fc;
-            --accent-success: #34d399;
-            --nav-glass: rgba(9, 9, 11, 0.85);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)"/></svg>');
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: var(--grid-pattern);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        /* --- NAVIGATION --- */
-        .navbar {
-            position: fixed; top: 0; width: 100%; height: 70px; padding: 0 6%;
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
-            background: var(--nav-glass); backdrop-filter: blur(12px); border-bottom: 1px solid var(--surface-border);
-        }
-        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        .logo-text { font-size: 1.35rem; letter-spacing: -0.04em; }
-        .logo-text .brand-nuera { font-weight: 500; color: var(--text-primary); }
-        .logo-text .brand-lab { font-weight: 800; color: var(--accent-blue); margin-left: 2px; }
-        .nav-links { display: flex; gap: 2.5rem; align-items: center; }
-        .nav-item { text-decoration: none; color: var(--text-secondary); font-weight: 500; font-size: 0.875rem; }
-        .nav-item:hover { color: var(--text-primary); }
-        .nav-utils { display: flex; align-items: center; gap: 20px; }
-        .icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        .icon-btn:hover { color: var(--text-primary); background: var(--surface-color); }
-        .profile-link { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; border: 1px solid var(--surface-border); display: block; }
-        .profile-link img, .profile-link svg { width: 100%; height: 100%; object-fit: cover; background: var(--surface-color); padding: 4px; color: var(--text-secondary); }
-
-        /* --- MODULE HERO --- */
-        .module-hero { padding: 140px 5% 60px; max-width: 1200px; margin: 0 auto; }
-        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; margin-bottom: 24px; }
-        .breadcrumb a { color: var(--accent-blue); text-decoration: none; }
-        .module-hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.04em; font-weight: 800; }
-        .gradient-text { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .module-hero p { font-size: 1.125rem; color: var(--text-secondary); max-width: 750px; line-height: 1.6; }
-
-        .db-concept-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(37, 99, 235, 0.05);
-            border-left: 4px solid var(--accent-blue);
-            border-radius: 0 12px 12px 0;
-            max-width: 750px;
-        }
-        .db-concept-box h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;}
-        .db-concept-box p { font-size: 0.95rem; margin-bottom: 0; color: var(--text-secondary); }
-
-        /* --- CONTENT GRID --- */
-        .content-section { padding: 40px 5% 100px; max-width: 1200px; margin: 0 auto; }
-        .section-title { display: flex; align-items: center; gap: 12px; font-size: 1.5rem; font-weight: 700; margin-bottom: 30px; padding-top: 40px; border-top: 1px solid var(--surface-border); color: var(--text-primary); }
-        .section-title svg { color: var(--accent-blue); }
-
-        .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); grid-auto-flow: dense; gap: 24px; }
-        
-        .res-card {
-            background: var(--surface-color); border-radius: 16px; padding: 28px;
-            border: 1px solid var(--surface-border); transition: all 0.4s var(--transition-snappy);
-            display: flex; flex-direction: column; cursor: pointer; text-align: left;
-            position: relative; overflow: hidden;
-            text-decoration: none;
-            color: var(--text-primary);
-        }
-        
-        .res-card::before {
-            content: ""; position: absolute; inset: 0;
-            background: radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(37, 99, 235, 0.08), transparent 40%);
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
-        }
-        .res-card:hover::before { opacity: 1; }
-        
-        .res-card:hover { transform: translateY(-4px); border-color: var(--accent-blue); box-shadow: var(--shadow-hover); }
-
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; pointer-events: none;}
-        .res-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--bg-color); border: 1px solid var(--surface-border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-        .res-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; background: rgba(37, 99, 235, 0.1); color: var(--accent-blue); border: 1px solid rgba(37, 99, 235, 0.2); }
-        
-        .res-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; pointer-events: none;}
-        .res-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; flex-grow: 1; pointer-events: none;}
-        
-        .db-action-btn {
-            margin-top: 20px; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
-            background: var(--bg-color); border: 1px solid var(--surface-border); color: var(--text-primary);
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; pointer-events: none;
-        }
-        .res-card:hover .db-action-btn { background: var(--text-primary); color: var(--bg-color); border-color: var(--text-primary); }
-
-        @media (min-width: 800px) {
-            .res-card.large { grid-column: span 2; }
-            .res-card.large .card-inner { display: grid; grid-template-columns: 80px 1fr; gap: 24px; align-items: start; pointer-events: none;}
-            .res-card.large .res-icon { width: 64px; height: 64px; font-size: 2rem;}
-            .res-card.large .card-header { margin-bottom: 0; }
-        }
-
-        /* --- UTILS --- */
-        .reveal { opacity: 0; transform: translateY(20px); transition: 0.8s all var(--transition-cinematic); }
-        .reveal.show { opacity: 1; transform: translateY(0); }
-
-        /* --- BATTERY SAVER MODE OVERRIDES --- */
-        body.battery-saver-mode * {
-            transition: none !important;
-            animation: none !important;
-        }
-        body.battery-saver-mode .reveal {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-        body.battery-saver-mode .res-card::before {
-            display: none !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebCore: Browser Engine Internals & Rendering Pipelines | Neuralab Systems Academy</title>
+  <meta name="description" content="Understand how Chromium and WebKit parse HTML/CSS, build the DOM & Render Tree, calculate layouts, and execute compositor passes.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <style>
+    .course-header {
+      background: radial-gradient(circle at 70% 30%, rgba(0, 242, 254, 0.08), var(--bg-primary) 60%);
+      padding: 4.5rem 0 3rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .module-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      transition: var(--transition);
+    }
+    .module-item:hover {
+      border-color: var(--border-glow);
+    }
+  </style>
 </head>
 <body>
 
-    <nav class="navbar" id="navbar">
-        <a href="index.html" class="logo">
-            <div class="logo-mark">
-                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 26V7C8 5.89543 8.89543 5 10 5H13L24 20.5V26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M24 6V25C24 26.1046 23.1046 27 22 27H19L8 11.5V6" stroke="var(--accent-blue)" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <div class="logo-text"><span class="brand-nuera">Nuera</span><span class="brand-lab">Lab</span></div>
-        </a>
-        <div class="nav-links">
-            <a href="index.html" class="nav-item">Platform</a>
-            <a href="#" class="nav-item" style="color: var(--text-primary);">Curriculum</a>
-            <a href="code-editor.html" class="nav-item">Editor</a>
-        </div>
-        <div class="nav-utils">
-            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
-                <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-            </button>
-            <a href="login.html" class="profile-link" title="User Profile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </a>
-        </div>
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon">🌐</div>
+      <span>Neuralab</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="/#courses" class="nav-link">All Tracks</a></li>
+        <li><a href="/#philosophy" class="nav-link">Philosophy</a></li>
+        <li><a href="/code-editor.html" class="nav-link">Code Studio</a></li>
+        <li><a href="/ai-lab.html" class="nav-link">Neural Lab</a></li>
+      </ul>
     </nav>
+    <div id="navActions" class="nav-actions"></div>
+  </header>
 
-    <main>
-        <section class="module-hero reveal">
-            <div class="breadcrumb">
-                <a href="index.html">Nexus Systems</a> 
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg> 
-                <span>Curriculum Directory</span>
+  <!-- Breadcrumbs & Course Header -->
+  <section class="course-header">
+    <div class="container">
+      <div style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+        <a href="/" style="color:var(--text-muted); text-decoration:none;">Home</a> &gt;
+        <a href="/#courses" style="color:var(--text-muted); text-decoration:none;">Curriculum</a> &gt;
+        <span style="color:var(--accent-cyan);">WebCore: Browser Engine Internals & Rendering Pipelines</span>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem; flex-wrap:wrap;">
+        <span class="badge badge-cyan">Web Architecture</span>
+        <span class="badge badge-purple">Intermediate</span>
+        <span class="badge badge-green">Verified PayPal Track</span>
+      </div>
+
+      <h1 style="font-size:2.8rem; font-weight:800; letter-spacing:-0.5px; margin-bottom:1rem;">WebCore: Browser Engine Internals & Rendering Pipelines</h1>
+      <p style="font-size:1.15rem; color:var(--text-secondary); max-width:800px; line-height:1.6; margin-bottom:2rem;">
+        Understand how Chromium and WebKit parse HTML/CSS, build the DOM & Render Tree, calculate layouts, and execute compositor passes.
+      </p>
+
+      <div style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
+        <div style="font-size:1.8rem; font-weight:800; color:var(--accent-cyan);">$129 <span style="font-size:0.9rem; color:var(--text-muted); font-weight:normal;">USD</span></div>
+        <button class="btn btn-primary" onclick="App.openPayPalCheckout('webcore')">Enroll with PayPal ($129 USD)</button>
+        <a href="/code-editor.html" class="btn btn-secondary">Open Interactive Sandbox</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Course Content & Syllabus -->
+  <section class="section">
+    <div class="container" style="display:grid; grid-template-columns:2fr 1fr; gap:3rem;">
+      <!-- Left Column: Syllabus -->
+      <div>
+        <h2 style="font-size:1.8rem; font-weight:800; margin-bottom:1.5rem;">Curriculum Modules</h2>
+        <div>
+
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 01: Blink & WebKit Parser Architecture</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">HTML tokenization, speculative pre-parsing, CSSOM construction, and DOM tree creation.</p>
+        </div>
+        
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 02: Layout Trees & Style Resolution</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Box model calculations, block formatting contexts (BFC), and subgrid computations.</p>
+        </div>
+        
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 03: Paint Passes, Rasterization, & Skia/GPU Canvas</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Display lists, tile rasterization, GPU compositing shaders, and Direct3D/Metal backends.</p>
+        </div>
+        
+        <div class="module-item">
+          <h3 style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.4rem;">Module 04: The Compositor Thread & V-Sync Synchronization</h3>
+          <p style="color:var(--text-secondary); font-size:0.9rem;">Scrolling off the main thread, touch action regions, and layout thrashing elimination.</p>
+        </div>
+
+        </div>
+
+        <!-- Interactive Architecture / Sample Code -->
+        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Core Architecture & Implementation</h2>
+        <div class="sandbox-card">
+          <div class="sandbox-header">
+            <span style="color:var(--text-muted); font-size:0.8rem;">WebCore: Browser Engine Internals & Rendering Pipelines — Key Production Primitive</span>
+            <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;">Test in Studio</a>
+          </div>
+          <pre class="sandbox-content"><code>// Observing Layout Shifts &amp; Rendering Pipeline Performance
+const observer = new PerformanceObserver((list) =&gt; {
+  for (const entry of list.getEntries()) {
+    if (!entry.hadRecentInput) {
+      console.log(`[Layout Shift] Value: ${entry.value.toFixed(4)}`, entry.sources);
+    }
+  }
+});
+observer.observe({ type: 'layout-shift', buffered: true });</code></pre>
+        </div>
+
+        <!-- Hands-On Capstone Project -->
+        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
+        <div class="card" style="border-left:4px solid var(--accent-cyan);">
+          <h3 style="font-size:1.2rem; margin-bottom:0.5rem;">Build a Toy HTML/CSS Parser & Box-Model Layout Engine from scratch in TypeScript/Rust.</h3>
+          <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7;">
+            You will implement, benchmark, and stress-test this system under adversarial workloads, memory pressure, and network partitions. Evaluated with automated sanitizers (ASan, TSan, MSan) and zero warnings.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Meta & Instructor -->
+      <div>
+        <div class="card" style="position:sticky; top:90px;">
+          <h3 style="font-size:1.15rem; margin-bottom:1rem; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem;">Track Specifications</h3>
+
+          <div style="font-size:0.9rem; line-height:2; color:var(--text-secondary);">
+            <div>⏱️ <strong>Duration:</strong> 8 Weeks</div>
+            <div>📊 <strong>Difficulty:</strong> Intermediate</div>
+            <div>⚡ <strong>Lab Access:</strong> Interactive Browser Sandbox</div>
+            <div>🔒 <strong>Payment:</strong> Official PayPal Order Checkout</div>
+            <div>📜 <strong>Certificate:</strong> Cryptographically Signed Hash</div>
+            <div>💡 <strong>Prerequisites:</strong> HTML/CSS/JavaScript experience</div>
+          </div>
+
+          <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border-subtle);">
+            <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; font-family:var(--font-mono); margin-bottom:0.5rem;">Lead Architect</div>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" style="width:42px; height:42px; border-radius:50%;" alt="Anay Upadhyay">
+              <div>
+                <strong style="color:#fff; font-size:0.92rem; display:block;">Anay Upadhyay</strong>
+                <span style="color:var(--accent-cyan); font-size:0.8rem;">Systems Architect</span>
+              </div>
             </div>
-            <h1>The <span class="gradient-text">Web Core.</span></h1>
-            <p>Our proprietary curriculum designed for absolute web architecture mastery. Select a module below to open the corresponding study materials and resources.</p>
-            
-            <div class="db-concept-box">
-                <h4>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                    Curated Module Library
-                </h4>
-                <p>These resources have been structured into individual deep-dive documents. Click any module to access the dedicated architectural blueprint.</p>
-            </div>
-        </section>
+          </div>
 
-        <section class="content-section">
-            
-            <!-- SECTION 1: HTML / STRUCTURE -->
-            <div class="section-title reveal">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                Phase I: Semantic Architecture (HTML)
-            </div>
-            
-            <div class="resource-grid">
-                <a href="High Performance Browser Networking.html" class="res-card large reveal">
-                    <div class="card-inner">
-                        <div class="card-header">
-                            <div class="res-icon">🕸️</div>
-                            <span class="res-badge">Module 01</span>
-                        </div>
-                        <div class="card-body">
-                            <h3>Core DOM Generation</h3>
-                            <p>An exhaustive analysis of how the browser parses markup into the Document Object Model tree. Understand node relationships, standard semantic tags, and document flow.</p>
-                            <div class="db-action-btn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                Access Module
-                            </div>
-                        </div>
-                    </div>
-                </a>
+          <button class="btn btn-primary" style="width:100%; margin-top:1.5rem;" onclick="App.openPayPalCheckout('webcore')">
+            Enroll Now ($129 USD)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-                <a href="Web Accessibility Mechanics.html" class="res-card reveal">
-                    <div class="card-header">
-                        <div class="res-icon">👁️</div>
-                        <span class="res-badge">Module 02</span>
-                    </div>
-                    <h3>The Accessibility Tree</h3>
-                    <p>Beyond the visual DOM. Master ARIA roles, semantic meaning, and how screen readers interface with your structural code.</p>
-                    <div class="db-action-btn">Access Module</div>
-                </a>
-            </div>
+  <!-- PayPal Modal -->
+  <div id="paypalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Secure PayPal Checkout</h3>
+        <button id="closePaypalModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-tertiary); padding:1rem; border-radius:var(--radius-sm); margin-bottom:1rem;">
+          <h4 id="paypalCourseTitle" style="font-size:1.15rem; margin-bottom:0.25rem;">WebCore: Browser Engine Internals & Rendering Pipelines</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-secondary); font-size:0.85rem;">Lifetime Lab Access</span>
+            <span id="paypalCoursePrice" style="font-size:1.3rem; font-weight:bold; color:var(--accent-cyan);">$129 USD</span>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+          🔒 Secure server-side PayPal order checkout. No client-side price tampering is possible.
+        </p>
+        <button id="confirmPaypalBtn" class="btn btn-primary" style="width:100%;">Complete PayPal Checkout</button>
+      </div>
+    </div>
+  </div>
 
-            <!-- SECTION 2: CSS / RENDERING -->
-            <div class="section-title reveal" style="margin-top: 40px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 4.2c.2.15.52.17.71 0L24 2.69v11.53c0 3.36-2.58 6.22-6 6.78l-5.6 1.12a2 2 0 0 1-.8 0l-5.6-1.12c-3.42-.56-6-3.42-6-6.78V2.69l5.66 4.2c.2.15.52.17.71 0L12 2.69z"></path></svg>
-                Phase II: The Render Engine (CSS)
-            </div>
+  <!-- Receipt Modal -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Enrollment Verified</h3>
+        <button id="closeReceiptModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div id="receiptBody" class="modal-body"></div>
+    </div>
+  </div>
 
-            <div class="resource-grid">
-                <a href="Render Engine Mechanics.html" class="res-card large reveal">
-                    <div class="card-inner">
-                        <div class="card-header">
-                            <div class="res-icon">🎨</div>
-                            <span class="res-badge">Module 03</span>
-                        </div>
-                        <div class="card-body">
-                            <h3>CSSOM & Paint Mechanics</h3>
-                            <p>How the CSS Object Model merges with the DOM to create the Render Tree. Learn the mathematics of recalculating styles, layout reflows, and composite layering.</p>
-                            <div class="db-action-btn">Access Module</div>
-                        </div>
-                    </div>
-                </a>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container" style="text-align:center;">
+      <p style="color:var(--text-secondary); font-size:0.88rem;">&copy; 2026 Neuralab Systems Academy by Anay Upadhyay. All systems operational.</p>
+    </div>
+  </footer>
 
-                <a href="Responsive Design Calculus.html" class="res-card reveal">
-                    <div class="card-header">
-                        <div class="res-icon">📐</div>
-                        <span class="res-badge">Module 04</span>
-                    </div>
-                    <h3>Responsive Grid Calculus</h3>
-                    <p>The definitive logic behind modern layouts. Master Flexbox alignment algorithms and CSS Grid fractional units.</p>
-                    <div class="db-action-btn">Access Module</div>
-                </a>
-            </div>
-
-            <!-- SECTION 3: JS / LOGIC -->
-            <div class="section-title reveal" style="margin-top: 40px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
-                Phase III: Execution Context (JS)
-            </div>
-
-            <div class="resource-grid">
-                <a href="Asynchronous JavaScript Engine.html" class="res-card reveal">
-                    <div class="card-header">
-                        <div class="res-icon">⚡</div>
-                        <span class="res-badge">Module 05</span>
-                    </div>
-                    <h3>The Event Loop</h3>
-                    <p>Demystifying the Call Stack, Microtask queues, and asynchronous execution. Understand how a single-threaded language handles high concurrency.</p>
-                    <div class="db-action-btn">Access Module</div>
-                </a>
-
-                <a href="JavaScript Memory Architecture.html" class="res-card reveal">
-                    <div class="card-header">
-                        <div class="res-icon">🧠</div>
-                        <span class="res-badge">Module 06</span>
-                    </div>
-                    <h3>Memory & Closures</h3>
-                    <p>The core of JS architecture. Lexical environments, garbage collection, and retaining state across execution contexts.</p>
-                    <div class="db-action-btn">Access Module</div>
-                </a>
-
-                <a href="Object Oriented JavaScript.html" class="res-card reveal">
-                    <div class="card-header">
-                        <div class="res-icon">🧬</div>
-                        <span class="res-badge">Module 07</span>
-                    </div>
-                    <h3>Prototypal Inheritance</h3>
-                    <p>Moving beyond basic classes. Discover the underlying object linkage chain that defines JavaScript's unique data architecture.</p>
-                    <div class="db-action-btn">Access Module</div>
-                </a>
-            </div>
-
-            <!-- SECTION 4: ASSESSMENTS & TESTING -->
-            <div class="section-title reveal" style="margin-top: 40px; border-top-color: rgba(239, 68, 68, 0.2);">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                <span style="color: #ef4444;">Phase IV: Architecture Validation (Testing)</span>
-            </div>
-
-            <div class="resource-grid">
-                <a href="Assessment DOM Rendering.html" class="res-card reveal" style="border-color: rgba(239, 68, 68, 0.2);">
-                    <div class="card-header">
-                        <div class="res-icon" style="color: #ef4444;">📝</div>
-                        <span class="res-badge" style="color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">Assessment</span>
-                    </div>
-                    <h3>DOM & Paint Evaluation</h3>
-                    <p>A rigorous examination testing your ability to optimize DOM manipulations and prevent browser layout thrashing.</p>
-                    <div class="db-action-btn" style="color: #ef4444;">Initialize Assessment</div>
-                </a>
-
-                <a href="Assessment JS Execution.html" class="res-card reveal" style="border-color: rgba(239, 68, 68, 0.2);">
-                    <div class="card-header">
-                        <div class="res-icon" style="color: #ef4444;">⏱️</div>
-                        <span class="res-badge" style="color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2);">Assessment</span>
-                    </div>
-                    <h3>Execution Context Final</h3>
-                    <p>Identify memory leaks, trace asynchronous closures, and predict the exact output of the V8 engine under heavy load.</p>
-                    <div class="db-action-btn" style="color: #ef4444;">Initialize Assessment</div>
-                </a>
-            </div>
-
-        </section>
-    </main>
-
-    <script>
-        // --- THEME LOGIC ---
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const sunPath = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
-        const moonPath = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
-
-        function applyTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            themeIcon.innerHTML = theme === 'dark' ? sunPath : moonPath;
-            localStorage.setItem('theme', theme);
-        }
-
-        themeToggle.addEventListener('click', () => {
-            applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        });
-        applyTheme(localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-
-        // --- BATTERY SAVER STATUS LOGIC ---
-        let isBatterySaverEnabled = false;
-
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(function(battery) {
-                function updateBatteryStatus() {
-                    // Turn on battery saver if battery is at/under 20% and not currently charging
-                    if (battery.level <= 0.20 && !battery.charging) {
-                        document.body.classList.add('battery-saver-mode');
-                        isBatterySaverEnabled = true;
-                    } else {
-                        document.body.classList.remove('battery-saver-mode');
-                        isBatterySaverEnabled = false;
-                    }
-                }
-
-                updateBatteryStatus();
-                battery.addEventListener('levelchange', updateBatteryStatus);
-                battery.addEventListener('chargingchange', updateBatteryStatus);
-            }).catch(e => console.log('Battery Status API blocked/unavailable.'));
-        }
-
-        // --- RADIAL GLOW LOGIC ---
-        document.querySelectorAll('.resource-grid').forEach(grid => {
-            grid.addEventListener('mousemove', (e) => {
-                // Skip JS execution to save CPU cycles if in battery saver mode
-                if (isBatterySaverEnabled) return; 
-
-                grid.querySelectorAll('.res-card').forEach(card => {
-                    const rect = card.getBoundingClientRect();
-                    card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-                    card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-                });
-            });
-        });
-
-        // --- SCROLL REVEAL ---
-        const observer = new IntersectionObserver((entries) => {
-            // Skip observer animations if battery saver is on
-            if (isBatterySaverEnabled) return;
-
-            entries.forEach(e => { 
-                if(e.isIntersecting) {
-                    e.target.classList.add('show'); 
-                } else {
-                    e.target.classList.remove('show');
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // --- ANTI-INSPECT LOGIC ---
-        // Disable Right Click (Context Menu)
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Disable Common Developer Tools Keyboard Shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Prevent F12
-            if (e.key === 'F12' || e.keyCode === 123) {
-                e.preventDefault();
-            }
-            // Prevent Ctrl+Shift+I (Inspect)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
-                e.preventDefault();
-            }
-            // Prevent Ctrl+Shift+J (Console)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
-                e.preventDefault();
-            }
-            // Prevent Ctrl+U (View Source)
-            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
-                e.preventDefault();
-            }
-            // Prevent Ctrl+Shift+C (Inspect Element)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
-                e.preventDefault();
-            }
-        });
-    </script>
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>
