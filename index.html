@@ -1,2069 +1,270 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuera Lab | Enterprise-Grade Language Mastery</title>
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
-    <style>
-        /* --- ENTERPRISE DESIGN TOKENS --- */
-        :root {
-            --bg-color: #ffffff;
-            --surface-color: #f8fafc;
-            --surface-border: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --accent-primary: #000000;
-            --accent-hover: #333333;
-            --accent-blue: #2563eb;
-            --accent-purple: #8b5cf6;
-            --accent-gold: #fbbf24;
-            --accent-green: #10b981;
-            --accent-warning: #ef4444;
-            --nav-glass: rgba(255, 255, 255, 0.85);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --transition-snappy: cubic-bezier(0.16, 1, 0.3, 1);
-            --transition-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
-            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(15,23,42,0.05)"/></svg>');
-            
-            /* Terminal Specific Colors */
-            --term-bg: #0f172a;
-            --term-header: #1e293b;
-            --term-text: #f8fafc;
-            --term-keyword: #c678dd;
-            --term-func: #61afef;
-            --term-string: #98c379;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #0a0a0a;
-            --surface-color: #111111;
-            --surface-border: #262626;
-            --text-primary: #ededed;
-            --text-secondary: #a3a3a3;
-            --accent-primary: #ffffff;
-            --accent-hover: #cccccc;
-            --accent-blue: #3b82f6;
-            --accent-purple: #a855f7;
-            --accent-gold: #f59e0b;
-            --accent-green: #10b981;
-            --accent-warning: #f87171;
-            --nav-glass: rgba(10, 10, 10, 0.85);
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.05)"/></svg>');
-        }
-
-        /* --- ENERGY SAVER MODE --- */
-        [data-power-saving="true"] {
-            filter: brightness(0.85);
-            background-image: none !important;
-        }
-        
-        [data-power-saving="true"] * {
-            transition: none !important;
-            animation: none !important;
-            transform: none !important;
-        }
-
-        /* --- BASE STYLES & SECURITY --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            scroll-behavior: smooth;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            
-            /* Security: Disable Text Selection */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: var(--grid-pattern);
-            color: var(--text-primary);
-            transition: background-color 0.5s ease, color 0.5s ease;
-            overflow-x: hidden;
-        }
-
-        /* --- STARTUP LOADER --- */
-        .startup-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            transition: opacity 0.8s var(--transition-cinematic), visibility 0.8s;
-        }
-
-        .startup-loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-brand {
-            font-size: 0.85rem;
-            color: var(--accent-blue);
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            font-weight: 800;
-            margin-bottom: -10px;
-            opacity: 0.9;
-        }
-
-        .cube-container {
-            display: flex;
-            gap: 20px;
-            perspective: 1000px;
-        }
-
-        .lang-cube {
-            width: 80px;
-            height: 80px;
-            background: var(--surface-color);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-            transform-style: preserve-3d;
-            animation: enterpriseDance 3s var(--transition-cinematic) infinite;
-            animation-delay: calc(var(--i) * 0.2s);
-        }
-
-        @keyframes enterpriseDance {
-            0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); border-color: var(--surface-border); box-shadow: var(--shadow-sm); }
-            25% { transform: translateY(-20px) rotateX(10deg) rotateY(-10deg); border-color: var(--accent-blue); color: var(--accent-blue); box-shadow: 0 15px 30px -10px rgba(37, 99, 235, 0.3); }
-            50% { transform: translateY(0) rotateX(0) rotateY(0); border-color: var(--surface-border); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-            75% { transform: translateY(-20px) rotateX(-10deg) rotateY(10deg); border-color: var(--accent-purple); color: var(--accent-purple); box-shadow: 0 15px 30px -10px rgba(168, 85, 247, 0.3); }
-        }
-
-        .loader-text {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            font-weight: 600;
-            animation: pulseText 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseText {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        /* --- NAVIGATION --- */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 70px;
-            padding: 0 6%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background: var(--nav-glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--surface-border);
-            transition: transform 0.4s var(--transition-snappy);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            transition: transform 0.3s var(--transition-snappy);
-        }
-
-        .logo:hover { transform: scale(1.03); }
-
-        .logo-mark { display: flex; align-items: center; justify-content: center; }
-
-        .logo-text {
-            display: flex;
-            align-items: center;
-            font-size: 1.35rem;
-            letter-spacing: -0.04em;
-        }
-
-        .logo-text .brand-nuera { font-weight: 500; color: var(--text-primary); }
-        .logo-text .brand-lab { font-weight: 800; color: var(--accent-blue); margin-left: 2px; }
-
-        .nav-links { display: flex; gap: 2rem; align-items: center; }
-
-        .nav-item {
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-item:hover { color: var(--text-primary); }
-
-        .nav-item::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: var(--accent-blue);
-            transition: width 0.4s var(--transition-snappy);
-        }
-        .nav-item:hover::after { width: 100%; }
-
-        .nav-utils { display: flex; align-items: center; gap: 15px; }
-
-        /* Wallet Indicator & Pro Badge */
-        .pro-badge {
-            background: linear-gradient(135deg, var(--accent-gold), #d97706);
-            color: #000;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: transform 0.2s ease;
-            white-space: nowrap;
-        }
-        .pro-badge:hover { transform: scale(1.05); }
-        .pro-badge.hidden { display: none; }
-
-        .wallet-pill {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 20px;
-            color: var(--accent-gold);
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .wallet-pill:hover {
-            background: rgba(245, 158, 11, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .icon-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .icon-btn:hover {
-            color: var(--text-primary);
-            background: var(--surface-color);
-            transform: translateY(-1px);
-        }
-
-        .profile-link {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 1px solid var(--surface-border);
-            display: block;
-            transition: all 0.3s ease;
-        }
-
-        .profile-link:hover { 
-            border-color: var(--accent-blue); 
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
-            transform: scale(1.05);
-        }
-
-        .profile-link img, .profile-link svg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: var(--surface-color);
-            padding: 4px;
-            color: var(--text-secondary);
-        }
-
-        .nav-greeting {
-            display: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .mobile-only { display: none; }
-
-        /* --- HERO & CINEMATIC AMBIENCE --- */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 100px 5% 60px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-container {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 60px;
-            width: 100%;
-            max-width: 1300px;
-            margin: 0 auto;
-            align-items: center;
-            z-index: 1;
-            position: relative;
-        }
-
-        .ambient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            z-index: 0;
-            pointer-events: none;
-            animation: cinematicDrift 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        [data-theme="light"] .ambient-orb { opacity: 0.15; filter: blur(80px); }
-
-        .orb-1 {
-            width: 45vw; height: 45vw;
-            max-width: 600px; max-height: 600px;
-            background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
-            top: 0; left: -10%;
-        }
-
-        .orb-2 {
-            width: 35vw; height: 35vw;
-            max-width: 500px; max-height: 500px;
-            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
-            bottom: -5%; right: 5%;
-            animation-duration: 25s;
-            animation-delay: -5s;
-        }
-
-        @keyframes cinematicDrift {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(3vw, 2vh) scale(1.05); }
-            100% { transform: translate(-2vw, -3vh) scale(0.95); }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        body:not(.loaded) .hero-content > *, body:not(.loaded) .hero-playground {
-            opacity: 0;
-            animation: none;
-        }
-
-        body.loaded .hero-content > * {
-            opacity: 0;
-            animation: cinematicFadeUp 1.2s var(--transition-cinematic) forwards;
-        }
-
-        .hero-content .badge { animation-delay: 0.1s; }
-        .hero-content h1 { animation-delay: 0.2s; }
-        .hero-content p { animation-delay: 0.35s; }
-        .hero-content .btn-group { animation-delay: 0.5s; }
-
-        @keyframes cinematicFadeUp {
-            0% { opacity: 0; transform: translateY(40px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 6px;
-            background: var(--surface-color);
-            color: var(--text-primary);
-            font-weight: 500;
-            font-size: 0.75rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--surface-border);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            box-shadow: var(--shadow-sm);
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 5vw, 4.2rem);
-            line-height: 1.08;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.04em;
-            font-weight: 800;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .hero-subtitle {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            margin-bottom: 2.5rem;
-            line-height: 1.6;
-            max-width: 600px;
-            min-height: 80px; /* Prevents layout jump when typing */
-            display: flex;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.1em;
-            background-color: var(--accent-blue);
-            animation: blink 1s step-end infinite;
-            margin-left: 2px;
-            vertical-align: text-bottom;
-        }
-
-        @keyframes blink { 
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        .btn-group { display: flex; gap: 16px; flex-wrap: wrap; }
-
-        .cta-btn {
-            padding: 0.875rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: none;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-btn.primary {
-            background: var(--accent-primary);
-            color: var(--bg-color);
-            box-shadow: var(--shadow-md);
-            transition: transform 0.3s var(--transition-snappy), box-shadow 0.3s ease;
-        }
-
-        .cta-btn.primary::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .cta-btn.primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px -10px var(--accent-primary);
-        }
-        
-        .cta-btn.primary:hover::before { left: 100%; }
-
-        .cta-btn.secondary {
-            background: var(--surface-color);
-            color: var(--text-primary);
-            border: 1px solid var(--surface-border);
-            transition: all 0.3s var(--transition-snappy);
-        }
-
-        .cta-btn.secondary:hover {
-            background: var(--bg-color);
-            border-color: var(--text-primary);
-            transform: translateY(-3px);
-        }
-
-        /* --- INTERACTIVE PLAYGROUND (ZERO-SCROLL DELIGHT) --- */
-        .hero-playground {
-            background: var(--term-bg);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-            box-shadow: var(--shadow-hover);
-            transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
-            transition: transform 0.5s var(--transition-cinematic);
-            opacity: 0;
-        }
-
-        body.loaded .hero-playground {
-            animation: cinematicPlayground 1.2s var(--transition-cinematic) forwards;
-            animation-delay: 0.6s;
-        }
-
-        @keyframes cinematicPlayground {
-            0% { opacity: 0; transform: perspective(1000px) translateY(40px) rotateY(-5deg) rotateX(15deg); }
-            100% { opacity: 1; transform: perspective(1000px) rotateY(-5deg) rotateX(5deg); }
-        }
-
-        .hero-playground:hover {
-            transform: perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1.02);
-        }
-
-        .playground-header {
-            background: var(--term-header);
-            padding: 12px 16px;
-            display: flex;
-            gap: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .pg-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            font-weight: 500;
-            font-family: 'Fira Code', monospace;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .pg-btn.active {
-            color: var(--term-text);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .playground-body {
-            padding: 24px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--term-text);
-            min-height: 220px;
-        }
-
-        .pg-kw { color: var(--term-keyword); }
-        .pg-fn { color: var(--term-func); }
-        .pg-str { color: var(--term-string); }
-
-        /* --- EXPLORATION SYSTEM (TRUE BENTO) --- */
-        .explore-section {
-            padding: 100px 5%;
-            background: var(--bg-color);
-            border-top: 1px solid var(--surface-border);
-            position: relative;
-            z-index: 2;
-        }
-
-        .section-header { text-align: center; margin-bottom: 3rem; }
-
-        .section-header h2 {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.03em;
-            font-weight: 700;
-        }
-
-        .section-header p { color: var(--text-secondary); font-size: 1rem; }
-
-        .toggle-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 50px;
-        }
-
-        .toggle-bar {
-            background: var(--surface-color);
-            padding: 6px;
-            border-radius: 8px;
-            display: flex;
-            border: 1px solid var(--surface-border);
-            overflow-x: auto;
-            max-width: 100%;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .toggle-bar::-webkit-scrollbar { display: none; }
-
-        .toggle-opt {
-            padding: 8px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.875rem;
-            transition: all 0.3s var(--transition-snappy);
-            color: var(--text-secondary);
-            border: none;
-            background: transparent;
-            white-space: nowrap;
-        }
-
-        .toggle-opt.active {
-            background: var(--bg-color);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-md);
-            transform: scale(1.02);
-        }
-
-        /* --- TRUE BENTO GRID LAYOUT WITH REWARDS --- */
-        .content-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            grid-auto-flow: dense;
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 400px;
-        }
-        .feature-card {
-            background: var(--surface-color);
-            border-radius: 16px;
-            padding: 32px;
-            border: 1px solid var(--surface-border);
-            transition: transform 0.5s var(--transition-snappy), box-shadow 0.5s ease, border-color 0.3s ease, opacity 0.5s ease;
-            opacity: 0;
-            transform: translateY(30px) scale(0.98);
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(37, 99, 235, 0.08), transparent 40%);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .feature-card:hover::before { opacity: 1; }
-
-        .feature-card > * { position: relative; z-index: 1; }
-
-        @media (min-width: 900px) {
-            .feature-card.bento-large {
-                grid-column: span 2;
-            }
-            .feature-card.bento-large .card-inner {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 40px;
-            }
-            .feature-card.bento-large .card-top {
-                flex-direction: column;
-                margin-bottom: 0;
-                align-items: flex-start;
-            }
-            .feature-card.bento-large .icon-circle {
-                font-size: 2.5rem;
-                margin-bottom: 12px;
-            }
-            .feature-card.bento-large .card-content {
-                flex: 1;
-            }
-        }
-
-        .feature-card.show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        .feature-card:hover {
-            border-color: rgba(37, 99, 235, 0.3);
-            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1), var(--shadow-hover);
-            transform: translateY(-4px);
-            background: var(--bg-color);
-        }
-
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24px;
-        }
-
-        .icon-circle {
-            font-size: 1.8rem;
-            color: var(--text-primary);
-            transition: transform 0.4s var(--transition-snappy);
-            display: inline-block;
-        }
-
-        .feature-card:hover .icon-circle {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        .reward-tag {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-green);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .feature-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 8px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-
-        .feature-card p {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 24px;
-            font-size: 0.95rem;
-            flex-grow: 1;
-            transition: color 0.3s ease;
-        }
-
-        .feature-card:hover p { color: var(--text-primary); }
-
-        .lang-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-
-        .pill {
-            padding: 4px 12px;
-            background: var(--bg-color);
-            border: 1px solid var(--surface-border);
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover .pill {
-            border-color: var(--text-primary);
-            color: var(--text-primary);
-        }
-
-        .card-link {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--accent-blue);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: gap 0.3s var(--transition-snappy);
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
-        
-        .feature-card:hover .card-link { gap: 10px; }
-
-        /* --- MARKETPLACE (E-COMMERCE) SECTION --- */
-        .marketplace-section {
-            padding: 100px 5%;
-            background: var(--surface-color);
-            border-top: 1px solid var(--surface-border);
-            position: relative;
-        }
-
-        .market-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .product-card {
-            background: var(--bg-color);
-            border: 1px solid var(--surface-border);
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s var(--transition-snappy);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--accent-blue);
-        }
-
-        .product-visual {
-            height: 140px;
-            background: var(--term-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            position: relative;
-        }
-
-        .product-visual::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 40px;
-            background: linear-gradient(to top, var(--bg-color), transparent);
-        }
-
-        .product-content {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-author {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .product-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .product-desc {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            flex-grow: 1;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--surface-border);
-            padding-top: 16px;
-        }
-
-        .product-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .product-price.nux-price {
-            color: var(--accent-gold);
-        }
-
-        .buy-btn {
-            background: var(--surface-color);
-            border: 1px solid var(--surface-border);
-            color: var(--text-primary);
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .product-card:hover .buy-btn {
-            background: var(--accent-primary);
-            color: var(--bg-color);
-            border-color: var(--accent-primary);
-        }
-
-        /* --- SUBSCRIPTION / PRICING SECTION --- */
-        .pricing-section {
-            padding: 100px 5%;
-            background: var(--bg-color);
-            border-top: 1px solid var(--surface-border);
-            position: relative;
-        }
-        
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .pricing-card {
-            background: var(--surface-color);
-            border: 1px solid var(--surface-border);
-            border-radius: 16px;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pricing-card.premium {
-            border-color: var(--accent-gold);
-            box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.2);
-        }
-        
-        .pricing-card.premium::before {
-            content: 'PRO';
-            position: absolute;
-            top: 12px; right: -30px;
-            background: var(--accent-gold);
-            color: #000;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 4px 35px;
-            transform: rotate(45deg);
-        }
-        
-        .pricing-price {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin: 20px 0;
-        }
-        
-        .pricing-price span {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        .pricing-features {
-            list-style: none;
-            margin-bottom: 30px;
-            flex-grow: 1;
-        }
-        
-        .pricing-features li {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .pricing-features li::before {
-            content: '✓';
-            color: var(--accent-green);
-            font-weight: bold;
-        }
-
-        /* --- TOAST NOTIFICATIONS --- */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .toast {
-            background: var(--nav-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--surface-border);
-            color: var(--text-primary);
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-hover);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 300px;
-            transform: translateX(120%);
-            opacity: 0;
-            transition: all 0.4s var(--transition-snappy);
-        }
-
-        .toast.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .toast-icon {
-            font-size: 1.2rem;
-            color: var(--accent-gold);
-        }
-
-        .toast.warning .toast-icon {
-            color: var(--accent-warning);
-        }
-
-        /* --- ABOUT US / ARCHITECTS SECTION --- */
-        .about-section {
-            padding: 100px 5%;
-            background: var(--surface-color);
-            border-top: 1px solid var(--surface-border);
-            position: relative;
-            z-index: 2;
-        }
-
-        .about-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .about-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1.2rem;
-            letter-spacing: -0.03em;
-            font-weight: 800;
-            color: var(--text-primary);
-        }
-
-        .about-content p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-        }
-
-        .about-content strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 2rem;
-        }
-
-        .stat-item {
-            padding: 24px;
-            background: var(--bg-color);
-            border: 1px solid var(--surface-border);
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.3s var(--transition-snappy), box-shadow 0.3s ease;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--accent-blue);
-        }
-
-        .stat-val {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--accent-blue);
-            margin-bottom: 4px;
-            letter-spacing: -0.02em;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .about-visual {
-            position: relative;
-            height: 100%;
-            min-height: 450px;
-            border-radius: 20px;
-            background: var(--bg-color);
-            border: 1px solid var(--surface-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-        }
-
-        .about-visual::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
-        }
-
-        /* Abstract Node Network SVG Animation */
-        .node-network {
-            width: 60%;
-            height: 60%;
-            opacity: 0.8;
-        }
-
-        .node-path {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: dash 5s linear forwards;
-        }
-
-        @keyframes dash {
-            to { stroke-dashoffset: 0; }
-        }
-
-        .node-dot {
-            animation: pulseDot 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseDot {
-            0% { transform: scale(1); opacity: 0.6; }
-            100% { transform: scale(1.3); opacity: 1; }
-        }
-
-        /* --- ENHANCED MOBILE UX OPTIMIZATIONS --- */
-        @media (max-width: 900px) {
-            .about-container { grid-template-columns: 1fr; gap: 40px; }
-            .about-visual { min-height: 300px; }
-        }
-
-        @media (max-width: 768px) {
-            .navbar { padding: 0 5%; height: 60px; }
-            .logo-text { font-size: 1.2rem; }
-            .nav-greeting { display: none !important; }
-            .mobile-only { display: flex; }
-            
-            .nav-links {
-                position: absolute;
-                top: 60px;
-                left: 0;
-                width: 100%;
-                background: var(--nav-glass);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 24px 5%;
-                gap: 24px;
-                border-bottom: 1px solid var(--surface-border);
-                transform: translateY(-120%);
-                opacity: 0;
-                pointer-events: none;
-                transition: all 0.4s var(--transition-snappy);
-                box-shadow: var(--shadow-md);
-            }
-            .nav-links.mobile-active {
-                transform: translateY(0);
-                opacity: 1;
-                pointer-events: auto;
-            }
-            .nav-utils { gap: 12px; }
-            
-            .cube-container { gap: 10px; flex-wrap: wrap; justify-content: center; }
-            .lang-cube { width: 50px; height: 50px; font-size: 0.75rem; }
-            
-            .hero { padding: 100px 5% 40px; min-height: auto; }
-            .hero-container { grid-template-columns: 1fr !important; gap: 40px; }
-            .hero-content { text-align: center; margin: 0 auto; }
-            h1 { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 1rem; margin-bottom: 2rem; min-height: 70px; justify-content: center; }
-            .btn-group { justify-content: center; flex-direction: column; width: 100%; gap: 12px; }
-            .cta-btn { width: 100%; justify-content: center; }
-            
-            .hero-playground { transform: none !important; margin: 0 auto; width: 100%; }
-            body.loaded .hero-playground { animation: cinematicPlaygroundMobile 1.2s var(--transition-cinematic) forwards; }
-            .hero-playground:hover { transform: translateY(-4px) !important; }
-            .playground-body { padding: 16px; font-size: 0.8rem; min-height: 180px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .pg-btn { padding: 6px 10px; font-size: 0.8rem; }
-            
-            .explore-section, .marketplace-section, .pricing-section, .about-section { padding: 60px 5%; }
-            .section-header h2 { font-size: 1.75rem; }
-            .toggle-container { margin-bottom: 30px; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 10px; border-radius: 0; }
-            .toggle-bar { width: max-content; }
-            
-            .content-display { grid-template-columns: 1fr; gap: 16px; min-height: auto; }
-            .feature-card { padding: 24px; }
-            .feature-card.bento-large .card-inner { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .icon-circle { margin-bottom: 16px; font-size: 1.5rem; }
-            
-            .about-content h2 { font-size: 2rem; }
-            .about-content p { font-size: 1rem; }
-            .stats-grid { grid-template-columns: 1fr; gap: 12px; }
-            .stat-item { padding: 16px; }
-            .stat-val { font-size: 1.75rem; }
-            
-            .footer { padding: 30px 5%; }
-        }
-
-        @keyframes cinematicPlaygroundMobile {
-            0% { opacity: 0; transform: translateY(40px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- FOOTER --- */
-        .footer {
-            padding: 40px 5%;
-            text-align: center;
-            border-top: 1px solid var(--surface-border);
-            background: var(--bg-color);
-        }
-
-        .footer-text { font-size: 0.875rem; color: var(--text-secondary); }
-        .footer-text strong { color: var(--text-primary); font-weight: 600; }
-
-        /* --- SCROLL REVEAL UTILS --- */
-        .reveal { opacity: 0; transform: translateY(30px); transition: 1s all var(--transition-cinematic); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neuralab | Deep Tech & Systems Engineering Platform</title>
+  <meta name="description" content="Master first-principles computer science, low-level systems, distributed consensus, compilers, and neural architectures. Founded by Anay Upadhyay.">
+  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 </head>
 <body>
 
-    <!-- --- STARTUP LOADING OVERLAY --- -->
-    <div id="startup-loader" class="startup-loader">
-        <div class="loader-brand">NEXUS SYSTEMS</div>
-        <div class="cube-container">
-            <div class="lang-cube" style="--i: 0;">Python</div>
-            <div class="lang-cube" style="--i: 1;">Java</div>
-            <div class="lang-cube" style="--i: 2;">CSS</div>
-            <div class="lang-cube" style="--i: 3;">Kotlin</div>
-        </div>
-        <div class="loader-text">Compiling Environment</div>
-    </div>
-
-    <!-- --- TOAST CONTAINER --- -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <nav class="navbar" id="navbar">
-        <a href="#" class="logo">
-            <div class="logo-mark">
-                <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 26V7C8 5.89543 8.89543 5 10 5H13L24 20.5V26" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M24 6V25C24 26.1046 23.1046 27 22 27H19L8 11.5V6" stroke="var(--accent-blue)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="logo-text">
-                <span class="brand-nuera">Nuera</span><span class="brand-lab">Lab</span>
-            </div>
-        </a>
-
-        <div class="nav-links">
-            <a href="neural-platform.html" class="nav-item">Platform</a>
-            <a href="editor.html" class="nav-item">Editor</a>
-            <a href="#marketplace" class="nav-item">Marketplace</a>
-            <a href="#pricing" class="nav-item">Pro Plans</a>
-            <a href="rate-us.html" class="nav-item">Rate Us</a>
-        </div>
-
-        <div class="nav-utils">
-            <a href="#pricing" class="pro-badge" id="pro-badge-btn">Upgrade</a>
-            
-            <!-- Real User Wallet synced with Backend -->
-            <a href="subscription.html" class="wallet-pill" style="text-decoration: none;" title="Top Up! $1 = 3 Bricks | 1 Brick = 3 NUX">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                <span id="wallet-balance">0</span> NUX
-            </a>
-
-            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
-                <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-            </button>
-            <button id="mobile-menu-btn" class="icon-btn mobile-only" title="Menu">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <span id="nav-greeting" class="nav-greeting"></span>
-            <a href="login.html" class="profile-link" title="User Profile" id="nav-profile-pic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            </a>
-        </div>
+  <!-- Navigation -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="brand-icon">⚡</div>
+      <span>Neuralab</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#courses" class="nav-link">Courses</a></li>
+        <li><a href="#philosophy" class="nav-link">Philosophy & Journey</a></li>
+        <li><a href="/code-editor.html" class="nav-link">Code Studio</a></li>
+        <li><a href="/ai-lab.html" class="nav-link">Neural Lab</a></li>
+        <li><a href="/neural-platform.html" class="nav-link">Dashboard</a></li>
+      </ul>
     </nav>
+    <div id="navActions" class="nav-actions">
+      <!-- Injected dynamically by app.js -->
+    </div>
+  </header>
 
-    <main>
-        <section class="hero">
-            <div class="ambient-orb orb-1"></div>
-            <div class="ambient-orb orb-2"></div>
+  <!-- 3D Hero Section -->
+  <section class="hero-wrapper">
+    <canvas id="neural3dCanvas"></canvas>
+    <div class="container hero-content">
+      <div class="badge badge-cyan">First-Principles Engineering • No Vibe Coding</div>
+      <h1 class="hero-title">From Bare Metal to Neural Synapses.</h1>
+      <p class="hero-subtitle">
+        Neuralab is an engineering academy for software developers who refuse to settle for superficial abstraction. Master C++, Rust, browser rendering engines, distributed consensus, and transformer architectures.
+      </p>
+      <div class="hero-buttons">
+        <a href="#courses" class="btn btn-primary">Explore Engineering Tracks</a>
+        <a href="/code-editor.html" class="btn btn-secondary">Launch Code Sandbox</a>
+        <a href="#philosophy" class="btn btn-secondary">The Creator's Journey</a>
+      </div>
+      <div style="margin-top:2.5rem; display:flex; gap:2rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">
+        <div><strong style="color:#fff; font-size:1.1rem; display:block;">18</strong> Systems Courses</div>
+        <div><strong style="color:var(--accent-cyan); font-size:1.1rem; display:block;">20,000+</strong> Hours of Systems Lab</div>
+        <div><strong style="color:var(--accent-green); font-size:1.1rem; display:block;">100%</strong> Zero-Trust Security</div>
+      </div>
+    </div>
+  </section>
 
-            <div class="hero-container">
-                <div class="hero-content">
-                    <div class="badge">v2.0 Deployment Ready</div>
-                    
-                    <h1>Architectural Mastery of <span class="gradient-text">Systems & Code.</span></h1>
-                    
-                    <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-blue); font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                        Developed and Founded by Anay Upadhyay
-                    </div>
-
-                    <p class="hero-subtitle">
-                        <span id="typewriter-text"></span><span class="cursor"></span>
-                    </p>
-                    
-                    <div class="btn-group">
-                        <a href="#explore" class="cta-btn primary">
-                            Initialize Workspace
-                        </a>
-                        <button class="cta-btn secondary" onclick="document.getElementById('explore').scrollIntoView()">
-                            View Documentation
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Interactive Playground -->
-                <div class="hero-playground">
-                    <div class="playground-header">
-                        <button class="pg-btn active" onclick="switchCode('python', this)">main.py</button>
-                        <button class="pg-btn" onclick="switchCode('react', this)">App.tsx</button>
-                        <button class="pg-btn" onclick="switchCode('rust', this)">main.rs</button>
-                    </div>
-                    <div class="playground-body" id="pg-code">
-                        <span class="pg-kw">def</span> <span class="pg-fn">init_nuera</span>(user_id):<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;session = Engine.connect(user_id)<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">if</span> session.is_active():<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-fn">print</span>(<span class="pg-str">"Welcome to the Architecture."</span>)<br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">return</span> session.compile()<br>
-                        <br>
-                        init_nuera(<span class="pg-str">"dev_0x99"</span>)
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- EXPLORE / LEARNING / BOUNTY SECTION -->
-        <section id="explore" class="explore-section">
-            <div class="section-header reveal">
-                <h2>System Modules</h2>
-                <p>Select a domain to inspect the available training architectures and earn Bounties.</p>
-            </div>
-
-            <div class="toggle-container reveal">
-                <div class="toggle-bar">
-                    <button class="toggle-opt" data-target="frontend">Front-End</button>
-                    <button class="toggle-opt" data-target="backend">Back-End</button>
-                    <button class="toggle-opt" data-target="systems">Systems</button>
-                    <button class="toggle-opt" data-target="data">Data</button>
-                </div>
-            </div>
-
-            <div id="content-grid" class="content-display">
-                <!-- Content Injected via JS -->
-            </div>
-        </section>
-
-        <!-- E-COMMERCE / MARKETPLACE SECTION -->
-        <section id="marketplace" class="marketplace-section">
-            <div class="section-header reveal">
-                <h2>Asset Exchange</h2>
-                <p>Acquire premium enterprise templates, models, and architectures. Pay with USD or NUX.</p>
-            </div>
-
-            <div class="market-grid reveal">
-                <!-- Product 1 -->
-                <div class="product-card">
-                    <div class="product-visual">⚛️</div>
-                    <div class="product-content">
-                        <div class="product-author">Nexus Official</div>
-                        <h3 class="product-title">React Enterprise SaaS Template</h3>
-                        <p class="product-desc">Production-ready React dashboard with built-in auth, RBAC, and Tailwind themes.</p>
-                        <div class="product-footer">
-                            <div class="product-price nux-price">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                850 NUX
-                            </div>
-                            <button class="buy-btn" onclick="triggerPurchase('React Enterprise SaaS Template', 850)">Deploy Now</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 2 -->
-                <div class="product-card">
-                    <div class="product-visual">🧠</div>
-                    <div class="product-content">
-                        <div class="product-author">DataCraft Inc</div>
-                        <h3 class="product-title">Sentiment Analysis Model V2</h3>
-                        <p class="product-desc">Pre-trained PyTorch model for real-time financial sentiment tracking. 94% accuracy.</p>
-                        <div class="product-footer">
-                            <div class="product-price">$49.00</div>
-                            <button class="buy-btn" onclick="triggerPurchase('Sentiment Analysis Model V2', 0, 49)">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Product 3 -->
-                <div class="product-card">
-                    <div class="product-visual">⚙️</div>
-                    <div class="product-content">
-                        <div class="product-author">0xSysDev</div>
-                        <h3 class="product-title">Rust Microservice Chassis</h3>
-                        <p class="product-desc">Highly optimized Tokio-based microservice template. Zero-cost abstractions guaranteed.</p>
-                        <div class="product-footer">
-                            <div class="product-price nux-price">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                                500 NUX
-                            </div>
-                            <button class="buy-btn" onclick="triggerPurchase('Rust Microservice Chassis', 500)">Deploy Now</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Product 4 -->
-                <div class="product-card">
-                    <div class="product-visual">🎨</div>
-                    <div class="product-content">
-                        <div class="product-author">UI/UX Guild</div>
-                        <h3 class="product-title">Cinematic Animation Library</h3>
-                        <p class="product-desc">A pure CSS/JS collection of high-performance animations for modern landing pages.</p>
-                        <div class="product-footer">
-                            <div class="product-price">$29.00</div>
-                            <button class="buy-btn" onclick="triggerPurchase('Cinematic Animation Library', 0, 29)">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SUBSCRIPTION PLANS (PLATFORM REVENUE) -->
-        <section id="pricing" class="pricing-section">
-            <div class="section-header reveal">
-                <h2>Unlock Full Ecosystem Access</h2>
-                <p>Upgrade to Nuera+ to maximize your earning potential and bypass marketplace fees.</p>
-            </div>
-            
-            <div class="pricing-grid reveal">
-                <div class="pricing-card">
-                    <h3>Developer Free</h3>
-                    <div class="pricing-price">$0<span>/mo</span></div>
-                    <ul class="pricing-features">
-                        <li>Access to basic learning modules</li>
-                        <li>Standard bounty rewards</li>
-                        <li>15% platform fee on marketplace sales</li>
-                        <li>Community support</li>
-                    </ul>
-                    <button class="cta-btn secondary" style="width: 100%; justify-content: center;" onclick="showToast('Current Plan Active', 'success')">Current Plan</button>
-                </div>
-                
-                <div class="pricing-card premium">
-                    <h3>Nuera+ Professional</h3>
-                    <div class="pricing-price">$3.99<span>/mo</span></div>
-                    <ul class="pricing-features">
-                        <li>Access to advanced/enterprise modules</li>
-                        <li><strong>Auto-refill 10,000 NUX (3 Month Guarantee)</strong></li>
-                        <li>0% platform fee on marketplace sales</li>
-                        <li>Publish unlimited assets to exchange</li>
-                        <li>Priority AI Mentor access</li>
-                    </ul>
-                    <button class="cta-btn primary" style="width: 100%; justify-content: center;" onclick="triggerProUpgrade()">Upgrade to Pro</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABOUT US / ARCHITECTS SECTION -->
-        <section id="about" class="about-section">
-            <div class="about-container reveal">
-                <div class="about-content">
-                    <div class="badge">Origin & Architecture</div>
-                    <h2>The Architects Behind Nuera</h2>
-                    <p>Nuera Lab was forged in a highly isolated development environment and <strong>built by Anay</strong>. Recognized as a visionary software architect and a relentless innovator, Anay engineered this platform to empower developers with a structural understanding of how software architecture truly breathes.</p>
-                    <p>Under his brilliant leadership, the platform pairs you with a dual-agent AI that thinks like a Senior Staff Engineer, guiding you from low-level memory management to high-level distributed system design.</p>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-val">250+</div>
-                            <div class="stat-label">Syntax Trees</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-val">Zero</div>
-                            <div class="stat-label">Latency Execution</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-visual">
-                    <svg class="node-network" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="var(--accent-blue)" stop-opacity="0.2"/>
-                                <stop offset="100%" stop-color="var(--accent-purple)" stop-opacity="0.8"/>
-                            </linearGradient>
-                        </defs>
-                        <!-- Connecting Lines -->
-                        <path class="node-path" d="M20 50 L50 20 L80 50 L50 80 Z" fill="none" stroke="url(#lineGrad)" stroke-width="2"/>
-                        <path class="node-path" d="M20 50 L80 50" fill="none" stroke="url(#lineGrad)" stroke-width="2"/>
-                        <path class="node-path" d="M50 20 L50 80" fill="none" stroke="url(#lineGrad)" stroke-width="2"/>
-                        
-                        <!-- Nodes -->
-                        <circle class="node-dot" cx="50" cy="50" r="6" fill="var(--bg-color)" stroke="var(--accent-blue)" stroke-width="3" style="animation-delay: 0s;"/>
-                        <circle class="node-dot" cx="20" cy="50" r="4" fill="var(--bg-color)" stroke="var(--accent-purple)" stroke-width="2" style="animation-delay: 0.5s;"/>
-                        <circle class="node-dot" cx="80" cy="50" r="4" fill="var(--bg-color)" stroke="var(--accent-purple)" stroke-width="2" style="animation-delay: 1s;"/>
-                        <circle class="node-dot" cx="50" cy="20" r="4" fill="var(--bg-color)" stroke="var(--accent-purple)" stroke-width="2" style="animation-delay: 1.5s;"/>
-                        <circle class="node-dot" cx="50" cy="80" r="4" fill="var(--bg-color)" stroke="var(--accent-purple)" stroke-width="2" style="animation-delay: 2s;"/>
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="footer">
-        <p class="footer-text">
-            &copy; Working from 2024 October 29 | Nuera Lab. A <strong>Nexus</strong> company.
+  <!-- Anay Upadhyay's Journey & Philosophy Section -->
+  <section id="philosophy" class="section" style="background:var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-purple">The Architectural Vision</div>
+        <h2 class="section-title">Beyond "Vibe Coding": Why Neuralab Exists</h2>
+        <p class="section-desc">
+          A note from founder and lead systems architect Anay Upadhyay on reclaiming depth, rigor, and technical sovereignty in software engineering.
         </p>
-    </footer>
+      </div>
 
-    <script>
-        // --- SECURITY: DISABLE DEVTOOLS, RIGHT CLICK & SHORTCUTS ---
-        document.addEventListener('contextmenu', event => event.preventDefault());
+      <div class="journey-card">
+        <span class="journey-badge">// THE FOUNDER'S JOURNEY • ANAY UPADHYAY</span>
+        <blockquote class="journey-quote">
+          "The modern engineering ecosystem is intoxicated by superficiality. Copying snippets, relying on autocomplete hallucinations, and treating the runtime as magic works right up until your distributed storage deadlocks or your cache line thrashing kills production."
+        </blockquote>
+        <div class="journey-body">
+          <p style="margin-bottom:1.25rem;">
+            My journey began like many others: writing high-level web applications and marveling at how fast something could appear on screen. But as I pushed deeper into large-scale distributed systems and high-throughput networking, the cracks in shallow knowledge became undeniable. A framework will not save you when your V8 garbage collector freezes the event loop for 400ms. An ORM will not rescue your latency when an unindexed LSM-tree write-ahead log saturates disk I/O.
+          </p>
+          <p style="margin-bottom:1.25rem;">
+            I realized that the distinction between an average developer and a staff-level systems architect is not how many frameworks they have memorized, but whether they understand the machine down to the silicon: memory layout, CPU cache hierarchies, OS kernel interrupts, TCP/QUIC state machines, and mathematical linear algebra.
+          </p>
+          <p>
+            I built <strong>Neuralab</strong> to be the platform I wished I had: an uncompromising, rigorous, first-principles curriculum where you write memory allocators in C++, understand the borrow checker's graph theory in Rust, disassemble V8 bytecode, build Raft consensus engines from scratch, and derive FlashAttention-2 kernels. No superficial tutorials. No hand-waving. Pure, unapologetic technical mastery.
+          </p>
+        </div>
+        <div class="journey-author">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" alt="Anay Upadhyay" class="journey-avatar">
+          <div>
+            <div class="author-name">Anay Upadhyay</div>
+            <div class="author-role">Founder, Neuralab • Systems & Neural Architect</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'F12' || event.keyCode === 123) { event.preventDefault(); return false; }
-            if ((event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'i')) || (event.metaKey && event.altKey && (event.key === 'I' || event.key === 'i'))) { event.preventDefault(); return false; }
-            if ((event.ctrlKey && event.shiftKey && (event.key === 'C' || event.key === 'c')) || (event.metaKey && event.altKey && (event.key === 'C' || event.key === 'c'))) { event.preventDefault(); return false; }
-            if ((event.ctrlKey && event.shiftKey && (event.key === 'J' || event.key === 'j')) || (event.metaKey && event.altKey && (event.key === 'J' || event.key === 'j'))) { event.preventDefault(); return false; }
-            if ((event.ctrlKey && (event.key === 'U' || event.key === 'u')) || (event.metaKey && (event.key === 'U' || event.key === 'u')) || (event.metaKey && event.altKey && (event.key === 'U' || event.key === 'u'))) { event.preventDefault(); return false; }
-        });
+  <!-- Interactive Sandbox Teaser Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-cyan">In-Browser Compilation & Execution</div>
+        <h2 class="section-title">Zero-Setup Systems Sandbox</h2>
+        <p class="section-desc">
+          Test algorithms, inspect memory layouts, and experiment with reactive signals directly in your browser.
+        </p>
+      </div>
 
-        // --- CUSTOM TOAST NOTIFICATIONS ---
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            let icon = type === 'success' ? '⚡' : (type === 'cart' ? '🛒' : (type === 'warning' ? '⚠️' : '❌'));
-            
-            toast.innerHTML = `
-                <div class="toast-icon">${icon}</div>
-                <div>${message}</div>
-            `;
-            
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 400); 
-            }, type === 'warning' ? 5000 : 3500); // Leave warnings on screen longer
-        }
+      <div class="sandbox-card">
+        <div class="sandbox-header">
+          <div class="window-dots">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+          </div>
+          <span style="color:var(--text-muted); font-size:0.8rem;">distributed_raft_consensus.cpp — C++20 / Thread Sanitizer</span>
+          <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.6rem;">Open in Studio →</a>
+        </div>
+        <pre class="sandbox-content"><code><span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;iostream&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;vector&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;atomic&gt;</span>
+<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;chrono&gt;</span>
 
-        // ==============================================================================
-        // --- SECURE BACKEND INTEGRATION (SERVER-AUTHORITATIVE ARCHITECTURE) ---
-        // ==============================================================================
-        
-        const API_BASE_URL = 'https://nueralab-api.onrender.com/api'; 
-        let globalAuthToken = null;
+<span style="color:#64748b;">// High-Performance Zero-Allocation Raft State Machine</span>
+<span style="color:#4facfe;">enum class</span> <span style="color:#ffb800;">NodeRole</span> { FOLLOWER, CANDIDATE, LEADER };
 
-        // Note: The UI is strictly a "dumb terminal". It trusts whatever the backend returns.
-        // It NEVER dictates NUX credits, 3-month logic, or expiration triggers. 
+<span style="color:#4facfe;">struct</span> <span style="color:#ffb800;">LogEntry</span> {
+    <span style="color:#4facfe;">uint64_t</span> term;
+    <span style="color:#4facfe;">uint64_t</span> index;
+    <span style="color:#4facfe;">std::vector&lt;uint8_t&gt;</span> command;
+};
 
-        async function fetchServerUserData(userId, token) {
-            try {
-                /*
-                // REAL IMPLEMENTATION (Commented out for the live preview to work seamlessly without throwing CORS/404s)
-                const response = await fetch(`${API_BASE_URL}/user/status`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                */
+<span style="color:#4facfe;">int</span> <span style="color:#00f2fe;">main</span>() {
+    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Neuralab Engine] Initializing Raft Cluster (Node 01)..."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
+    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Term 1] Heartbeat acknowledged via zero-copy RDMA."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
+    <span style="color:#4facfe;">return</span> <span style="color:#ff3366;">0</span>;
+}</code></pre>
+      </div>
+    </div>
+  </section>
 
-                // ----------------------------------------------------------------------
-                // SIMULATED BACKEND RESPONSE (How your Node.js/MongoDB should behave)
-                // ----------------------------------------------------------------------
-                // Your backend logic should look roughly like this:
-                // 1. Validate JWT Token. Find user in MongoDB (`db.users.findOne({ _id: userId })`).
-                // 2. If user is null -> return { isRegistered: false }.
-                // 3. If user.isPremium == true:
-                //      a. Check const monthsSinceStart = (Date.now() - user.subscriptionDate) / (1000*60*60*24*30)
-                //      b. If monthsSinceStart >= 3: 
-                //            - Trigger SendGrid/SES email "Subscription Ending".
-                //            - return { ..., subscriptionStatus: 'ending', balance: user.balance }
-                //      c. If monthsSinceStart < 3 AND user.balance < THRESHOLD (e.g., 1000):
-                //            - db.users.updateOne({ _id: userId }, { $set: { balance: 10000 } })
-                //            - return { ..., refilled: true, balance: 10000 }
-                //      d. Else return current balance.
-                // ----------------------------------------------------------------------
-                
-                // Simulating the secure payload returned from the backend above:
-                const isMockPremiumUser = true; // Change to false to test standard user
+  <!-- Courses Catalog Section -->
+  <section id="courses" class="section" style="background:var(--bg-secondary);">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge badge-green">Production Curriculum</div>
+        <h2 class="section-title">The Engineering Curriculum</h2>
+        <p class="section-desc">
+          18 comprehensive tracks covering the full modern engineering spectrum. Verified with official PayPal checkout and instant sandbox access.
+        </p>
+      </div>
 
-                const simulatedBackendPayload = {
-                    isRegistered: true,
-                    isPremium: isMockPremiumUser,
-                    balance: isMockPremiumUser ? 10000 : 150, // Premium users get the auto-refill amount injected here
-                    subscriptionStatus: isMockPremiumUser ? 'ending' : 'none', // Simulating the 3-month trigger logic
-                    refilledEvent: false // Would be true if the backend JUST topped up the account on this specific request
-                };
+      <!-- Controls: Search & Category Filter -->
+      <div style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2.5rem;">
+        <div style="position:relative; max-width:600px; margin:0 auto; width:100%;">
+          <input type="text" id="courseSearchInput" class="form-input" placeholder="Search systems, protocols, compilers, algorithms..." style="padding-left:1.2rem; font-size:1rem; border-radius:999px;">
+        </div>
 
-                // Strict UI updates based purely on the backend's dictation
-                if (simulatedBackendPayload.isRegistered) {
-                    document.getElementById('wallet-balance').innerText = simulatedBackendPayload.balance.toLocaleString();
-                    
-                    if (simulatedBackendPayload.isPremium) {
-                        document.getElementById('pro-badge-btn').classList.add('hidden'); // Hide upgrade button
-                        
-                        // Backend dictates the subscription is nearing the 3 month limit
-                        if (simulatedBackendPayload.subscriptionStatus === 'ending') {
-                            showToast("Your premium auto-refill subscription is ending soon. Please renew to keep your progress.", "warning");
-                        } 
-                        // Backend dictates an auto-refill just occurred
-                        else if (simulatedBackendPayload.refilledEvent) {
-                            showToast("Premium Active: Wallet auto-refilled to 10,000 NUX.", "success");
-                        }
-                    }
-                }
-                
-                return simulatedBackendPayload;
+        <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
+          <button class="badge filter-pill active" data-category="all" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">All Tracks</button>
+          <button class="badge badge-cyan filter-pill" data-category="Systems Programming" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Systems & C++/Rust</button>
+          <button class="badge badge-purple filter-pill" data-category="Distributed Systems" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Distributed & Storage</button>
+          <button class="badge badge-green filter-pill" data-category="Artificial Intelligence" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">AI & Tensors</button>
+          <button class="badge filter-pill" data-category="Web Architecture" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,255,255,0.05); color:#fff;">Web Core & V8</button>
+          <button class="badge filter-pill" data-category="Cyber Security" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,51,102,0.15); color:var(--accent-red);">Security & Exploits</button>
+          <button class="badge filter-pill" data-category="Quantum & Physics" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(139,92,246,0.15); color:#d8b4fe;">Quantum Computing</button>
+        </div>
+      </div>
 
-            } catch (error) {
-                console.error("Backend Error:", error);
-                showToast("Secure server connection failed.", "error");
-                return { isRegistered: false };
-            }
-        }
+      <!-- Dynamic Course Grid -->
+      <div id="coursesGrid" class="grid-cards">
+        <!-- Rendered dynamically by app.js from /api/courses -->
+      </div>
+    </div>
+  </section>
 
-        async function triggerPurchase(itemName, nuxCost = 0, fiatCost = 0) {
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                showToast("Please log in to verify your identity.", "error");
-                return;
-            }
+  <!-- PayPal Checkout Modal -->
+  <div id="paypalModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.6rem;">
+          <span style="font-size:1.3rem;">💳</span>
+          <h3 class="modal-title">Secure PayPal Checkout</h3>
+        </div>
+        <button id="closePaypalModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-tertiary); padding:1.25rem; border-radius:var(--radius-sm); margin-bottom:1.5rem;">
+          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono);">Selected Track</div>
+          <h4 id="paypalCourseTitle" style="font-size:1.2rem; margin:0.35rem 0 0.75rem;">Loading course...</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+            <span style="color:var(--text-secondary); font-size:0.9rem;">Duration: <span id="paypalCourseDuration">-</span></span>
+            <div id="paypalCoursePrice" style="font-size:1.35rem; font-weight:700; color:var(--accent-cyan);">$0 USD</div>
+          </div>
+        </div>
 
-            if (nuxCost > 0) {
-                showToast(`Verifying ledger on secure server...`, 'cart');
-                try {
-                    /*
-                    // REAL IMPLEMENTATION (Secure Purchase)
-                    // The backend checks if the user has enough NUX and performs atomic subtraction in MongoDB
-                    const response = await fetch(`${API_BASE_URL}/marketplace/purchase`, {
-                        method: 'POST',
-                        headers: { 
-                            'Authorization': `Bearer ${globalAuthToken}`,
-                            'Content-Type': 'application/json' 
-                        },
-                        body: JSON.stringify({ item: itemName, cost: nuxCost })
-                    });
-                    const data = await response.json();
-                    */
+        <div style="border:1px solid rgba(0,242,254,0.2); background:rgba(0,242,254,0.03); padding:1rem; border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+          🔒 <strong>Server-Verified Transaction:</strong> Order prices are verified on the backend core. Includes lifetime access, source repositories, interactive labs, and completion credentials.
+        </div>
 
-                    // Simulated Backend Response:
-                    // Backend validates logic: if (user.balance < req.body.cost) return { success: false }
-                    const data = { success: true, newBalance: 10000 - nuxCost }; 
+        <!-- PayPal Button Mock/Live Container -->
+        <div id="paypalButtonContainer" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <button id="confirmPaypalBtn" class="btn btn-primary" style="width:100%; padding:0.85rem; font-size:1rem;">
+            Complete PayPal Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                    if (data.success) {
-                        document.getElementById('wallet-balance').innerText = data.newBalance.toLocaleString();
-                        showToast(`Successfully acquired ${itemName} for ${nuxCost} NUX.`, 'success');
-                    } else {
-                        showToast(data.message || `Transaction rejected by backend.`, 'error');
-                    }
-                } catch (error) {
-                    showToast("Secure server connection failed.", "error");
-                }
-            } else {
-                showToast(`Redirecting to secure payment gateway...`, 'cart');
-                // Real Implementation: window.location.href = `${API_BASE_URL}/checkout?item=${encodeURIComponent(itemName)}&token=${globalAuthToken}`;
-            }
-        }
+  <!-- Receipt / Confirmation Modal -->
+  <div id="receiptModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Enrollment Confirmation</h3>
+        <button id="closeReceiptModalBtn" class="modal-close">&times;</button>
+      </div>
+      <div id="receiptBody" class="modal-body">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+  </div>
 
-        async function triggerProUpgrade() {
-            const user = firebase.auth().currentUser;
-            if (!user) {
-                showToast("Please log in first.", "error");
-                return;
-            }
-            showToast('Redirecting to Stripe checkout to initialize your 3-Month auto-refill plan...', 'cart');
-            // Backend will handle Stripe webhook, mark user as premium in Mongo, credit 10k NUX, and store subscription date.
-        }
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
+            <div class="brand-icon">⚡</div>
+            <span style="font-weight:700; font-size:1.2rem; color:#fff;">Neuralab</span>
+          </div>
+          <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
+            The deep-tech engineering and systems academy architected by Anay Upadhyay. High-security, zero-dependency runtime core built for serious software craftsmen.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Engineering</h4>
+          <ul>
+            <li><a href="/courses/cpp-foundation.html">C++ Systems</a></li>
+            <li><a href="/courses/rust-core.html">Rust Core</a></li>
+            <li><a href="/courses/databases.html">Storage Engines</a></li>
+            <li><a href="/courses/intelligence-ai.html">Transformers & AI</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Platforms & Tools</h4>
+          <ul>
+            <li><a href="/code-editor.html">Code Studio IDE</a></li>
+            <li><a href="/ai-lab.html">Interactive Neural Lab</a></li>
+            <li><a href="/admin.html">Admin Portal</a></li>
+            <li><a href="/neural-platform.html">Student Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Security & Architecture</h4>
+          <ul>
+            <li><span style="color:var(--accent-green); font-size:0.85rem;">● Zero Dependencies</span></li>
+            <li><span style="color:var(--accent-cyan); font-size:0.85rem;">● CSRF Protected</span></li>
+            <li><span style="color:var(--accent-purple); font-size:0.85rem;">● OWASP Hardened</span></li>
+            <li><a href="https://github.com/anayupadhyay-all" target="_blank" rel="noopener">GitHub: anayupadhyay-all</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; 2026 Neuralab Core by Anay Upadhyay. All systems operational.</div>
+        <div style="font-family:var(--font-mono); font-size:0.8rem;">SHA-256 Verified • Node 18 Native Core</div>
+      </div>
+    </div>
+  </footer>
 
-        // ==============================================================================
-
-        // --- FIREBASE AUTH LISTENER ---
-        try {
-            const firebaseConfig = {
-                apiKey: "AIzaSyByxn4QBU0nvDD-vwbzq3Tm68p46HuU2gQ",
-                authDomain: "nueralab.firebaseapp.com",
-                projectId: "nueralab",
-                storageBucket: "nueralab.firebasestorage.app",
-                messagingSenderId: "365514463677",
-                appId: "1:365514463677:web:46d424463e6f3dd4105ad4"
-            };
-
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            const auth = firebase.auth();
-
-            auth.onAuthStateChanged(async (user) => {
-                const onboardingDone = localStorage.getItem('onboarding_done');
-                if (!user || !onboardingDone) {
-                    // Pre-auth state
-                } else {
-                    if(user.displayName) {
-                        const greeting = document.getElementById('nav-greeting');
-                        greeting.innerText = `${user.displayName.split(' ')[0]}`;
-                        greeting.style.display = 'block';
-                    }
-                    if(user.photoURL) {
-                        document.getElementById('nav-profile-pic').innerHTML = `<img src="${user.photoURL}" alt="Profile" />`;
-                    }
-                    
-                    // Retrieve secure token for API
-                    globalAuthToken = await user.getIdToken();
-                    
-                    // The Frontend surrenders control to the Backend here
-                    await fetchServerUserData(user.uid, globalAuthToken);
-                }
-            });
-        } catch(e) {
-            console.log("Firebase not configured properly for this environment.");
-            // Mocking auth for demonstration of the backend logic visual flow
-            setTimeout(() => {
-                fetchServerUserData('mock_user_123', 'mock_token');
-            }, 1500);
-        }
-
-        // --- BOUNTY SYSTEM ---
-        async function triggerBounty(bountyName, reward) {
-            if (!globalAuthToken) {
-                showToast("Please log in to initialize bounties.", "error");
-                return;
-            }
-
-            showToast(`Connecting to network to initialize ${bountyName}...`, 'cart');
-            // Backend takes over here: validating completion and adding NUX via MongoDB
-            setTimeout(() => {
-                showToast(`Bounty Verified: ${bountyName}. Complete it to earn +${reward} NUX.`, 'success');
-            }, 800);
-        }
-
-        // --- THEME LOGIC ---
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const sunPath = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
-        const moonPath = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
-
-        function applyTheme(theme, saveToStorage = true) {
-            document.documentElement.setAttribute('data-theme', theme);
-            themeIcon.innerHTML = theme === 'dark' ? sunPath : moonPath;
-            if (saveToStorage) localStorage.setItem('theme', theme);
-        }
-
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                const current = document.documentElement.getAttribute('data-theme');
-                applyTheme(current === 'dark' ? 'light' : 'dark', true);
-            });
-        }
-
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        if (savedTheme) applyTheme(savedTheme, false);
-        else applyTheme(systemPrefersDark ? 'dark' : 'light', false);
-
-        // --- ENERGY SAVER (BATTERY API) LOGIC ---
-        function updateBatteryStatus(battery) {
-            document.documentElement.setAttribute('data-power-saving', (battery.level <= 0.20 && !battery.charging));
-        }
-
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(function(battery) {
-                updateBatteryStatus(battery);
-                battery.addEventListener('levelchange', () => updateBatteryStatus(battery));
-                battery.addEventListener('chargingchange', () => updateBatteryStatus(battery));
-            });
-        }
-
-        // --- EXPLORE DATA CONTENT INJECTION ---
-        const exploreData = {
-            frontend: [
-                { title: "Web Core", desc: "Foundational mastery of semantic structure, layout precision, and DOM interactivity.", icon: "🌐", file: "webcore.html", langs: ["HTML5", "CSS3", "JS"], reward: 50 },
-                { title: "Reactive UI", desc: "Build state-driven components using modern declarative rendering patterns.", icon: "⚡", file: "frameworks.html", langs: ["React", "Vue", "Svelte"], reward: 120 },
-                { title: "Design Systems", desc: "Scalable styling architectures utilizing utility classes and CSS-in-JS.", icon: "📐", file: "styling.html", langs: ["Tailwind", "Sass"], reward: 80 }
-            ],
-            backend: [
-                { title: "Server Runtime", desc: "High-throughput server logic, event loops, and environment management.", icon: "🖥️", file: "runtime.html", langs: ["Node.js", "Go", "Bun"], reward: 150 },
-                { title: "Enterprise Systems", desc: "Robust, statically-typed architectures for distributed scaling.", icon: "🏗️", file: "enterprise.html", langs: ["Java", "C#", "Rust"], reward: 250 },
-                { title: "API Architecture", desc: "Network communication protocols, schema design, and data fetching.", icon: "🔗", file: "apis.html", langs: ["GraphQL", "REST", "gRPC"], reward: 100 }
-            ],
-            systems: [
-                { title: "Memory Safety", desc: "Zero-cost abstractions with guaranteed thread and memory safety.", icon: "🛡️", file: "rust-core.html", langs: ["Rust", "Zig"], reward: 300 },
-                { title: "System Foundations", desc: "Direct hardware manipulation, pointers, and manual memory allocation.", icon: "⚙️", file: "cpp-foundation.html", langs: ["C", "C++"], reward: 200 },
-                { title: "Embedded Logic", desc: "Micro-controller interfacing, RTOS, and bare-metal programming.", icon: "🔌", file: "embedded.html", langs: ["Embedded C", "Arduino"], reward: 180 }
-            ],
-            data: [
-                { title: "Data Pipelines", desc: "Automation, statistical modeling, and heavy data transformation.", icon: "📊", file: "python-data.html", langs: ["Python", "R", "SQL"], reward: 150 },
-                { title: "Persistence Layers", desc: "Relational modeling, indexing, and high-availability storage.", icon: "🗄️", file: "databases.html", langs: ["PostgreSQL", "Redis"], reward: 130 },
-                { title: "Neural Architecture", desc: "Tensor operations, model training, and LLM orchestration.", icon: "🧠", file: "ai-lab.html", langs: ["PyTorch", "TensorFlow"], reward: 400 }
-            ]
-        };
-
-        const cardObserver = new IntersectionObserver((entries) => {
-            entries.forEach((e, i) => {
-                if(e.isIntersecting) {
-                    setTimeout(() => e.target.classList.add('show'), i * 50);
-                } else {
-                    e.target.classList.remove('show');
-                }
-            });
-        }, { threshold: 0.05 });
-
-        function updateExploreContent(category) {
-            const grid = document.getElementById('content-grid');
-            if(!grid) return;
-            grid.innerHTML = '';
-            
-            exploreData[category].forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = `feature-card ${index === 0 ? 'bento-large' : ''}`;
-                card.innerHTML = `
-                    <div class="card-inner">
-                        <div class="card-top">
-                            <div class="icon-circle">${item.icon}</div>
-                            <div class="reward-tag">+${item.reward} NUX</div>
-                        </div>
-                        <div class="card-content">
-                            <h3>${item.title}</h3>
-                            <p>${item.desc}</p>
-                            <div class="lang-pills">
-                                ${item.langs.map(l => `<span class="pill">${l}</span>`).join('')}
-                            </div>
-                            <button class="card-link" onclick="triggerBounty('${item.title}', ${item.reward})">Initialize Bounty &rarr;</button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-                cardObserver.observe(card);
-            });
-        }
-
-        const gridContainer = document.getElementById('content-grid');
-        if(gridContainer) {
-            gridContainer.addEventListener('mousemove', (e) => {
-                document.querySelectorAll('.feature-card').forEach(card => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    card.style.setProperty('--mouse-x', `${x}px`);
-                    card.style.setProperty('--mouse-y', `${y}px`);
-                });
-            });
-        }
-
-        const lastCategory = localStorage.getItem('nueralab_last_category') || 'frontend';
-        
-        document.querySelectorAll('.toggle-opt').forEach(btn => {
-            if (btn.dataset.target === lastCategory) btn.classList.add('active');
-            
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.toggle-opt').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const target = btn.dataset.target;
-                localStorage.setItem('nueralab_last_category', target);
-                updateExploreContent(target);
-            });
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => { 
-                if(e.isIntersecting) {
-                    e.target.classList.add('active'); 
-                } else {
-                    e.target.classList.remove('active');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        if(document.getElementById('content-grid')) {
-            updateExploreContent(lastCategory);
-        }
-
-        // --- STARTUP LOADER LOGIC ---
-        let typewriterStarted = false;
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('startup-loader');
-                loader.classList.add('hidden');
-                
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    document.body.classList.add('loaded');
-                    
-                    if(!typewriterStarted) {
-                        setTimeout(startTypewriter, 1200);
-                        typewriterStarted = true;
-                    }
-                }, 800); 
-            }, 4000); // 4 second loader
-            
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-            }
-        });
-
-        // --- TYPEWRITER LOGIC (EXACT 22 SENTENCES) ---
-        const heroSentences = [
-            "An intelligence-driven environment designed for absolute syntax mastery.",
-            "From core web infrastructure to low-level systems logic.",
-            "Built for developers who demand precision and architecture.",
-            "Master 250+ languages with enterprise-grade tooling.",
-            "Deploy robust, statically-typed architectures for distributed scaling.",
-            "Zero-cost abstractions with guaranteed thread and memory safety.",
-            "Build state-driven components using modern declarative patterns.",
-            "Your gateway to neural networks, LLMs, and intelligent automation.",
-            "High-throughput server logic and advanced environment management.",
-            "System-level engineering with modern functional paradigms.",
-            "Direct hardware manipulation, pointers, and manual memory allocation.",
-            "Relational modeling, indexing, and high-availability storage.",
-            "Write once, compile anywhere. Cross-platform logic execution.",
-            "Elevate your coding capabilities beyond basic syntax.",
-            "Architect scalable APIs with GraphQL, REST, and gRPC.",
-            "Automate, analyze, and build heavy data transformation pipelines.",
-            "The definitive ecosystem for next-generation software engineers.",
-            "Hardware control meets zero-latency execution environments.",
-            "Design resilient enterprise systems built for the modern web.",
-            "Accelerate your transition from junior scripter to system architect.",
-            "Where flawless UI design meets heavy computational backends.",
-            "Understand the machine. Control the code. Build the future."
-        ];
-        
-        let sentenceIdx = 0;
-        let charIdx = 0;
-        let isDeleting = false;
-        
-        function startTypewriter() {
-            const typeTarget = document.getElementById('typewriter-text');
-            if(!typeTarget) return;
-            
-            const currentSentence = heroSentences[sentenceIdx];
-
-            if (isDeleting) {
-                typeTarget.textContent = currentSentence.substring(0, charIdx - 1);
-                charIdx--;
-            } else {
-                typeTarget.textContent = currentSentence.substring(0, charIdx + 1);
-                charIdx++;
-            }
-
-            let typingSpeed = isDeleting ? 25 : 50;
-
-            if (!isDeleting && charIdx === currentSentence.length) {
-                typingSpeed = 2500; 
-                isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false;
-                sentenceIdx = (sentenceIdx + 1) % heroSentences.length;
-                typingSpeed = 500; 
-            }
-
-            setTimeout(startTypewriter, typingSpeed);
-        }
-
-        // --- INTERACTIVE PLAYGROUND LOGIC ---
-        const codeSnippets = {
-            python: `<span class="pg-kw">def</span> <span class="pg-fn">init_nuera</span>(user_id):<br>&nbsp;&nbsp;&nbsp;&nbsp;session = Engine.connect(user_id)<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">if</span> session.is_active():<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-fn">print</span>(<span class="pg-str">"Welcome to the Architecture."</span>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">return</span> session.compile()<br><br>init_nuera(<span class="pg-str">"dev_0x99"</span>)`,
-            react: `<span class="pg-kw">export default function</span> <span class="pg-fn">App</span>() {<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">const</span> [sys, setSys] = useState(<span class="pg-str">'standby'</span>);<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">return</span> (<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="pg-fn">NueraProvider</span> theme=<span class="pg-str">"dark"</span>&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<span class="pg-fn">Workspace</span> onReady={<span class="pg-kw">() =></span> setSys(<span class="pg-str">'active'</span>)} /&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/<span class="pg-fn">NueraProvider</span>&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;);<br>}`,
-            rust: `<span class="pg-kw">fn</span> <span class="pg-fn">main</span>() {<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">let</span> mut compiler = NueraEngine::new();<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-kw">match</span> compiler.boot() {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-fn">Ok</span>(_) => println!(<span class="pg-str">"Systems Online."</span>),<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pg-fn">Err</span>(e) => panic!(<span class="pg-str">"Fatal: {}"</span>, e),<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}`
-        };
-
-        function switchCode(lang, btn) {
-            document.querySelectorAll('.pg-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            const codeEl = document.getElementById('pg-code');
-            codeEl.style.opacity = 0;
-            setTimeout(() => {
-                codeEl.innerHTML = codeSnippets[lang];
-                codeEl.style.opacity = 1;
-            }, 200);
-        }
-
-        // --- NAV SCROLL EFFECT ---
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            navbar.style.boxShadow = window.scrollY > 50 ? 'var(--shadow-sm)' : 'none';
-        });
-
-        // --- MOBILE MENU LOGIC ---
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const navLinksContainer = document.querySelector('.nav-links');
-        
-        if (mobileMenuBtn && navLinksContainer) {
-            mobileMenuBtn.addEventListener('click', () => {
-                navLinksContainer.classList.toggle('mobile-active');
-            });
-            
-            document.querySelectorAll('.nav-item').forEach(link => {
-                link.addEventListener('click', () => {
-                    navLinksContainer.classList.remove('mobile-active');
-                });
-            });
-        }
-
-        // --- PWA SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator && window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(registration => {
-                    console.log('PWA ServiceWorker registered successfully:', registration.scope);
-                }).catch(error => {
-                    console.warn('PWA ServiceWorker registration skipped/failed:', error);
-                });
-            });
-        }
-    </script>
+  <script src="/assets/js/three-neural.js"></script>
+  <script src="/assets/js/app.js"></script>
 </body>
 </html>

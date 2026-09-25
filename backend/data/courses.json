@@ -13,7 +13,7 @@
     "description": "Master modern C++20/23, RAII, memory layout, cache locality, SIMD intrinsics, templates, and zero-cost abstractions.",
     "file": "cpp-foundation.html",
     "published": true,
-    "enrolledStudents": 1423,
+    "enrolledStudents": 1424,
     "rating": 4.9,
     "modulesCount": 14,
     "prerequisites": "Solid programming foundations in any imperative language"

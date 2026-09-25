@@ -57,7 +57,7 @@ const DB = {
 
   save(collection) {
     try {
-      const filename = path.join(DATA_DIR, `${collection}.json`);
+      const filename = path.join(DATA_DIR, collection === 'auditLogs' ? 'audit_logs.json' : `${collection}.json`);
       const tempFilename = `${filename}.tmp.${crypto.randomBytes(4).toString('hex')}`;
       const data = collection === 'courses' ? this.courses :
                    collection === 'users' ? this.users :
