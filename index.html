@@ -1606,11 +1606,9 @@
         // Note: The UI is strictly a "dumb terminal". It trusts whatever the backend returns.
         // It NEVER dictates NUX credits, 3-month logic, or expiration triggers. 
 
-        async function fetchServerUserData(userId, token) {
+                async function fetchServerUserData(userId, token) {
             try {
-                /*
-                // REAL IMPLEMENTATION (Commented out for the live preview to work seamlessly without throwing CORS/404s)
-                const response = await fetch(`${API_BASE_URL}/user/status`, {
+                const response = await fetch(`${API_BASE_URL}/sync/user-profiles/${userId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1618,55 +1616,31 @@
                     }
                 });
                 const data = await response.json();
-                */
-
-                // ----------------------------------------------------------------------
-                // SIMULATED BACKEND RESPONSE (How your Node.js/MongoDB should behave)
-                // ----------------------------------------------------------------------
-                // Your backend logic should look roughly like this:
-                // 1. Validate JWT Token. Find user in MongoDB (`db.users.findOne({ _id: userId })`).
-                // 2. If user is null -> return { isRegistered: false }.
-                // 3. If user.isPremium == true:
-                //      a. Check const monthsSinceStart = (Date.now() - user.subscriptionDate) / (1000*60*60*24*30)
-                //      b. If monthsSinceStart >= 3: 
-                //            - Trigger SendGrid/SES email "Subscription Ending".
-                //            - return { ..., subscriptionStatus: 'ending', balance: user.balance }
-                //      c. If monthsSinceStart < 3 AND user.balance < THRESHOLD (e.g., 1000):
-                //            - db.users.updateOne({ _id: userId }, { $set: { balance: 10000 } })
-                //            - return { ..., refilled: true, balance: 10000 }
-                //      d. Else return current balance.
-                // ----------------------------------------------------------------------
                 
-                // Simulating the secure payload returned from the backend above:
-                const isMockPremiumUser = true; // Change to false to test standard user
-
-                const simulatedBackendPayload = {
-                    isRegistered: true,
-                    isPremium: isMockPremiumUser,
-                    balance: isMockPremiumUser ? 10000 : 150, // Premium users get the auto-refill amount injected here
-                    subscriptionStatus: isMockPremiumUser ? 'ending' : 'none', // Simulating the 3-month trigger logic
-                    refilledEvent: false // Would be true if the backend JUST topped up the account on this specific request
+                const backendPayload = {
+                    isRegistered: data ? true : false,
+                    isPremium: data && data.subscription === 'premium' ? true : false,
+                    balance: data && data.nux ? data.nux : 150,
+                    subscriptionStatus: data && data.subscription === 'premium' ? 'active' : 'none',
+                    refilledEvent: false
                 };
 
-                // Strict UI updates based purely on the backend's dictation
-                if (simulatedBackendPayload.isRegistered) {
-                    document.getElementById('wallet-balance').innerText = simulatedBackendPayload.balance.toLocaleString();
+                if (backendPayload.isRegistered) {
+                    document.getElementById('wallet-balance').innerText = backendPayload.balance.toLocaleString();
                     
-                    if (simulatedBackendPayload.isPremium) {
-                        document.getElementById('pro-badge-btn').classList.add('hidden'); // Hide upgrade button
+                    if (backendPayload.isPremium) {
+                        document.getElementById('pro-badge-btn').classList.add('hidden');
                         
-                        // Backend dictates the subscription is nearing the 3 month limit
-                        if (simulatedBackendPayload.subscriptionStatus === 'ending') {
+                        if (backendPayload.subscriptionStatus === 'ending') {
                             showToast("Your premium auto-refill subscription is ending soon. Please renew to keep your progress.", "warning");
                         } 
-                        // Backend dictates an auto-refill just occurred
-                        else if (simulatedBackendPayload.refilledEvent) {
+                        else if (backendPayload.refilledEvent) {
                             showToast("Premium Active: Wallet auto-refilled to 10,000 NUX.", "success");
                         }
                     }
                 }
                 
-                return simulatedBackendPayload;
+                return backendPayload;
 
             } catch (error) {
                 console.error("Backend Error:", error);
@@ -1685,9 +1659,6 @@
             if (nuxCost > 0) {
                 showToast(`Verifying ledger on secure server...`, 'cart');
                 try {
-                    /*
-                    // REAL IMPLEMENTATION (Secure Purchase)
-                    // The backend checks if the user has enough NUX and performs atomic subtraction in MongoDB
                     const response = await fetch(`${API_BASE_URL}/marketplace/purchase`, {
                         method: 'POST',
                         headers: { 
@@ -1697,11 +1668,6 @@
                         body: JSON.stringify({ item: itemName, cost: nuxCost })
                     });
                     const data = await response.json();
-                    */
-
-                    // Simulated Backend Response:
-                    // Backend validates logic: if (user.balance < req.body.cost) return { success: false }
-                    const data = { success: true, newBalance: 10000 - nuxCost }; 
 
                     if (data.success) {
                         document.getElementById('wallet-balance').innerText = data.newBalance.toLocaleString();
@@ -1714,7 +1680,6 @@
                 }
             } else {
                 showToast(`Redirecting to secure payment gateway...`, 'cart');
-                // Real Implementation: window.location.href = `${API_BASE_URL}/checkout?item=${encodeURIComponent(itemName)}&token=${globalAuthToken}`;
             }
         }
 
@@ -1781,10 +1746,24 @@
             }
 
             showToast(`Connecting to network to initialize ${bountyName}...`, 'cart');
-            // Backend takes over here: validating completion and adding NUX via MongoDB
-            setTimeout(() => {
-                showToast(`Bounty Verified: ${bountyName}. Complete it to earn +${reward} NUX.`, 'success');
-            }, 800);
+            try {
+                const response = await fetch(`${API_BASE_URL}/sync/bounty/trigger`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${globalAuthToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bountyName, reward })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(`Bounty Verified: ${bountyName}. Complete it to earn +${reward} NUX.`, 'success');
+                } else {
+                    showToast(data.message || 'Bounty initialization failed.', 'error');
+                }
+            } catch (err) {
+                showToast('Network error initializing bounty.', 'error');
+            }
         }
 
         // --- THEME LOGIC ---

@@ -728,12 +728,12 @@
             
             if (!user || !onboardingDone) {
                 // Remove bypass for standard protocols in production
-                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+
                     // window.location.replace("login.html");
                     console.log("Dev environment bypass active. Simulate DB load.");
-                    simulateUserData(); // For demo/preview purposes
+                    // simulateUserData(); // For demo/preview purposes
                 } else {
-                    simulateUserData(); // Ensure canvas preview works beautifully
+                    window.location.replace('login.html');
                 }
             } else {
                 populateUserUI(user);
@@ -773,11 +773,11 @@
                     processUserMetrics(data);
                 } else {
                     console.warn("Failed to fetch DB. Applying default state.");
-                    simulateUserData();
+                    // simulateUserData();
                 }
             } catch (error) {
                 console.error("MongoDB Sync Error:", error);
-                simulateUserData();
+                // simulateUserData();
             }
         }
 

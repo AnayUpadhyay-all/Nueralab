@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuera Lab | System Foundations & C++</title>
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- ENTERPRISE DESIGN TOKENS --- */
+        :root {
+            color-scheme: light;
+            --bg-color: #ffffff;
+            --surface-color: #f8fafc;
+            --surface-border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --accent-blue: #2563eb;
+            --accent-purple: #8b5cf6;
+            --accent-success: #10b981;
+            --nav-glass: rgba(255, 255, 255, 0.85);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(15,23,42,0.05)"/></svg>');
+        }
+
+        [data-theme="dark"] {
+            color-scheme: dark;
+            --bg-color: #09090b;
+            --surface-color: #18181b;
+            --surface-border: #27272a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #60a5fa;
+            --accent-purple: #c084fc;
+            --accent-success: #34d399;
+            --nav-glass: rgba(9, 9, 11, 0.85);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --grid-pattern: url('data:image/svg+xml;utf8,<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)"/></svg>');
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--grid-pattern);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Nav */
+        .platform-nav {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background: var(--nav-glass); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--surface-border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; z-index: 100;
+        }
+
+        .logo { font-size: 1.25rem; font-weight: 700; color: var(--text-primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-item { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+        .nav-item:hover { color: var(--text-primary); }
+
+        .container {
+            max-width: 1000px;
+            margin: 100px auto 0;
+            padding: 40px 20px;
+        }
+
+        .header { margin-bottom: 40px; text-align: center; }
+        h1 { margin-bottom: 10px; color: var(--accent-blue); font-size: 3rem; letter-spacing: -1px; }
+        .subtitle { font-size: 1.2rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+
+        .course-content {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .course-content h2 { color: var(--text-primary); margin-bottom: 20px; border-bottom: 1px solid var(--surface-border); padding-bottom: 10px; }
+        .course-content h3 { color: var(--text-primary); margin: 20px 0 10px; }
+        .course-content p, .course-content li { color: var(--text-secondary); margin-bottom: 10px; }
+        .course-content ul { padding-left: 20px; margin-bottom: 20px; }
+
+        .action-container { text-align: center; margin-top: 40px; }
+
+        .btn {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+    </style>
+</head>
+<body>
+    <nav class="platform-nav">
+        <a href="index.html" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            Nuera Lab
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="nav-item">Ecosystem</a>
+            <a href="neural-platform.html" class="nav-item">Platform</a>
+            <a href="code-editor.html" class="nav-item">Playground</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="header">
+            <h1>System Foundations & C++</h1>
+            <p class="subtitle">Direct hardware manipulation, pointers, and manual memory allocation.</p>
+        </div>
+
+        <div class="course-content">
+
+            <h2>Module 1: Manual Memory Management</h2>
+            <p>Working close to the metal requires an intimate understanding of how memory is allocated, accessed, and freed.</p>
+
+            <h3>The Stack vs. The Heap</h3>
+            <ul>
+                <li><strong>Stack:</strong> Fast, contiguous memory automatically managed by scope. Limited in size.</li>
+                <li><strong>Heap:</strong> Dynamic memory for objects whose lifetime must extend beyond their current scope. Requires manual allocation (<code>new</code>/<code>malloc</code>) and deallocation (<code>delete</code>/<code>free</code>).</li>
+            </ul>
+
+            <h3>Pointers and References</h3>
+            <p>Pointers hold memory addresses. Understanding pointer arithmetic, null pointers, and references is crucial for interacting with hardware and passing large structures efficiently.</p>
+
+            <h3>Resource Acquisition Is Initialization (RAII)</h3>
+            <p>The core C++ idiom where resource lifecycle is bound to object lifetime, preventing memory leaks through smart pointers (<code>std::unique_ptr</code>, <code>std::shared_ptr</code>).</p>
+
+        </div>
+
+        <div class="action-container">
+            <a href="code-editor.html" class="btn">Proceed to Interactive Playground</a>
+        </div>
+    </div>
+</body>
+</html>

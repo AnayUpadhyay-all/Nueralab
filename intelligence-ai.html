@@ -354,7 +354,7 @@
         
         firebase.auth().onAuthStateChanged(async (user) => {
             if (!user) {
-                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'data:') {
+
                     window.location.replace("login.html");
                 }
                 return;
