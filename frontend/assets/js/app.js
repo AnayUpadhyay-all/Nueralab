@@ -240,7 +240,7 @@ const App = {
       document.getElementById('receiptModal')?.classList.remove('active');
     });
 
-    // Search input
+    // Search input & ⌘K shortcut
     const searchInput = document.getElementById('courseSearchInput');
     if (searchInput) {
       let timeout;
@@ -250,6 +250,15 @@ const App = {
           const val = e.target.value.trim();
           this.fetchCourses(val ? `?search=${encodeURIComponent(val)}` : '');
         }, 250);
+      });
+
+      // Global ⌘K / Ctrl+K listener
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       });
     }
 

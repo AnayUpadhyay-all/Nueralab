@@ -1,6 +1,7 @@
 /**
  * Neuralab 3D Interactive Synaptic Constellation Engine
  * First-Principles 3D Perspective Projection & Raycasting
+ * Industrial Systems Minimalism (Terminal Emerald & Obsidian)
  * Architected by Anay Upadhyay
  */
 
@@ -12,25 +13,25 @@
   let width = (canvas.width = window.innerWidth);
   let height = (canvas.height = window.innerHeight);
 
-  // 3D Nodes Definition
+  // 3D Nodes Definition aligned with Systems Engineering curriculum
   const DOMAIN_LABELS = [
-    { title: 'C++ Systems & RAII', category: 'Low-Level', color: '#00f2fe' },
-    { title: 'Rust Safe Concurrency', category: 'Memory', color: '#ffb800' },
-    { title: 'WebCore & Compositor', category: 'Blink', color: '#4facfe' },
-    { title: 'HTTP/3 QUIC & WebRTC', category: 'Network', color: '#00f5a0' },
-    { title: 'LSM-Trees & Raft', category: 'Storage', color: '#ff3366' },
-    { title: 'V8 JIT & Bytecode', category: 'Runtimes', color: '#7928ca' },
-    { title: 'Reactive Primitives', category: 'UI Core', color: '#d8b4fe' },
-    { title: 'gRPC & Protobuf', category: 'APIs', color: '#38bdf8' },
+    { title: 'C++ Systems & RAII', category: 'Low-Level', color: '#10b981' },
+    { title: 'Rust Fearless Concurrency', category: 'Memory', color: '#34d399' },
+    { title: 'WebCore & Compositor', category: 'Blink', color: '#38bdf8' },
+    { title: 'HTTP/3 QUIC & WebRTC', category: 'Network', color: '#10b981' },
+    { title: 'LSM-Trees & Raft', category: 'Storage', color: '#f59e0b' },
+    { title: 'V8 JIT & Bytecode', category: 'Runtimes', color: '#a78bfa' },
+    { title: 'Reactive Primitives', category: 'UI Core', color: '#34d399' },
+    { title: 'gRPC & Protobuf', category: 'APIs', color: '#06b6d4' },
     { title: 'ARM Bare-Metal & RTOS', category: 'Embedded', color: '#f43f5e' },
     { title: 'Cloud-Native & CQRS', category: 'Enterprise', color: '#10b981' },
-    { title: 'Transformers & FlashAttn', category: 'Neural AI', color: '#a855f7' },
+    { title: 'Transformers & FlashAttn-2', category: 'Neural AI', color: '#8b5cf6' },
     { title: 'WebGPU Tensor Lab', category: 'Compute', color: '#06b6d4' },
-    { title: 'Python 3.13 No-GIL', category: 'Data', color: '#eab308' },
-    { title: 'GPU CSS Houdini', category: 'Graphics', color: '#ec4899' },
-    { title: 'Quantum Qubits & Qiskit', category: 'Quantum', color: '#8b5cf6' },
+    { title: 'Python 3.13 No-GIL', category: 'Data', color: '#fbbf24' },
+    { title: 'GPU Shaders & WebGL', category: 'Graphics', color: '#ec4899' },
+    { title: 'Quantum Qubits & Qiskit', category: 'Quantum', color: '#a855f7' },
     { title: 'Binary Exploitation & ROP', category: 'Security', color: '#ef4444' },
-    { title: 'Linux eBPF & SRE', category: 'Kernel', color: '#14b8a6' },
+    { title: 'Linux eBPF & SRE', category: 'Kernel', color: '#10b981' },
     { title: 'Multi-Raft Consensus', category: 'Distributed', color: '#f97316' }
   ];
 
@@ -53,10 +54,10 @@
       baseX: 0,
       baseY: 0,
       baseZ: 0,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: (Math.random() - 0.5) * 0.2,
-      vz: (Math.random() - 0.5) * 0.2,
-      radius: i < DOMAIN_LABELS.length ? 5.5 : 2.5,
+      vx: (Math.random() - 0.5) * 0.18,
+      vy: (Math.random() - 0.5) * 0.18,
+      vz: (Math.random() - 0.5) * 0.18,
+      radius: i < DOMAIN_LABELS.length ? 5.0 : 2.2,
       title: i < DOMAIN_LABELS.length ? labelData.title : null,
       color: labelData.color,
       isCore: i < DOMAIN_LABELS.length,
@@ -147,7 +148,7 @@
     rotY += (targetRotY - rotY) * 0.04;
 
     // Center offset (shift slightly right for desktop hero layout)
-    const cx = width > 900 ? width * 0.62 : width * 0.5;
+    const cx = width > 900 ? width * 0.64 : width * 0.5;
     const cy = height * 0.5;
 
     // Update Node positions & gentle oscillation
@@ -194,7 +195,7 @@
       if (!p1 || !p2) continue;
 
       const avgDepth = (p1.depth + p2.depth) / 2;
-      const alpha = Math.max(0.04, Math.min(0.45, 1 - (avgDepth - 350) / 450));
+      const alpha = Math.max(0.04, Math.min(0.40, 1 - (avgDepth - 350) / 450));
       
       const isHighlighted = (hoveredNode === e.a || hoveredNode === e.b);
       
@@ -202,9 +203,9 @@
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
       ctx.strokeStyle = isHighlighted 
-        ? 'rgba(0, 242, 254, 0.8)' 
-        : `rgba(79, 172, 254, ${alpha * 0.6})`;
-      ctx.lineWidth = isHighlighted ? 2 : 0.8;
+        ? 'rgba(16, 185, 129, 0.85)' 
+        : `rgba(255, 255, 255, ${alpha * 0.28})`;
+      ctx.lineWidth = isHighlighted ? 1.8 : 0.75;
       ctx.stroke();
     }
 
@@ -225,10 +226,10 @@
       const py = p1.y + (p2.y - p1.y) * p.progress;
 
       ctx.beginPath();
-      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#00f2fe';
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = '#00f2fe';
+      ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#10b981';
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = '#10b981';
       ctx.fill();
       ctx.shadowBlur = 0;
     }
@@ -243,15 +244,15 @@
       const node = nodes[idx];
       const isHovered = (hoveredNode === idx);
 
-      const r = node.radius * proj.scale * 1.5;
+      const r = node.radius * proj.scale * 1.4;
       const alpha = Math.max(0.2, Math.min(1, 1 - (proj.depth - 400) / 500));
 
       ctx.beginPath();
       ctx.arc(proj.x, proj.y, isHovered ? r * 1.8 : r, 0, Math.PI * 2);
-      ctx.fillStyle = isHovered ? '#00f2fe' : node.color;
+      ctx.fillStyle = isHovered ? '#34d399' : node.color;
       ctx.globalAlpha = alpha;
-      ctx.shadowBlur = isHovered ? 25 : (node.isCore ? 12 : 4);
-      ctx.shadowColor = node.color;
+      ctx.shadowBlur = isHovered ? 20 : (node.isCore ? 10 : 3);
+      ctx.shadowColor = isHovered ? '#10b981' : node.color;
       ctx.fill();
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1.0;
@@ -259,11 +260,11 @@
       // Draw Label if hovered or core in front
       if (node.isCore && (isHovered || (proj.rawZ < 50 && proj.scale > 0.85))) {
         ctx.font = isHovered 
-          ? 'bold 12px ui-monospace, monospace' 
-          : '10px ui-monospace, monospace';
-        ctx.fillStyle = isHovered ? '#00f2fe' : 'rgba(240, 246, 252, 0.75)';
+          ? '600 11px "Geist Mono", "JetBrains Mono", ui-monospace, monospace' 
+          : '500 10px "Geist Mono", "JetBrains Mono", ui-monospace, monospace';
+        ctx.fillStyle = isHovered ? '#34d399' : 'rgba(248, 250, 252, 0.85)';
         ctx.textAlign = 'center';
-        ctx.fillText(node.title, proj.x, proj.y - (r + 8));
+        ctx.fillText(node.title, proj.x, proj.y - (r + 7));
       }
     }
 

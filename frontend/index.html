@@ -3,51 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neuralab | Deep Tech & Systems Engineering Platform</title>
+  <title>Neuralab | Deep Tech & First-Principles Systems Academy</title>
   <meta name="description" content="Master first-principles computer science, low-level systems, distributed consensus, compilers, and neural architectures. Founded by Anay Upadhyay.">
+  <meta name="theme-color" content="#08090d">
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:title" content="Neuralab | Deep Tech & Systems Academy">
+  <meta property="og:description" content="Uncompromising, rigorous, first-principles curriculum. Master C++, Rust, browser rendering engines, distributed consensus, and neural transformers.">
+  <meta property="og:type" content="website">
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/assets/css/neuralab.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2308090d%22/><text y=%22.78em%22 x=%2250%25%22 text-anchor=%22middle%22 font-size=%2268%22 fill=%22%2310b981%22 font-family=%22sans-serif%22 font-weight=%22bold%22>⚡</text></svg>">
 </head>
 <body>
 
-  <!-- Navigation -->
+  <!-- Precision Industrial Navigation Bar -->
   <header class="navbar">
-    <a href="/" class="nav-brand">
-      <div class="brand-icon">⚡</div>
-      <span>Neuralab</span>
-    </a>
+    <div style="display:flex; align-items:center; gap:1.5rem;">
+      <a href="/" class="nav-brand">
+        <div class="brand-icon">⚡</div>
+        <span>Neuralab</span>
+        <span class="brand-tag">SYS.OS</span>
+      </a>
+      <div class="status-indicator" style="display:none;" id="systemStatusPill">
+        <span class="status-dot"></span>
+        <span>CORE 99.99%</span>
+      </div>
+    </div>
+
     <nav>
       <ul class="nav-links">
-        <li><a href="#courses" class="nav-link">Courses</a></li>
-        <li><a href="#philosophy" class="nav-link">Philosophy & Journey</a></li>
+        <li><a href="#courses" class="nav-link">Curriculum</a></li>
+        <li><a href="#philosophy" class="nav-link">Architectural Vision</a></li>
         <li><a href="/code-editor.html" class="nav-link">Code Studio</a></li>
         <li><a href="/ai-lab.html" class="nav-link">Neural Lab</a></li>
         <li><a href="/neural-platform.html" class="nav-link">Dashboard</a></li>
       </ul>
     </nav>
+
     <div id="navActions" class="nav-actions">
-      <!-- Injected dynamically by app.js -->
+      <!-- Injected dynamically by app.js: Auth session & profile -->
     </div>
   </header>
 
-  <!-- 3D Hero Section -->
+  <!-- 3D Interactive Hero Section -->
   <section class="hero-wrapper">
     <canvas id="neural3dCanvas"></canvas>
     <div class="container hero-content">
-      <div class="badge badge-cyan">First-Principles Engineering • No Vibe Coding</div>
-      <h1 class="hero-title">From Bare Metal to Neural Synapses.</h1>
-      <p class="hero-subtitle">
-        Neuralab is an engineering academy for software developers who refuse to settle for superficial abstraction. Master C++, Rust, browser rendering engines, distributed consensus, and transformer architectures.
-      </p>
-      <div class="hero-buttons">
-        <a href="#courses" class="btn btn-primary">Explore Engineering Tracks</a>
-        <a href="/code-editor.html" class="btn btn-secondary">Launch Code Sandbox</a>
-        <a href="#philosophy" class="btn btn-secondary">The Creator's Journey</a>
+      <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <span class="badge badge-emerald">
+          <span class="status-dot" style="width:6px; height:6px;"></span>
+          System Protocol v2.4
+        </span>
+        <span class="badge">First-Principles Systems • Zero Vibe Coding</span>
       </div>
-      <div style="margin-top:2.5rem; display:flex; gap:2rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">
-        <div><strong style="color:#fff; font-size:1.1rem; display:block;">18</strong> Systems Courses</div>
-        <div><strong style="color:var(--accent-cyan); font-size:1.1rem; display:block;">20,000+</strong> Hours of Systems Lab</div>
-        <div><strong style="color:var(--accent-green); font-size:1.1rem; display:block;">100%</strong> Zero-Trust Security</div>
+
+      <h1 class="hero-title">From Bare Metal to Neural Synapses.</h1>
+      
+      <p class="hero-subtitle">
+        Neuralab is an engineering academy for software developers who refuse to settle for superficial abstraction. Master C++, Rust, browser rendering engines, distributed consensus, and transformer architectures from the silicon up.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="#courses" class="btn btn-primary btn-lg">Explore Systems Tracks</a>
+        <a href="/code-editor.html" class="btn btn-secondary btn-lg">Launch Studio Sandbox</a>
+        <a href="#philosophy" class="btn btn-secondary btn-lg">The Creator's Journey</a>
+      </div>
+
+      <!-- Telemetry Live Metrics Bar -->
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <div class="telemetry-value">18</div>
+          <div class="telemetry-label">Systems Tracks</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value" style="color:var(--accent-emerald-light);">20,000+</div>
+          <div class="telemetry-label">Hours of Systems Lab</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value" style="color:#38bdf8;">0 deps</div>
+          <div class="telemetry-label">Zero-Trust Node Core</div>
+        </div>
+        <div class="telemetry-item">
+          <div class="telemetry-value" style="color:var(--accent-emerald-light);">100%</div>
+          <div class="telemetry-label">Verified PayPal Orders</div>
+        </div>
       </div>
     </div>
   </section>
@@ -64,7 +107,7 @@
       </div>
 
       <div class="journey-card">
-        <span class="journey-badge">// THE FOUNDER'S JOURNEY • ANAY UPADHYAY</span>
+        <span class="journey-badge">// THE FOUNDER'S JOURNEY • ANAY UPADHYAY • SYSTEMS ARCHITECT</span>
         <blockquote class="journey-quote">
           "The modern engineering ecosystem is intoxicated by superficiality. Copying snippets, relying on autocomplete hallucinations, and treating the runtime as magic works right up until your distributed storage deadlocks or your cache line thrashing kills production."
         </blockquote>
@@ -108,27 +151,27 @@
             <div class="window-dot dot-yellow"></div>
             <div class="window-dot dot-green"></div>
           </div>
-          <span style="color:var(--text-muted); font-size:0.8rem;">distributed_raft_consensus.cpp — C++20 / Thread Sanitizer</span>
-          <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.6rem;">Open in Studio →</a>
+          <span style="color:var(--text-muted); font-size:0.8rem; font-family:var(--font-mono);">distributed_raft_consensus.cpp — C++20 / ThreadSanitizer</span>
+          <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.65rem;">Open in Studio →</a>
         </div>
-        <pre class="sandbox-content"><code><span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;iostream&gt;</span>
-<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;vector&gt;</span>
-<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;atomic&gt;</span>
-<span style="color:#7928ca;">#include</span> <span style="color:#00f5a0;">&lt;chrono&gt;</span>
+        <pre class="sandbox-content"><code><span style="color:#a78bfa;">#include</span> <span style="color:#10b981;">&lt;iostream&gt;</span>
+<span style="color:#a78bfa;">#include</span> <span style="color:#10b981;">&lt;vector&gt;</span>
+<span style="color:#a78bfa;">#include</span> <span style="color:#10b981;">&lt;atomic&gt;</span>
+<span style="color:#a78bfa;">#include</span> <span style="color:#10b981;">&lt;chrono&gt;</span>
 
 <span style="color:#64748b;">// High-Performance Zero-Allocation Raft State Machine</span>
-<span style="color:#4facfe;">enum class</span> <span style="color:#ffb800;">NodeRole</span> { FOLLOWER, CANDIDATE, LEADER };
+<span style="color:#38bdf8;">enum class</span> <span style="color:#fbbf24;">NodeRole</span> { FOLLOWER, CANDIDATE, LEADER };
 
-<span style="color:#4facfe;">struct</span> <span style="color:#ffb800;">LogEntry</span> {
-    <span style="color:#4facfe;">uint64_t</span> term;
-    <span style="color:#4facfe;">uint64_t</span> index;
-    <span style="color:#4facfe;">std::vector&lt;uint8_t&gt;</span> command;
+<span style="color:#38bdf8;">struct</span> <span style="color:#fbbf24;">LogEntry</span> {
+    <span style="color:#38bdf8;">uint64_t</span> term;
+    <span style="color:#38bdf8;">uint64_t</span> index;
+    <span style="color:#38bdf8;">std::vector&lt;uint8_t&gt;</span> command;
 };
 
-<span style="color:#4facfe;">int</span> <span style="color:#00f2fe;">main</span>() {
-    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Neuralab Engine] Initializing Raft Cluster (Node 01)..."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
-    <span style="color:#4facfe;">std::cout</span> &lt;&lt; <span style="color:#00f5a0;">"[Term 1] Heartbeat acknowledged via zero-copy RDMA."</span> &lt;&lt; <span style="color:#4facfe;">std::endl</span>;
-    <span style="color:#4facfe;">return</span> <span style="color:#ff3366;">0</span>;
+<span style="color:#38bdf8;">int</span> <span style="color:#34d399;">main</span>() {
+    <span style="color:#38bdf8;">std::cout</span> &lt;&lt; <span style="color:#10b981;">"[Neuralab Engine] Initializing Raft Cluster (Node 01)..."</span> &lt;&lt; <span style="color:#38bdf8;">std::endl</span>;
+    <span style="color:#38bdf8;">std::cout</span> &lt;&lt; <span style="color:#10b981;">"[Term 1] Heartbeat acknowledged via zero-copy RDMA."</span> &lt;&lt; <span style="color:#38bdf8;">std::endl</span>;
+    <span style="color:#38bdf8;">return</span> <span style="color:#ef4444;">0</span>;
 }</code></pre>
       </div>
     </div>
@@ -138,64 +181,68 @@
   <section id="courses" class="section" style="background:var(--bg-secondary);">
     <div class="container">
       <div class="section-header">
-        <div class="badge badge-green">Production Curriculum</div>
+        <div class="badge badge-emerald">Production Curriculum</div>
         <h2 class="section-title">The Engineering Curriculum</h2>
         <p class="section-desc">
           18 comprehensive tracks covering the full modern engineering spectrum. Verified with official PayPal checkout and instant sandbox access.
         </p>
       </div>
 
-      <!-- Controls: Search & Category Filter -->
-      <div style="display:flex; flex-direction:column; gap:1.25rem; margin-bottom:2.5rem;">
-        <div style="position:relative; max-width:600px; margin:0 auto; width:100%;">
-          <input type="text" id="courseSearchInput" class="form-input" placeholder="Search systems, protocols, compilers, algorithms..." style="padding-left:1.2rem; font-size:1rem; border-radius:999px;">
+      <!-- Controls: Debounced Search & Category Filter Pills -->
+      <div class="catalog-controls">
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="courseSearchInput" placeholder="Search systems, protocols, compilers, algorithms..." autocomplete="off">
+            <span class="search-kbd">⌘K</span>
+          </div>
         </div>
 
-        <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
-          <button class="badge filter-pill active" data-category="all" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">All Tracks</button>
-          <button class="badge badge-cyan filter-pill" data-category="Systems Programming" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Systems & C++/Rust</button>
-          <button class="badge badge-purple filter-pill" data-category="Distributed Systems" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">Distributed & Storage</button>
-          <button class="badge badge-green filter-pill" data-category="Artificial Intelligence" style="cursor:pointer; border:none; padding:0.4rem 0.9rem;">AI & Tensors</button>
-          <button class="badge filter-pill" data-category="Web Architecture" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,255,255,0.05); color:#fff;">Web Core & V8</button>
-          <button class="badge filter-pill" data-category="Cyber Security" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(255,51,102,0.15); color:var(--accent-red);">Security & Exploits</button>
-          <button class="badge filter-pill" data-category="Quantum & Physics" style="cursor:pointer; border:none; padding:0.4rem 0.9rem; background:rgba(139,92,246,0.15); color:#d8b4fe;">Quantum Computing</button>
+        <div class="filter-pills-row">
+          <button class="badge filter-pill active" data-category="all">All Tracks</button>
+          <button class="badge badge-cyan filter-pill" data-category="Systems Programming">Systems & C++/Rust</button>
+          <button class="badge badge-purple filter-pill" data-category="Distributed Systems">Distributed & Storage</button>
+          <button class="badge badge-emerald filter-pill" data-category="Artificial Intelligence">AI & Tensors</button>
+          <button class="badge filter-pill" data-category="Web Architecture">Web Core & V8</button>
+          <button class="badge badge-red filter-pill" data-category="Cyber Security">Security & Exploits</button>
+          <button class="badge filter-pill" data-category="Quantum & Physics">Quantum Computing</button>
         </div>
       </div>
 
-      <!-- Dynamic Course Grid -->
+      <!-- Dynamic Course Grid (Rendered by App.js) -->
       <div id="coursesGrid" class="grid-cards">
         <!-- Rendered dynamically by app.js from /api/courses -->
       </div>
     </div>
   </section>
 
-  <!-- PayPal Checkout Modal -->
+  <!-- PayPal Checkout Modal (Protected Selectors) -->
   <div id="paypalModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <div style="display:flex; align-items:center; gap:0.6rem;">
-          <span style="font-size:1.3rem;">💳</span>
+          <span style="font-size:1.25rem; color:var(--accent-emerald);">⚡</span>
           <h3 class="modal-title">Secure PayPal Checkout</h3>
         </div>
-        <button id="closePaypalModalBtn" class="modal-close">&times;</button>
+        <button id="closePaypalModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div style="background:var(--bg-tertiary); padding:1.25rem; border-radius:var(--radius-sm); margin-bottom:1.5rem;">
-          <div style="font-size:0.8rem; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono);">Selected Track</div>
-          <h4 id="paypalCourseTitle" style="font-size:1.2rem; margin:0.35rem 0 0.75rem;">Loading course...</h4>
+        <div style="background:var(--bg-tertiary); padding:1.25rem; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); margin-bottom:1.5rem;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--text-muted); font-family:var(--font-mono); letter-spacing:0.05em;">Selected Track</div>
+          <h4 id="paypalCourseTitle" style="font-size:1.15rem; color:#ffffff; margin:0.35rem 0 0.75rem;">Loading course...</h4>
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
-            <span style="color:var(--text-secondary); font-size:0.9rem;">Duration: <span id="paypalCourseDuration">-</span></span>
-            <div id="paypalCoursePrice" style="font-size:1.35rem; font-weight:700; color:var(--accent-cyan);">$0 USD</div>
+            <span style="color:var(--text-secondary); font-size:0.88rem; font-family:var(--font-mono);">Duration: <span id="paypalCourseDuration" style="color:#ffffff;">-</span></span>
+            <div id="paypalCoursePrice" style="font-size:1.35rem; font-weight:700; color:var(--accent-emerald-light); font-family:var(--font-mono);">$0 USD</div>
           </div>
         </div>
 
-        <div style="border:1px solid rgba(0,242,254,0.2); background:rgba(0,242,254,0.03); padding:1rem; border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
-          🔒 <strong>Server-Verified Transaction:</strong> Order prices are verified on the backend core. Includes lifetime access, source repositories, interactive labs, and completion credentials.
+        <div style="border:1px solid rgba(16,185,129,0.25); background:rgba(16,185,129,0.04); padding:1rem; border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.5rem;">
+          🔒 <strong style="color:var(--text-primary);">Server-Verified Transaction:</strong> Order prices are verified on the backend core. Includes lifetime access, source repositories, interactive labs, and completion credentials.
         </div>
 
-        <!-- PayPal Button Mock/Live Container -->
+        <!-- PayPal Button Container -->
         <div id="paypalButtonContainer" style="display:flex; flex-direction:column; gap:0.75rem;">
-          <button id="confirmPaypalBtn" class="btn btn-primary" style="width:100%; padding:0.85rem; font-size:1rem;">
+          <button id="confirmPaypalBtn" class="btn btn-primary btn-lg" style="width:100%;">
             Complete PayPal Checkout
           </button>
         </div>
@@ -203,12 +250,12 @@
     </div>
   </div>
 
-  <!-- Receipt / Confirmation Modal -->
+  <!-- Receipt / Confirmation Modal (Protected Selectors) -->
   <div id="receiptModal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Enrollment Confirmation</h3>
-        <button id="closeReceiptModalBtn" class="modal-close">&times;</button>
+        <button id="closeReceiptModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
       </div>
       <div id="receiptBody" class="modal-body">
         <!-- Rendered by app.js -->
@@ -216,14 +263,14 @@
     </div>
   </div>
 
-  <!-- Footer -->
+  <!-- Industrial Systems Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
           <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1rem;">
             <div class="brand-icon">⚡</div>
-            <span style="font-weight:700; font-size:1.2rem; color:#fff;">Neuralab</span>
+            <span style="font-weight:700; font-size:1.15rem; color:#fff; letter-spacing:-0.02em;">Neuralab</span>
           </div>
           <p style="color:var(--text-secondary); font-size:0.88rem; line-height:1.7;">
             The deep-tech engineering and systems academy architected by Anay Upadhyay. High-security, zero-dependency runtime core built for serious software craftsmen.
@@ -250,20 +297,21 @@
         <div class="footer-col">
           <h4>Security & Architecture</h4>
           <ul>
-            <li><span style="color:var(--accent-green); font-size:0.85rem;">● Zero Dependencies</span></li>
-            <li><span style="color:var(--accent-cyan); font-size:0.85rem;">● CSRF Protected</span></li>
-            <li><span style="color:var(--accent-purple); font-size:0.85rem;">● OWASP Hardened</span></li>
-            <li><a href="https://github.com/anayupadhyay-all" target="_blank" rel="noopener">GitHub: anayupadhyay-all</a></li>
+            <li><span style="color:var(--accent-emerald); font-family:var(--font-mono); font-size:0.8rem;">● Zero Dependencies</span></li>
+            <li><span style="color:#38bdf8; font-family:var(--font-mono); font-size:0.8rem;">● Anti-CSRF Protected</span></li>
+            <li><span style="color:#c084fc; font-family:var(--font-mono); font-size:0.8rem;">● OWASP CSP Hardened</span></li>
+            <li><a href="https://github.com/AnayUpadhyay-all/Nueralab" target="_blank" rel="noopener">GitHub: AnayUpadhyay-all</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <div>&copy; 2026 Neuralab Core by Anay Upadhyay. All systems operational.</div>
-        <div style="font-family:var(--font-mono); font-size:0.8rem;">SHA-256 Verified • Node 18 Native Core</div>
+        <div style="font-family:var(--font-mono); font-size:0.78rem;">SHA-256 Verified • Node 18 Native Core</div>
       </div>
     </div>
   </footer>
 
+  <!-- Scripts -->
   <script src="/assets/js/three-neural.js"></script>
   <script src="/assets/js/app.js"></script>
 </body>
