@@ -181,7 +181,48 @@ async function runTests() {
     assert.strictEqual(captureRes.json.enrolled, true);
   });
 
-  // 8. Admin Statistics & Audit Logs
+  // 8. PayPal Route Aliases & Error Handling
+  await test('PayPal Route Aliases & Input Validation (/api/paypal/create-order)', async () => {
+    // Missing courseId test
+    const failRes = await request({
+      path: '/api/paypal/create-order',
+      method: 'POST',
+      port: 5504,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      }
+    }, {});
+    assert.strictEqual(failRes.statusCode, 400);
+
+    // Valid creation on alias endpoint
+    const aliasRes = await request({
+      path: '/api/paypal/create-order',
+      method: 'POST',
+      port: 5504,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      }
+    }, { courseId: 'rust-core' });
+
+    assert.strictEqual(aliasRes.statusCode, 200);
+    assert.strictEqual(aliasRes.json.amount, 169);
+    assert.ok(aliasRes.json.orderId);
+  });
+
+  // 9. Static Route Fallback Resolution
+  await test('Static Routing: Course Page Resolution with and without /courses/ prefix', async () => {
+    const directRes = await request({ path: '/courses/rust-core.html', method: 'GET', port: 5504 });
+    assert.strictEqual(directRes.statusCode, 200);
+    assert.ok(directRes.body.includes('Rust Core'));
+
+    const fallbackRes = await request({ path: '/rust-core.html', method: 'GET', port: 5504 });
+    assert.strictEqual(fallbackRes.statusCode, 200);
+    assert.ok(fallbackRes.body.includes('Rust Core'));
+  });
+
+  // 10. Admin Statistics & Audit Logs
   await test('Admin Stats & Audit Log Verification', async () => {
     const statsRes = await request({
       path: '/api/admin/stats',

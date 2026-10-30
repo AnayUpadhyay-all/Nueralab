@@ -65,17 +65,21 @@ const App = {
 
   async fetchCourses(query = '') {
     const grid = document.getElementById('coursesGrid');
-    if (!grid) return;
-
-    grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Syncing Neural Course Matrix...</div>';
+    if (grid) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Syncing Neural Course Matrix...</div>';
+    }
 
     try {
       const res = await fetch(`/api/courses${query}`);
       const data = await res.json();
       this.state.courses = data.courses || [];
-      this.renderCourses(this.state.courses);
+      if (grid) {
+        this.renderCourses(this.state.courses);
+      }
     } catch (err) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--accent-red);">Failed to connect to Neuralab core.</div>';
+      if (grid) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--accent-red);">Failed to connect to Neuralab core.</div>';
+      }
     }
   },
 
@@ -123,8 +127,23 @@ const App = {
       return;
     }
 
-    const course = this.state.courses.find(c => c.id === courseId);
-    if (!course) return;
+    let course = this.state.courses.find(c => c.id === courseId || c.slug === courseId);
+    if (!course) {
+      try {
+        const res = await fetch(`/api/courses/${encodeURIComponent(courseId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          course = data.course;
+        }
+      } catch (err) {
+        console.warn('Could not fetch single course:', err);
+      }
+    }
+
+    if (!course) {
+      this.showToast('Course details could not be found.', 'error');
+      return;
+    }
 
     this.state.selectedCourse = course;
     const modal = document.getElementById('paypalModal');
@@ -135,7 +154,7 @@ const App = {
     if (modal && modalTitle && modalPrice) {
       modalTitle.textContent = course.title;
       modalPrice.textContent = `$${course.price} USD`;
-      if (modalDuration) modalDuration.textContent = course.duration;
+      if (modalDuration) modalDuration.textContent = course.duration || 'Self-Paced';
       modal.classList.add('active');
     }
   },
@@ -186,7 +205,7 @@ const App = {
 
       // 3. Success! Render receipt & unlock course
       this.closePayPalModal();
-      this.showReceiptModal(captureData.receipt, course);
+      this.showReceiptModal(captureData.receipt, course, captureData.transactionId);
       this.showToast(`Enrolled in "${course.title}" successfully!`, 'success');
 
       if (!this.state.user.enrolledCourses) this.state.user.enrolledCourses = [];
@@ -206,27 +225,34 @@ const App = {
     const modal = document.getElementById('paypalModal');
     if (modal) modal.classList.remove('active');
     this.state.selectedCourse = null;
+    const payBtn = document.getElementById('confirmPaypalBtn');
+    if (payBtn) {
+      payBtn.disabled = false;
+      payBtn.textContent = 'Complete PayPal Checkout';
+    }
   },
 
-  showReceiptModal(receipt, course) {
+  showReceiptModal(receipt, course, transactionId) {
     const modal = document.getElementById('receiptModal');
     const body = document.getElementById('receiptBody');
     if (!modal || !body) return;
 
     body.innerHTML = `
       <div style="text-align:center; margin-bottom:1.5rem;">
-        <div style="font-size:3rem; color:var(--accent-green); margin-bottom:0.5rem;">✓</div>
-        <h3 style="font-size:1.4rem;">Payment Verified</h3>
-        <p style="color:var(--text-secondary); font-size:0.9rem;">PayPal Transaction Completed</p>
+        <div style="font-size:2.8rem; color:var(--accent-emerald); margin-bottom:0.4rem;">✓</div>
+        <h3 style="font-size:1.3rem; font-weight:700; color:#ffffff;">Payment Verified</h3>
+        <p style="color:var(--text-secondary); font-size:0.85rem; font-family:var(--font-mono);">PayPal Transaction Completed</p>
       </div>
-      <div style="background:var(--bg-tertiary); padding:1rem; border-radius:var(--radius-sm); font-size:0.9rem; line-height:1.8;">
-        <div><strong>Course:</strong> ${this.escapeHTML(receipt.item)}</div>
-        <div><strong>Amount Paid:</strong> ${this.escapeHTML(receipt.amount)}</div>
-        <div><strong>Student:</strong> ${this.escapeHTML(receipt.buyer)}</div>
-        <div><strong>Date:</strong> ${new Date(receipt.date).toLocaleString()}</div>
+      <div style="background:var(--bg-tertiary); border:1px solid var(--border-subtle); padding:1.25rem; border-radius:var(--radius-sm); font-size:0.88rem; line-height:1.9;">
+        <div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Course:</strong> <span style="color:#ffffff; font-weight:600;">${this.escapeHTML(receipt.item)}</span></div>
+        <div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Amount Paid:</strong> <span style="color:var(--accent-emerald-light); font-family:var(--font-mono); font-weight:700;">${this.escapeHTML(receipt.amount)}</span></div>
+        <div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Student:</strong> <span style="color:var(--text-secondary);">${this.escapeHTML(receipt.buyer)}</span></div>
+        ${transactionId ? `<div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Transaction ID:</strong> <span style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.8rem;">${this.escapeHTML(transactionId)}</span></div>` : ''}
+        <div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Timestamp:</strong> <span style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.8rem;">${new Date(receipt.date).toLocaleString()}</span></div>
       </div>
-      <div style="margin-top:1.5rem; display:flex; gap:0.5rem;">
-        <a href="/courses/${encodeURIComponent(course.file || course.slug + '.html')}" class="btn btn-primary" style="flex:1;">Access Course Material</a>
+      <div style="margin-top:1.5rem; display:flex; gap:0.75rem;">
+        <a href="/courses/${encodeURIComponent(course.file || course.slug + '.html')}" class="btn btn-primary" style="flex:1;">Access Course Syllabus</a>
+        <a href="/neural-platform.html" class="btn btn-secondary" style="flex:1;">View in Dashboard</a>
       </div>
     `;
     modal.classList.add('active');
@@ -238,6 +264,24 @@ const App = {
     document.getElementById('closePaypalModalBtn')?.addEventListener('click', () => this.closePayPalModal());
     document.getElementById('closeReceiptModalBtn')?.addEventListener('click', () => {
       document.getElementById('receiptModal')?.classList.remove('active');
+    });
+
+    // Modal Backdrop Click to Close
+    document.getElementById('paypalModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'paypalModal') this.closePayPalModal();
+    });
+    document.getElementById('receiptModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'receiptModal') {
+        document.getElementById('receiptModal')?.classList.remove('active');
+      }
+    });
+
+    // Escape Key to Close Active Modals
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.closePayPalModal();
+        document.getElementById('receiptModal')?.classList.remove('active');
+      }
     });
 
     // Search input & ⌘K shortcut
