@@ -1039,6 +1039,101 @@ body {
   background: rgba(255, 255, 255, 0.02);
 }
 
+/* Admin Tabs & Unified Command Center */
+.admin-tabs-nav {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.admin-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  padding: 0.85rem 1.4rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-tab-btn.active {
+  color: var(--accent-emerald);
+  border-bottom-color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.06);
+}
+
+.admin-tab-pane {
+  display: none;
+}
+
+.admin-tab-pane.active {
+  display: block;
+  animation: fadeInPane 0.2s ease-in-out;
+}
+
+@keyframes fadeInPane {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.publish-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  color: var(--text-muted);
+}
+
+.publish-toggle-btn.published {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: var(--accent-emerald);
+}
+
+.publish-toggle-btn.draft {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #f59e0b;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+.status-dot.amber { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+.status-dot.red { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+
+.table-action-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* ==========================================================================
    Footer
    ========================================================================== */

@@ -245,6 +245,76 @@ async function runTests() {
     assert.ok(logsRes.json.logs.some(l => l.action === 'COURSE_CREATED'));
   });
 
+  // 11. Course Edit & Publish Toggle Verification
+  await test('Admin Course Edit & Publish Toggle (PUT /api/courses/:id)', async () => {
+    const updateRes = await request({
+      path: '/api/courses/rust-core',
+      method: 'PUT',
+      port: 5504,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`,
+        'X-CSRF-Token': adminCsrf
+      }
+    }, { published: true, price: 169 });
+    assert.strictEqual(updateRes.statusCode, 200);
+    assert.strictEqual(updateRes.json.success, true);
+    assert.strictEqual(updateRes.json.course.price, 169);
+  });
+
+  // 12. Student & User CRM Verification
+  await test('Student & User CRM Endpoint (GET /api/admin/users & enroll)', async () => {
+    const usersRes = await request({
+      path: '/api/admin/users',
+      method: 'GET',
+      port: 5504,
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(usersRes.statusCode, 200);
+    assert.ok(Array.isArray(usersRes.json.users));
+    assert.ok(usersRes.json.users.length > 0);
+    // Sensitive fields must be excluded
+    assert.strictEqual(usersRes.json.users[0].password, undefined);
+
+    const student = usersRes.json.users.find(u => u.role === 'student');
+    if (student) {
+      const enrollRes = await request({
+        path: `/api/admin/users/${student.id}/enroll`,
+        method: 'POST',
+        port: 5504,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`,
+          'X-CSRF-Token': adminCsrf
+        }
+      }, { courseId: 'rust-core', action: 'enroll' });
+      assert.strictEqual(enrollRes.statusCode, 200);
+      assert.ok(enrollRes.json.enrolledCourses.includes('rust-core'));
+    }
+  });
+
+  // 13. System Health & Route Explorer Verification
+  await test('System Health & Route Explorer (GET /api/admin/system-health & orders)', async () => {
+    const healthRes = await request({
+      path: '/api/admin/system-health',
+      method: 'GET',
+      port: 5504,
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(healthRes.statusCode, 200);
+    assert.ok(healthRes.json.telemetry.memory.heapUsedMb);
+    assert.ok(healthRes.json.routes.length >= 20);
+
+    const ordersRes = await request({
+      path: '/api/admin/orders',
+      method: 'GET',
+      port: 5504,
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(ordersRes.statusCode, 200);
+    assert.ok(Array.isArray(ordersRes.json.orders));
+  });
+
   console.log(`\n=========================================`);
   console.log(`Audit Complete: ${passed} passed, ${failed} failed`);
   console.log(`=========================================\n`);

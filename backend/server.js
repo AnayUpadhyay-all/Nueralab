@@ -635,6 +635,214 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { logs: DB.auditLogs.slice(0, 100) });
       }
 
+      // 11a. Admin: User & Student CRM (Admin Only)
+      if (pathname === '/api/admin/users' && method === 'GET') {
+        const authUser = getAuthUser(req);
+        if (!authUser || authUser.role !== 'admin') {
+          return sendError(res, 403, 'Forbidden. Admin privileges required.');
+        }
+
+        const safeUsers = DB.users.map(u => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          role: u.role || 'student',
+          headline: u.headline || '',
+          avatar: u.avatar || '',
+          enrolledCourses: u.enrolledCourses || [],
+          createdAt: u.createdAt || new Date().toISOString()
+        }));
+
+        return sendJson(res, 200, { users: safeUsers, total: safeUsers.length });
+      }
+
+      // 11b. Admin: Update User Role (Admin Only)
+      const userRoleMatch = pathname.match(/^\/api\/admin\/users\/([a-zA-Z0-9_-]+)\/role$/);
+      if (userRoleMatch && method === 'PUT') {
+        const authUser = getAuthUser(req);
+        if (!authUser || authUser.role !== 'admin') {
+          return sendError(res, 403, 'Forbidden. Admin privileges required.');
+        }
+
+        const csrf = req.headers['x-csrf-token'];
+        if (!verifyCsrfToken(csrf)) {
+          return sendError(res, 403, 'Invalid or expired CSRF token.');
+        }
+
+        const targetUserId = userRoleMatch[1];
+        const user = DB.users.find(u => u.id === targetUserId);
+        if (!user) return sendError(res, 404, 'User not found in registry.');
+
+        const data = await parseBody(req);
+        const newRole = data.role === 'admin' ? 'admin' : 'student';
+
+        // Prevent admin from removing their own admin status accidentally
+        if (targetUserId === authUser.id && newRole !== 'admin') {
+          return sendError(res, 400, 'Cannot revoke your own administrator privileges.');
+        }
+
+        user.role = newRole;
+        DB.save('users');
+
+        logAudit('USER_ROLE_UPDATED', authUser.email, `Updated role for user ${user.email} (${user.id}) to ${newRole}`, ip);
+        return sendJson(res, 200, { success: true, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+      }
+
+      // 11c. Admin: Manage User Enrollment (Admin Only)
+      const userEnrollMatch = pathname.match(/^\/api\/admin\/users\/([a-zA-Z0-9_-]+)\/enroll$/);
+      if (userEnrollMatch && method === 'POST') {
+        const authUser = getAuthUser(req);
+        if (!authUser || authUser.role !== 'admin') {
+          return sendError(res, 403, 'Forbidden. Admin privileges required.');
+        }
+
+        const csrf = req.headers['x-csrf-token'];
+        if (!verifyCsrfToken(csrf)) {
+          return sendError(res, 403, 'Invalid or expired CSRF token.');
+        }
+
+        const targetUserId = userEnrollMatch[1];
+        const user = DB.users.find(u => u.id === targetUserId);
+        if (!user) return sendError(res, 404, 'User not found in registry.');
+
+        const data = await parseBody(req);
+        const { courseId, action } = data; // action: 'enroll' or 'unenroll'
+        if (!courseId) return sendError(res, 400, 'courseId is required.');
+
+        const course = DB.courses.find(c => c.id === courseId || c.slug === courseId);
+        if (!course) return sendError(res, 404, 'Course not found.');
+
+        if (!user.enrolledCourses) user.enrolledCourses = [];
+
+        if (action === 'unenroll') {
+          user.enrolledCourses = user.enrolledCourses.filter(id => id !== course.id);
+          if (course.enrolledStudents && course.enrolledStudents > 0) {
+            course.enrolledStudents -= 1;
+          }
+          logAudit('USER_UNENROLLED_BY_ADMIN', authUser.email, `Removed user ${user.email} from track "${course.title}"`, ip);
+        } else {
+          if (!user.enrolledCourses.includes(course.id)) {
+            user.enrolledCourses.push(course.id);
+            course.enrolledStudents = (course.enrolledStudents || 0) + 1;
+          }
+          logAudit('USER_ENROLLED_BY_ADMIN', authUser.email, `Enrolled user ${user.email} in track "${course.title}"`, ip);
+        }
+
+        DB.save('users');
+        DB.save('courses');
+
+        return sendJson(res, 200, {
+          success: true,
+          enrolledCourses: user.enrolledCourses,
+          course: { id: course.id, enrolledStudents: course.enrolledStudents }
+        });
+      }
+
+      // 11d. Admin: Orders & Revenue Ledger (Admin Only)
+      if (pathname === '/api/admin/orders' && method === 'GET') {
+        const authUser = getAuthUser(req);
+        if (!authUser || authUser.role !== 'admin') {
+          return sendError(res, 403, 'Forbidden. Admin privileges required.');
+        }
+
+        const totalRevenue = DB.orders.reduce((acc, o) => acc + (o.amount || 0), 0);
+        return sendJson(res, 200, {
+          orders: DB.orders,
+          totalRevenue,
+          totalOrders: DB.orders.length
+        });
+      }
+
+      // 11e. Admin: System Telemetry & Route Explorer (Admin Only)
+      if (pathname === '/api/admin/system-health' && method === 'GET') {
+        const authUser = getAuthUser(req);
+        if (!authUser || authUser.role !== 'admin') {
+          return sendError(res, 403, 'Forbidden. Admin privileges required.');
+        }
+
+        const mem = process.memoryUsage();
+        const uptime = Math.floor(process.uptime());
+
+        // Scan all registered portal and course routes
+        const routes = [
+          { path: '/', type: 'Portal', file: 'index.html', title: 'Main Landing & 3D Constellation' },
+          { path: '/admin.html', type: 'Portal', file: 'admin.html', title: 'Matrix Admin Command Center' },
+          { path: '/login.html', type: 'Portal', file: 'login.html', title: 'Authentication Portal' },
+          { path: '/code-editor.html', type: 'Studio', file: 'code-editor.html', title: 'Interactive Multi-Language Compiler' },
+          { path: '/neural-platform.html', type: 'Portal', file: 'neural-platform.html', title: 'Student Learning OS Workspace' },
+          { path: '/api/health', type: 'API', method: 'GET', title: 'Core API Health Check' },
+          { path: '/api/courses', type: 'API', method: 'GET, POST', title: 'Curriculum Catalog & Course CRUD' },
+          { path: '/api/payments/paypal/create-order', type: 'API', method: 'POST', title: 'PayPal Orders v2 Checkout Engine' }
+        ];
+
+        // Add 18 curriculum tracks
+        DB.courses.forEach(c => {
+          const candidate = c.file || `${c.id}.html`;
+          routes.push({
+            path: `/courses/${candidate}`,
+            altPath: `/${candidate}`,
+            type: 'Curriculum',
+            category: c.category,
+            file: `courses/${candidate}`,
+            title: c.title,
+            courseId: c.id,
+            price: c.price,
+            published: c.published !== false
+          });
+        });
+
+        // Check file status on disk
+        const checkedRoutes = routes.map(r => {
+          if (r.type === 'API') {
+            return { ...r, status: 'Active (200)', exists: true };
+          }
+          const filePath = path.resolve(PUBLIC_DIR, r.file);
+          let exists = false;
+          let size = 0;
+          try {
+            if (fs.existsSync(filePath)) {
+              const stat = fs.statSync(filePath);
+              exists = stat.isFile();
+              size = stat.size;
+            }
+          } catch (e) {}
+
+          return {
+            ...r,
+            status: exists ? 'Operational (200)' : 'Missing File (404)',
+            exists,
+            sizeBytes: size,
+            sizeFormatted: size > 0 ? `${(size / 1024).toFixed(1)} KB` : 'N/A'
+          };
+        });
+
+        return sendJson(res, 200, {
+          telemetry: {
+            uptimeSeconds: uptime,
+            uptimeFormatted: `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`,
+            nodeVersion: process.version,
+            platform: `${process.platform} (${process.arch})`,
+            memory: {
+              rssMb: (mem.rss / (1024 * 1024)).toFixed(2),
+              heapTotalMb: (mem.heapTotal / (1024 * 1024)).toFixed(2),
+              heapUsedMb: (mem.heapUsed / (1024 * 1024)).toFixed(2),
+              externalMb: (mem.external / (1024 * 1024)).toFixed(2)
+            },
+            securityStatus: {
+              zeroRuntimeDependencies: true,
+              csrfActive: true,
+              rateLimiterActive: true,
+              owaspHeadersActive: true
+            },
+            totalUsers: DB.users.length,
+            totalOrders: DB.orders.length,
+            totalCourses: DB.courses.length,
+            totalAuditLogs: DB.auditLogs.length
+          },
+          routes: checkedRoutes
+        });
+      }
+
 // --- PayPal Orders v2 Engine Helpers ---
 async function createPayPalOrderHelper(course) {
   const hasLiveCredentials = 

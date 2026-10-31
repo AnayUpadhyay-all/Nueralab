@@ -32,7 +32,9 @@
     "createdAt": "2026-03-15T00:00:00.000Z",
     "enrolledCourses": [
       "webcore",
-      "frameworks"
+      "frameworks",
+      "cpp-foundation",
+      "rust-core"
     ]
   }
 ]
