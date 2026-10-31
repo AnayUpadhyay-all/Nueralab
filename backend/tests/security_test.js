@@ -315,6 +315,42 @@ async function runTests() {
     assert.ok(Array.isArray(ordersRes.json.orders));
   });
 
+  // 14. DRM Curriculum Content Gating & Inspect-Proof Verification
+  await test('DRM Content Gating (GET /api/courses/:id/content rejection & decryption)', async () => {
+    // A. Unauthenticated request must be rejected with 401
+    const unauthRes = await request({ path: '/api/courses/cpp-foundation/content', method: 'GET', port: 5504 });
+    assert.strictEqual(unauthRes.statusCode, 401);
+
+    // B. Verified Admin gets decrypted materials
+    const adminRes = await request({
+      path: '/api/courses/cpp-foundation/content',
+      method: 'GET',
+      port: 5504,
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    assert.strictEqual(adminRes.statusCode, 200);
+    assert.strictEqual(adminRes.json.success, true);
+    assert.ok(adminRes.json.content.modules.length > 0);
+  });
+
+  // 15. Admin Multi-Step Access Request Verification
+  await test('Admin Multi-Step Access Request (POST /api/admin/request-access)', async () => {
+    const reqRes = await request({
+      path: '/api/admin/request-access',
+      method: 'POST',
+      port: 5504,
+      headers: { 'Content-Type': 'application/json' }
+    }, {
+      name: 'Security Researcher',
+      email: 'researcher@sec.org',
+      justification: 'External audit inspection'
+    });
+
+    assert.strictEqual(reqRes.statusCode, 202);
+    assert.strictEqual(reqRes.json.status, 'PENDING_OWNER_APPROVAL');
+    assert.ok(reqRes.json.requestId);
+  });
+
   console.log(`\n=========================================`);
   console.log(`Audit Complete: ${passed} passed, ${failed} failed`);
   console.log(`=========================================\n`);

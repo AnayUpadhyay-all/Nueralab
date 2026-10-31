@@ -3,81 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Authentication Portal | Neuralab</title>
-  <meta name="description" content="Secure Zero-Trust authentication portal for Neuralab learners and systems architects.">
+  <title>Sign In — Neuralab</title>
+  <meta name="description" content="Sign in or register for Neuralab engineering tracks and interactive workspaces.">
   <link rel="stylesheet" href="/assets/css/neuralab.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000%22/><text y=%22.75em%22 x=%2250%25%22 text-anchor=%22middle%22 font-size=%2260%22 fill=%22%23fff%22 font-family=%22sans-serif%22 font-weight=%22bold%22>N</text></svg>">
 </head>
-<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1.5rem; background:radial-gradient(circle at 50% 20%, rgba(0,242,254,0.06), var(--bg-primary) 70%);">
+<body style="display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1.5rem; background:#000000;">
 
-  <div class="card" style="max-width:440px; width:100%; padding:2.25rem; box-shadow: 0 0 40px rgba(0,0,0,0.6);">
+  <div class="card" style="max-width:420px; width:100%; padding:2.5rem 2rem; background:#0d0d10; border:1px solid #222226; border-radius:8px;">
+    <!-- Brand Header -->
     <div style="text-align:center; margin-bottom:2rem;">
-      <a href="/" style="display:inline-flex; align-items:center; gap:0.6rem; text-decoration:none; color:#fff; font-size:1.4rem; font-weight:700;">
-        <div class="brand-icon">⚡</div>
-        <span>Neuralab</span>
+      <a href="/" style="display:inline-block; text-decoration:none; color:#fff; font-size:1.4rem; font-weight:700; letter-spacing:-0.02em;">
+        Neuralab
       </a>
-      <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0.5rem;">Zero-Trust Systems Access</p>
+      <p style="color:#71717a; font-size:0.88rem; margin-top:0.35rem;">Student & Engineer Portal</p>
     </div>
 
     <!-- Tab Selector -->
-    <div style="display:flex; background:var(--bg-tertiary); padding:0.25rem; border-radius:var(--radius-sm); margin-bottom:1.75rem;">
-      <button id="tabLogin" class="btn" style="flex:1; background:var(--bg-card); color:#fff; border-radius:var(--radius-sm); font-size:0.88rem;">Sign In</button>
-      <button id="tabRegister" class="btn" style="flex:1; background:transparent; color:var(--text-muted); border-radius:var(--radius-sm); font-size:0.88rem;">Register</button>
+    <div style="display:flex; background:#141417; padding:0.25rem; border-radius:6px; margin-bottom:1.75rem; border:1px solid #222226;">
+      <button id="tabLogin" class="btn" style="flex:1; background:#ffffff; color:#000000; border-radius:4px; font-size:0.85rem; font-weight:600; padding:0.45rem;">Sign In</button>
+      <button id="tabRegister" class="btn" style="flex:1; background:transparent; color:#71717a; border-radius:4px; font-size:0.85rem; padding:0.45rem;">Register</button>
     </div>
 
-    <!-- Error / Success Alert -->
-    <div id="authAlert" style="display:none; padding:0.75rem 1rem; border-radius:var(--radius-sm); font-size:0.85rem; margin-bottom:1.25rem;"></div>
+    <!-- Alert Message -->
+    <div id="authAlert" style="display:none; padding:0.75rem 1rem; border-radius:6px; font-size:0.85rem; margin-bottom:1.25rem;"></div>
 
-    <!-- Login Form -->
+    <!-- Student Sign In Form -->
     <form id="loginForm">
-      <div class="form-group">
-        <label class="form-label" for="loginEmail">Email Address</label>
-        <input type="email" id="loginEmail" class="form-input" placeholder="engineer@neuralab.dev" required>
+      <div class="form-group" style="margin-bottom:1.15rem;">
+        <label class="form-label" for="loginEmail" style="color:#a1a1aa; font-size:0.8rem; margin-bottom:0.35rem;">Email address</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="engineer@example.com" required style="background:#141417; border-color:#27272a; border-radius:6px; padding:0.7rem 0.9rem;">
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+      <div class="form-group" style="margin-bottom:1.5rem;">
+        <label class="form-label" for="loginPassword" style="color:#a1a1aa; font-size:0.8rem; margin-bottom:0.35rem;">Password</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required style="background:#141417; border-color:#27272a; border-radius:6px; padding:0.7rem 0.9rem;">
       </div>
 
-      <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">
-        Authenticate Session
+      <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width:100%; padding:0.75rem; border-radius:6px;">
+        Sign In
       </button>
     </form>
 
-    <!-- Register Form -->
+    <!-- Student Registration Form -->
     <form id="registerForm" style="display:none;">
-      <div class="form-group">
-        <label class="form-label" for="regName">Full Name</label>
-        <input type="text" id="regName" class="form-input" placeholder="Ada Lovelace" required>
+      <div class="form-group" style="margin-bottom:1.15rem;">
+        <label class="form-label" for="regName" style="color:#a1a1aa; font-size:0.8rem; margin-bottom:0.35rem;">Full name</label>
+        <input type="text" id="regName" class="form-input" placeholder="Alex Chen" required style="background:#141417; border-color:#27272a; border-radius:6px; padding:0.7rem 0.9rem;">
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="regEmail">Email Address</label>
-        <input type="email" id="regEmail" class="form-input" placeholder="ada@systems.org" required>
+      <div class="form-group" style="margin-bottom:1.15rem;">
+        <label class="form-label" for="regEmail" style="color:#a1a1aa; font-size:0.8rem; margin-bottom:0.35rem;">Email address</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="alex@domain.com" required style="background:#141417; border-color:#27272a; border-radius:6px; padding:0.7rem 0.9rem;">
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="regPassword">Password (Min. 8 chars)</label>
-        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" minlength="8" required>
+      <div class="form-group" style="margin-bottom:1.5rem;">
+        <label class="form-label" for="regPassword" style="color:#a1a1aa; font-size:0.8rem; margin-bottom:0.35rem;">Password (Min. 8 characters)</label>
+        <input type="password" id="regPassword" class="form-input" placeholder="••••••••" minlength="8" required style="background:#141417; border-color:#27272a; border-radius:6px; padding:0.7rem 0.9rem;">
       </div>
 
-      <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">
-        Create Engineering Account
+      <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width:100%; padding:0.75rem; border-radius:6px;">
+        Create Account
       </button>
     </form>
 
-    <!-- One-Click Demo Credentials for Quick Testing -->
-    <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border-subtle); text-align:center;">
-      <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem; text-transform:uppercase; font-family:var(--font-mono);">Preconfigured Roles</div>
-      <div style="display:flex; gap:0.5rem; justify-content:center;">
-        <button id="quickAdminBtn" class="btn btn-secondary btn-sm" style="font-size:0.78rem; border-color:var(--accent-purple); color:#d8b4fe;">
-          ⚡ Admin (Anay)
-        </button>
-        <button id="quickStudentBtn" class="btn btn-secondary btn-sm" style="font-size:0.78rem;">
-          👤 Student Demo
-        </button>
+    <!-- Hidden / Gated Admin Access Link -->
+    <div style="margin-top:2rem; padding-top:1.25rem; border-top:1px solid #1f1f23; text-align:center;">
+      <button id="openAdminRequestBtn" style="background:none; border:none; color:#52525b; font-size:0.75rem; cursor:pointer; font-family:var(--font-sans);">
+        Request Administrator Verification &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- Multi-Step Admin Verification & Approval Modal -->
+  <div id="adminRequestModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:460px; background:#121215; border:1px solid #28282e;">
+      <div class="modal-header">
+        <h3 class="modal-title">Administrator Verification Gate</h3>
+        <button id="closeAdminModalBtn" class="modal-close">&times;</button>
       </div>
+      <form id="adminRequestForm">
+        <div class="modal-body">
+          <p style="font-size:0.85rem; color:#a1a1aa; line-height:1.6; margin-bottom:1.25rem;">
+            Admin privileges require explicit authorization. Submitting this form dispatches a security alert and approval request to platform owner <strong>Anay Upadhyay</strong>.
+          </p>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label" for="reqAdminName" style="color:#a1a1aa; font-size:0.8rem;">Your Name</label>
+            <input type="text" id="reqAdminName" class="form-input" placeholder="Anay Upadhyay" required style="background:#18181c; border-color:#27272a;">
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label" for="reqAdminEmail" style="color:#a1a1aa; font-size:0.8rem;">Your Email</label>
+            <input type="email" id="reqAdminEmail" class="form-input" placeholder="admin@neuralab.dev" required style="background:#18181c; border-color:#27272a;">
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label" for="reqAdminPassphrase" style="color:#a1a1aa; font-size:0.8rem;">Master Verification Passphrase (Optional for instant elevation)</label>
+            <input type="password" id="reqAdminPassphrase" class="form-input" placeholder="••••••••" style="background:#18181c; border-color:#27272a;">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reqAdminReason" style="color:#a1a1aa; font-size:0.8rem;">Justification / Reason</label>
+            <textarea id="reqAdminReason" class="form-textarea" rows="2" placeholder="Local development / Production administration" style="background:#18181c; border-color:#27272a;"></textarea>
+          </div>
+        </div>
+
+        <div style="padding:1rem 1.75rem; border-top:1px solid #1f1f23; display:flex; justify-content:flex-end; gap:0.75rem; background:#0d0d10;">
+          <button type="button" id="cancelAdminReqBtn" class="btn btn-secondary btn-sm">Cancel</button>
+          <button type="submit" id="submitAdminReqBtn" class="btn btn-primary btn-sm">Dispatch Request</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -90,27 +126,31 @@
 
     function showAlert(msg, isSuccess = false) {
       authAlert.style.display = 'block';
-      authAlert.style.background = isSuccess ? 'rgba(0, 245, 160, 0.1)' : 'rgba(255, 51, 102, 0.1)';
-      authAlert.style.border = `1px solid ${isSuccess ? 'var(--accent-green)' : 'var(--accent-red)'}`;
-      authAlert.style.color = isSuccess ? 'var(--accent-green)' : 'var(--accent-red)';
+      authAlert.style.background = isSuccess ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+      authAlert.style.border = `1px solid ${isSuccess ? '#10b981' : '#ef4444'}`;
+      authAlert.style.color = isSuccess ? '#34d399' : '#f87171';
       authAlert.textContent = msg;
     }
 
     tabLogin.addEventListener('click', () => {
-      tabLogin.style.background = 'var(--bg-card)';
-      tabLogin.style.color = '#fff';
+      tabLogin.style.background = '#ffffff';
+      tabLogin.style.color = '#000000';
+      tabLogin.style.fontWeight = '600';
       tabRegister.style.background = 'transparent';
-      tabRegister.style.color = 'var(--text-muted)';
+      tabRegister.style.color = '#71717a';
+      tabRegister.style.fontWeight = 'normal';
       loginForm.style.display = 'block';
       registerForm.style.display = 'none';
       authAlert.style.display = 'none';
     });
 
     tabRegister.addEventListener('click', () => {
-      tabRegister.style.background = 'var(--bg-card)';
-      tabRegister.style.color = '#fff';
+      tabRegister.style.background = '#ffffff';
+      tabRegister.style.color = '#000000';
+      tabRegister.style.fontWeight = '600';
       tabLogin.style.background = 'transparent';
-      tabLogin.style.color = 'var(--text-muted)';
+      tabLogin.style.color = '#71717a';
+      tabLogin.style.fontWeight = 'normal';
       registerForm.style.display = 'block';
       loginForm.style.display = 'none';
       authAlert.style.display = 'none';
@@ -121,24 +161,12 @@
       tabRegister.click();
     }
 
-    // Quick demo buttons
-    document.getElementById('quickAdminBtn').addEventListener('click', () => {
-      document.getElementById('loginEmail').value = 'admin@neuralab.dev';
-      document.getElementById('loginPassword').value = 'NeuralabAdmin@2026!';
-      loginForm.dispatchEvent(new Event('submit'));
-    });
-
-    document.getElementById('quickStudentBtn').addEventListener('click', () => {
-      document.getElementById('loginEmail').value = 'student@neuralab.dev';
-      document.getElementById('loginPassword').value = 'Student@2026!';
-      loginForm.dispatchEvent(new Event('submit'));
-    });
-
+    // Student Login Submission
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('loginSubmitBtn');
       btn.disabled = true;
-      btn.textContent = 'Verifying cryptographic signature...';
+      btn.textContent = 'Authenticating...';
 
       try {
         const res = await fetch('/api/auth/login', {
@@ -152,28 +180,31 @@
 
         const data = await res.json();
         if (!res.ok || !data.token) {
-          throw new Error(data.message || 'Authentication failed.');
+          throw new Error(data.message || 'Authentication failed. Please check your credentials.');
         }
 
         localStorage.setItem('neuralab_jwt', data.token);
         localStorage.setItem('neuralab_csrf', data.csrfToken);
 
-        showAlert('Access Granted. Redirecting...', true);
-        const redirect = urlParams.get('redirect') || (data.user.role === 'admin' ? '/admin.html' : '/');
-        setTimeout(() => window.location.href = redirect, 800);
+        showAlert('Authenticated successfully. Redirecting...', true);
+        
+        // Redirect: Students go to Dashboard, Admins go to Admin Matrix if requested
+        const targetRedirect = urlParams.get('redirect') || (data.user.role === 'admin' ? '/admin.html' : '/neural-platform.html');
+        setTimeout(() => window.location.href = targetRedirect, 600);
       } catch (err) {
         showAlert(err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Authenticate Session';
+        btn.textContent = 'Sign In';
       }
     });
 
+    // Student Registration Submission
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('regSubmitBtn');
       btn.disabled = true;
-      btn.textContent = 'Registering credentials...';
+      btn.textContent = 'Creating account...';
 
       try {
         const res = await fetch('/api/auth/register', {
@@ -194,14 +225,57 @@
         localStorage.setItem('neuralab_jwt', data.token);
         localStorage.setItem('neuralab_csrf', data.csrfToken);
 
-        showAlert('Account created. Redirecting...', true);
-        const redirect = urlParams.get('redirect') || '/';
-        setTimeout(() => window.location.href = redirect, 800);
+        showAlert('Account created successfully. Redirecting...', true);
+        const targetRedirect = urlParams.get('redirect') || '/neural-platform.html';
+        setTimeout(() => window.location.href = targetRedirect, 600);
       } catch (err) {
         showAlert(err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Create Engineering Account';
+        btn.textContent = 'Create Account';
+      }
+    });
+
+    // Admin Request Modal Handling
+    const adminModal = document.getElementById('adminRequestModal');
+    document.getElementById('openAdminRequestBtn').addEventListener('click', () => adminModal.classList.add('active'));
+    document.getElementById('closeAdminModalBtn').addEventListener('click', () => adminModal.classList.remove('active'));
+    document.getElementById('cancelAdminReqBtn').addEventListener('click', () => adminModal.classList.remove('active'));
+
+    document.getElementById('adminRequestForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitAdminReqBtn');
+      btn.disabled = true;
+      btn.textContent = 'Dispatching alert...';
+
+      const payload = {
+        name: document.getElementById('reqAdminName').value.trim(),
+        email: document.getElementById('reqAdminEmail').value.trim(),
+        masterPassphrase: document.getElementById('reqAdminPassphrase').value,
+        justification: document.getElementById('reqAdminReason').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/admin/request-access', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        adminModal.classList.remove('active');
+        showAlert(data.message, data.status === 'APPROVED');
+        if (data.status === 'APPROVED') {
+          setTimeout(() => {
+            document.getElementById('loginEmail').value = payload.email;
+            document.getElementById('loginPassword').value = payload.masterPassphrase;
+            tabLogin.click();
+          }, 1200);
+        }
+      } catch (err) {
+        alert('Could not dispatch admin verification request: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Dispatch Request';
       }
     });
   </script>

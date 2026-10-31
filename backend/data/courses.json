@@ -13,7 +13,7 @@
     "description": "Master modern C++20/23, RAII, memory layout, cache locality, SIMD intrinsics, templates, and zero-cost abstractions.",
     "file": "cpp-foundation.html",
     "published": true,
-    "enrolledStudents": 1429,
+    "enrolledStudents": 1430,
     "rating": 4.9,
     "modulesCount": 14,
     "prerequisites": "Solid programming foundations in any imperative language",
@@ -37,7 +37,7 @@
     "rating": 5,
     "modulesCount": 12,
     "prerequisites": "Basic systems or C/C++ knowledge",
-    "updatedAt": "2026-10-31T04:46:50.284Z"
+    "updatedAt": "2026-10-31T05:16:36.214Z"
   },
   {
     "id": "webcore",

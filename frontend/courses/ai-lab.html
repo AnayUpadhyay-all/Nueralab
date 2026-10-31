@@ -80,38 +80,18 @@
         
         </div>
 
-        <!-- Interactive Architecture / Sample Code -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Core Architecture & Implementation</h2>
-        <div class="sandbox-card">
-          <div class="sandbox-header">
-            <span style="color:var(--text-muted); font-size:0.8rem;">Interactive Neural Computation & WebGPU Lab — Key Production Primitive</span>
-            <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;">Test in Studio</a>
+        <!-- Gated DRM Curriculum Materials (Inspect-Proof: Decrypted strictly via server authorization) -->
+        <div id="gatedCourseContent" data-course-id="ai-lab">
+          <div class="card" style="border:1px solid #222226; background:#0d0d10; padding:2rem; text-align:center; margin:2rem 0;">
+            <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">Curriculum Source Code & Lab Materials Locked</h3>
+            <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
+              Deep implementation walkthroughs, zero-allocation memory benchmarks, and capstone tests are decrypted after enrollment.
+            </p>
+            <div style="display:flex; justify-content:center; gap:0.75rem;">
+              <a href="/login.html?redirect=/courses/ai-lab.html" class="btn btn-secondary btn-sm">Sign In</a>
+              <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('ai-lab')">Enroll to Decrypt Track</button>
+            </div>
           </div>
-          <pre class="sandbox-content"><code>// WebGPU Compute Shader for Matrix Multiplication (WGSL)
-@group(0) @binding(0) var&lt;storage, read&gt; A : array&lt;f32&gt;;
-@group(0) @binding(1) var&lt;storage, read&gt; B : array&lt;f32&gt;;
-@group(0) @binding(2) var&lt;storage, read_write&gt; C : array&lt;f32&gt;;
-
-@compute @workgroup_size(16, 16)
-fn main(@builtin(global_invocation_id) global_id : vec3&lt;u32&gt;) {
-    var sum : f32 = 0.0;
-    // Fast parallel row-column dot product
-}</code></pre>
-        </div>
-
-        <!-- Hands-On Interactive 3D Synaptic Visualizer -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Interactive 3D Synaptic Constellation</h2>
-        <div style="background:#06080d; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); position:relative; height:420px; overflow:hidden;">
-          <canvas id="neural3dCanvas" style="width:100%; height:100%; display:block;"></canvas>
-        </div>
-
-        <!-- Hands-On Capstone Project -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
-        <div class="card" style="border-left:4px solid var(--accent-cyan);">
-          <h3 style="font-size:1.2rem; margin-bottom:0.5rem;">Build a WebGPU-Powered Convolutional Visualizer in Pure Canvas & WebGL.</h3>
-          <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7;">
-            You will implement, benchmark, and stress-test this system under adversarial workloads, memory pressure, and network partitions. Evaluated with automated sanitizers (ASan, TSan, MSan) and zero warnings.
-          </p>
         </div>
       </div>
 

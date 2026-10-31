@@ -1,5 +1,17 @@
 [
   {
+    "id": "TX_1793423796127_D6802AB4",
+    "paypalOrderId": "PAYPAL_ORD_1793423796116_0F2C850CDDDA",
+    "userId": "usr_admin_01",
+    "userEmail": "admin@neuralab.dev",
+    "courseId": "cpp-foundation",
+    "courseTitle": "C++ Systems & Low-Level Foundations",
+    "amount": 149,
+    "currency": "USD",
+    "status": "COMPLETED",
+    "timestamp": "2026-10-31T05:16:36.127Z"
+  },
+  {
     "id": "TX_1793422010221_6A8AFE28",
     "paypalOrderId": "PAYPAL_ORD_1793422010209_390D60CE5C17",
     "userId": "usr_admin_01",

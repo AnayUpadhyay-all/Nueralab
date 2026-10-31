@@ -85,36 +85,18 @@
         
         </div>
 
-        <!-- Interactive Architecture / Sample Code -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Core Architecture & Implementation</h2>
-        <div class="sandbox-card">
-          <div class="sandbox-header">
-            <span style="color:var(--text-muted); font-size:0.8rem;">Deep Consensus: Raft, Paxos & Byzantine Fault Tolerance — Key Production Primitive</span>
-            <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;">Test in Studio</a>
+        <!-- Gated DRM Curriculum Materials (Inspect-Proof: Decrypted strictly via server authorization) -->
+        <div id="gatedCourseContent" data-course-id="distributed-consensus">
+          <div class="card" style="border:1px solid #222226; background:#0d0d10; padding:2rem; text-align:center; margin:2rem 0;">
+            <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">Curriculum Source Code & Lab Materials Locked</h3>
+            <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
+              Deep implementation walkthroughs, zero-allocation memory benchmarks, and capstone tests are decrypted after enrollment.
+            </p>
+            <div style="display:flex; justify-content:center; gap:0.75rem;">
+              <a href="/login.html?redirect=/courses/distributed-consensus.html" class="btn btn-secondary btn-sm">Sign In</a>
+              <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('distributed-consensus')">Enroll to Decrypt Track</button>
+            </div>
           </div>
-          <pre class="sandbox-content"><code>// Raft Leader Heartbeat &amp; Log Replication RPC Definition
-struct AppendEntriesRequest {
-    uint64_t term;
-    uint64_t leader_id;
-    uint64_t prev_log_index;
-    uint64_t prev_log_term;
-    std::vector&lt;LogEntry&gt; entries;
-    uint64_t leader_commit;
-};
-
-struct AppendEntriesResponse {
-    uint64_t term;
-    bool success;
-};</code></pre>
-        </div>
-
-        <!-- Hands-On Capstone Project -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
-        <div class="card" style="border-left:4px solid var(--accent-cyan);">
-          <h3 style="font-size:1.2rem; margin-bottom:0.5rem;">Implement a Multi-Node Raft Cluster in C++ passing Jepsen network partition tests.</h3>
-          <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7;">
-            You will implement, benchmark, and stress-test this system under adversarial workloads, memory pressure, and network partitions. Evaluated with automated sanitizers (ASan, TSan, MSan) and zero warnings.
-          </p>
         </div>
       </div>
 

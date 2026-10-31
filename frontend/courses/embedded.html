@@ -85,33 +85,18 @@
         
         </div>
 
-        <!-- Interactive Architecture / Sample Code -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Core Architecture & Implementation</h2>
-        <div class="sandbox-card">
-          <div class="sandbox-header">
-            <span style="color:var(--text-muted); font-size:0.8rem;">Bare-Metal Embedded Systems & RTOS — Key Production Primitive</span>
-            <a href="/code-editor.html" class="btn btn-secondary btn-sm" style="padding:0.2rem 0.5rem;">Test in Studio</a>
+        <!-- Gated DRM Curriculum Materials (Inspect-Proof: Decrypted strictly via server authorization) -->
+        <div id="gatedCourseContent" data-course-id="embedded">
+          <div class="card" style="border:1px solid #222226; background:#0d0d10; padding:2rem; text-align:center; margin:2rem 0;">
+            <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">Curriculum Source Code & Lab Materials Locked</h3>
+            <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
+              Deep implementation walkthroughs, zero-allocation memory benchmarks, and capstone tests are decrypted after enrollment.
+            </p>
+            <div style="display:flex; justify-content:center; gap:0.75rem;">
+              <a href="/login.html?redirect=/courses/embedded.html" class="btn btn-secondary btn-sm">Sign In</a>
+              <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('embedded')">Enroll to Decrypt Track</button>
+            </div>
           </div>
-          <pre class="sandbox-content"><code>// Bare-Metal GPIO Pin Toggle on ARM Cortex-M
-#define GPIOA_BASE   0x40020000
-#define GPIOA_MODER  (*(volatile uint32_t*)(GPIOA_BASE + 0x00))
-#define GPIOA_ODR    (*(volatile uint32_t*)(GPIOA_BASE + 0x14))
-
-void init_led() {
-    GPIOA_MODER |= (1 &lt;&lt; 10); // Configure Pin 5 as General Purpose Output
-}
-void toggle_led() {
-    GPIOA_ODR ^= (1 &lt;&lt; 5);    // Atomic XOR toggle on Pin 5
-}</code></pre>
-        </div>
-
-        <!-- Hands-On Capstone Project -->
-        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
-        <div class="card" style="border-left:4px solid var(--accent-cyan);">
-          <h3 style="font-size:1.2rem; margin-bottom:0.5rem;">Build an RTOS Firmware Sensor Pipeline with DMA and Sleep Modes.</h3>
-          <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.7;">
-            You will implement, benchmark, and stress-test this system under adversarial workloads, memory pressure, and network partitions. Evaluated with automated sanitizers (ASan, TSan, MSan) and zero warnings.
-          </p>
         </div>
       </div>
 

@@ -18,6 +18,14 @@ const App = {
     await this.fetchCurrentUser();
     await this.fetchCourses();
     this.bindEvents();
+
+    // Check if on a course syllabus page with gated content container
+    const gatedContainer = document.getElementById('gatedCourseContent');
+    if (gatedContainer) {
+      const courseId = gatedContainer.getAttribute('data-course-id') || 
+                       window.location.pathname.split('/').pop().replace('.html', '').replace('courses/', '');
+      await this.checkAndLoadCourseContent(courseId);
+    }
   },
 
   async fetchCurrentUser() {
@@ -314,6 +322,74 @@ const App = {
         this.fetchCourses(cat === 'all' ? '' : `?category=${encodeURIComponent(cat)}`);
       });
     });
+  },
+
+  async checkAndLoadCourseContent(courseId) {
+    const container = document.getElementById('gatedCourseContent');
+    if (!container) return;
+
+    if (!this.state.token) {
+      container.innerHTML = `
+        <div class="card" style="border:1px solid #222226; background:#0d0d10; padding:2rem; text-align:center; margin:2rem 0;">
+          <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">Curriculum Source Code & Lab Materials Locked</h3>
+          <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
+            Deep implementation walkthroughs, zero-allocation memory benchmarks, and capstone tests are decrypted after enrollment.
+          </p>
+          <div style="display:flex; justify-content:center; gap:0.75rem;">
+            <a href="/login.html?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-secondary btn-sm">Sign In</a>
+            <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('${courseId}')">Enroll to Decrypt Track</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/courses/${encodeURIComponent(courseId)}/content`, {
+        headers: { 'Authorization': `Bearer ${this.state.token}` }
+      });
+      const data = await res.json();
+
+      if (res.status === 403 || data.error === 'ENROLLMENT_REQUIRED') {
+        container.innerHTML = `
+          <div class="card" style="border:1px solid #222226; background:#0d0d10; padding:2rem; text-align:center; margin:2rem 0;">
+            <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.5rem;">Curriculum Source Code & Lab Materials Locked</h3>
+            <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
+              You are signed in as <strong style="color:#fff;">${this.escapeHTML(this.state.user ? this.state.user.email : '')}</strong>, but have not enrolled in this track yet. Complete verified checkout to decrypt full source code, compiler benchmarks, and capstone repositories.
+            </p>
+            <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('${courseId}')">Enroll with PayPal ($${data.price || 149} USD)</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (res.ok && data.content) {
+        const c = data.content;
+        container.innerHTML = `
+          <div style="margin-top:2rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; border-bottom:1px solid #222226; padding-bottom:0.75rem;">
+              <h2 style="font-size:1.5rem; font-weight:700; color:#fff;">Decrypted Curriculum Materials</h2>
+              <span class="card-level" style="color:var(--accent-emerald); border-color:rgba(16,185,129,0.3);">Enrolled & Verified</span>
+            </div>
+            ${(c.modules || []).map(m => `
+              <div class="card" style="margin-bottom:1.25rem;">
+                <div style="font-size:0.75rem; font-family:var(--font-mono); color:#71717a; text-transform:uppercase; margin-bottom:0.25rem;">Module 0${m.moduleNumber}</div>
+                <h3 style="font-size:1.15rem; color:#fff; margin-bottom:0.5rem;">${this.escapeHTML(m.title)}</h3>
+                <p style="color:#a1a1aa; font-size:0.9rem; line-height:1.6; margin-bottom:1rem;">${this.escapeHTML(m.content)}</p>
+                <div style="background:#06080d; border:1px solid #222226; border-radius:6px; padding:1rem; margin-bottom:1rem; font-family:var(--font-mono); font-size:0.82rem; overflow-x:auto;">
+                  <pre style="margin:0; color:#34d399;"><code>${this.escapeHTML(m.codeSnippet)}</code></pre>
+                </div>
+                <div style="font-size:0.82rem; color:#71717a;">
+                  <strong style="color:#fff;">Lab Exercise:</strong> ${this.escapeHTML(m.labExercise)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    } catch (e) {
+      console.warn('Could not load course content:', e);
+    }
   },
 
   logout(redirect = true) {

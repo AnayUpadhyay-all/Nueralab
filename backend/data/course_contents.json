@@ -1,0 +1,902 @@
+{
+  "cpp-foundation": {
+    "courseId": "cpp-foundation",
+    "title": "C++ Systems & Low-Level Foundations",
+    "lastUpdated": "2026-10-31T05:05:54.234Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into C++ Systems & Low-Level Foundations. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for C++ Systems & Low-Level Foundations\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for C++ Systems & Low-Level Foundations.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "rust-core": {
+    "courseId": "rust-core",
+    "title": "Rust Core: Memory Safety & Systems Concurrency",
+    "lastUpdated": "2026-10-31T05:05:54.235Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Rust Core: Memory Safety & Systems Concurrency. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Rust Core: Memory Safety & Systems Concurrency\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Rust Core: Memory Safety & Systems Concurrency.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "webcore": {
+    "courseId": "webcore",
+    "title": "WebCore: Browser Engine Internals & Rendering Pipelines",
+    "lastUpdated": "2026-10-31T05:05:54.235Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into WebCore: Browser Engine Internals & Rendering Pipelines. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for WebCore: Browser Engine Internals & Rendering Pipelines\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for WebCore: Browser Engine Internals & Rendering Pipelines.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "networking": {
+    "courseId": "networking",
+    "title": "High Performance Browser Networking",
+    "lastUpdated": "2026-10-31T05:05:54.235Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into High Performance Browser Networking. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for High Performance Browser Networking\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for High Performance Browser Networking.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "databases": {
+    "courseId": "databases",
+    "title": "Distributed Databases & Storage Engine Design",
+    "lastUpdated": "2026-10-31T05:05:54.235Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Distributed Databases & Storage Engine Design. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Distributed Databases & Storage Engine Design\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Distributed Databases & Storage Engine Design.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "runtime": {
+    "courseId": "runtime",
+    "title": "V8 Engine Internals & JavaScript Runtimes",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into V8 Engine Internals & JavaScript Runtimes. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for V8 Engine Internals & JavaScript Runtimes\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for V8 Engine Internals & JavaScript Runtimes.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "frameworks": {
+    "courseId": "frameworks",
+    "title": "Modern Framework Architecture: Signals to Virtual DOM",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Modern Framework Architecture: Signals to Virtual DOM. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Modern Framework Architecture: Signals to Virtual DOM\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Modern Framework Architecture: Signals to Virtual DOM.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "apis": {
+    "courseId": "apis",
+    "title": "High-Scale Distributed APIs & Microservices",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into High-Scale Distributed APIs & Microservices. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for High-Scale Distributed APIs & Microservices\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for High-Scale Distributed APIs & Microservices.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "embedded": {
+    "courseId": "embedded",
+    "title": "Bare-Metal Embedded Systems & RTOS",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Bare-Metal Embedded Systems & RTOS. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Bare-Metal Embedded Systems & RTOS\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Bare-Metal Embedded Systems & RTOS.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "enterprise": {
+    "courseId": "enterprise",
+    "title": "Enterprise Systems & Cloud-Native Architecture",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Enterprise Systems & Cloud-Native Architecture. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Enterprise Systems & Cloud-Native Architecture\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Enterprise Systems & Cloud-Native Architecture.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "intelligence-ai": {
+    "courseId": "intelligence-ai",
+    "title": "Neural Foundations & Transformer Architectures",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Neural Foundations & Transformer Architectures. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Neural Foundations & Transformer Architectures\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Neural Foundations & Transformer Architectures.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "ai-lab": {
+    "courseId": "ai-lab",
+    "title": "Interactive Neural Computation & WebGPU Lab",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Interactive Neural Computation & WebGPU Lab. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Interactive Neural Computation & WebGPU Lab\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Interactive Neural Computation & WebGPU Lab.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "python-data": {
+    "courseId": "python-data",
+    "title": "High-Performance Python & Vectorized Computing",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into High-Performance Python & Vectorized Computing. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for High-Performance Python & Vectorized Computing\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for High-Performance Python & Vectorized Computing.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "styling": {
+    "courseId": "styling",
+    "title": "GPU-Accelerated CSS & Modern Layout Engines",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into GPU-Accelerated CSS & Modern Layout Engines. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for GPU-Accelerated CSS & Modern Layout Engines\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for GPU-Accelerated CSS & Modern Layout Engines.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "quantum-computing": {
+    "courseId": "quantum-computing",
+    "title": "Quantum Computing & Quantum Algorithm Design",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Quantum Computing & Quantum Algorithm Design. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Quantum Computing & Quantum Algorithm Design\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Quantum Computing & Quantum Algorithm Design.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "security-reverse-engineering": {
+    "courseId": "security-reverse-engineering",
+    "title": "Binary Exploitation & Systems Security",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Binary Exploitation & Systems Security. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Binary Exploitation & Systems Security\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Binary Exploitation & Systems Security.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "cloud-infrastructure": {
+    "courseId": "cloud-infrastructure",
+    "title": "High-Scale Site Reliability & Linux eBPF",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into High-Scale Site Reliability & Linux eBPF. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for High-Scale Site Reliability & Linux eBPF\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for High-Scale Site Reliability & Linux eBPF.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  },
+  "distributed-consensus": {
+    "courseId": "distributed-consensus",
+    "title": "Deep Consensus: Raft, Paxos & Byzantine Fault Tolerance",
+    "lastUpdated": "2026-10-31T05:05:54.236Z",
+    "drmProtected": true,
+    "modules": [
+      {
+        "moduleNumber": 1,
+        "title": "Architectural Foundations & Machine Model",
+        "content": "Comprehensive deep dive into Deep Consensus: Raft, Paxos & Byzantine Fault Tolerance. Inspecting memory layouts, runtime performance bottlenecks, and systems invariants.",
+        "codeSnippet": "// Neuralab Production Primitive for Deep Consensus: Raft, Paxos & Byzantine Fault Tolerance\n// Decrypted for verified enrolled student\nvoid execute_secure_pipeline() {\n    // First-principles kernel pipeline\n}",
+        "labExercise": "Implement zero-allocation data structures and benchmark under saturation load."
+      },
+      {
+        "moduleNumber": 2,
+        "title": "Low-Level Concurrency & Cache Coherence",
+        "content": "Dissecting lock-free synchronization, atomic memory order semantics, and minimizing CPU cache-line false sharing for Deep Consensus: Raft, Paxos & Byzantine Fault Tolerance.",
+        "codeSnippet": "// Lock-Free Synchronization Primitive\natomic<uint64_t> sequence_counter{0};\nvoid synchronize_cores() {\n    sequence_counter.fetch_add(1, memory_order_acq_rel);\n}",
+        "labExercise": "Eliminate mutex contention by designing a lock-free ring buffer."
+      },
+      {
+        "moduleNumber": 3,
+        "title": "High-Throughput IO & Kernel Boundary",
+        "content": "Interfacing with Linux kernel primitives (io_uring, epoll, eBPF) and zero-copy packet processing pipelines.",
+        "codeSnippet": "// Zero-Copy Kernel IO Primitive\nint setup_io_uring_channel();",
+        "labExercise": "Write an event loop handling 100,000 requests/sec with sub-millisecond p99 latency."
+      },
+      {
+        "moduleNumber": 4,
+        "title": "Capstone Engineering Specification & Production Test Harness",
+        "content": "Final capstone project. Stress-tested under fuzzing, memory leak sanitizers (ASan, TSan), and adversarial workloads.",
+        "codeSnippet": "// Capstone Verification Harness\nint main() { run_verification_suite(); return 0; }",
+        "labExercise": "Deploy the verified production binary and pass 100% of integration checks."
+      }
+    ],
+    "assets": [
+      {
+        "name": "Full Git Source Repository (Gated Access)",
+        "type": "repository"
+      },
+      {
+        "name": "Verified Cryptographic Completion Hash",
+        "type": "certificate"
+      },
+      {
+        "name": "Automated Sanitizer Test Suite (ASan / TSan)",
+        "type": "test_suite"
+      }
+    ]
+  }
+}

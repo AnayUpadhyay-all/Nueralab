@@ -1,0 +1,11 @@
+[
+  {
+    "id": "adm_req_1793423796276_61b260a0",
+    "name": "Security Researcher",
+    "email": "researcher@sec.org",
+    "justification": "External audit inspection",
+    "status": "PENDING_OWNER_APPROVAL",
+    "ip": "127.0.0.1",
+    "requestedAt": "2026-10-31T05:16:36.276Z"
+  }
+]
