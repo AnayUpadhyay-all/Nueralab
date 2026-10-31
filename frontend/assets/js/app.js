@@ -47,8 +47,8 @@ const App = {
     if (this.state.user) {
       const isAdmin = this.state.user.role === 'admin';
       navActions.innerHTML = `
-        <div style="display:flex; align-items:center; gap: 0.85rem;">
-          ${isAdmin ? `<a href="/admin.html" class="btn btn-secondary btn-sm" style="border-color:var(--accent-purple); color:#d8b4fe;">⚡ Admin Panel</a>` : ''}
+        <div style="display:flex; align-items:center; gap: 0.75rem;">
+          ${isAdmin ? `<a href="/admin.html" class="btn btn-secondary btn-sm">Admin Panel</a>` : ''}
           <a href="/neural-platform.html" class="btn btn-secondary btn-sm">Dashboard</a>
           <span style="font-size:0.85rem; color:var(--text-secondary);">${this.escapeHTML(this.state.user.name)}</span>
           <button id="logoutBtn" class="btn btn-secondary btn-sm" style="padding:0.35rem 0.65rem;">Sign Out</button>
@@ -66,7 +66,7 @@ const App = {
   async fetchCourses(query = '') {
     const grid = document.getElementById('coursesGrid');
     if (grid) {
-      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Syncing Neural Course Matrix...</div>';
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Loading curriculum...</div>';
     }
 
     try {
@@ -95,18 +95,18 @@ const App = {
     grid.innerHTML = courses.map(c => `
       <div class="card" data-id="${c.id}">
         <div class="card-header">
-          <div class="card-icon">${c.icon || '⚡'}</div>
-          <span class="badge ${c.badge === 'Core Track' ? 'badge-cyan' : c.badge === 'Flagship' ? 'badge-purple' : 'badge-green'}">${this.escapeHTML(c.badge || c.level)}</span>
+          <span class="card-category">${this.escapeHTML(c.category)}</span>
+          <span class="card-level">${this.escapeHTML(c.level || 'Advanced')}</span>
         </div>
         <h3 class="card-title">${this.escapeHTML(c.title)}</h3>
         <p class="card-desc">${this.escapeHTML(c.description)}</p>
         <div class="card-meta">
-          <span>⏱️ ${this.escapeHTML(c.duration)} • ${c.modulesCount} Modules</span>
-          <div class="card-price">$${c.price} <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">USD</span></div>
+          <span>${this.escapeHTML(c.duration)} &bull; ${c.modulesCount || 8} modules</span>
+          <div class="card-price">$${c.price} USD</div>
         </div>
-        <div style="display:flex; gap:0.5rem; margin-top:1.25rem;">
-          <a href="/courses/${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-secondary btn-sm" style="flex:1;">View Syllabus</a>
-          <button class="btn btn-primary btn-sm enroll-btn" data-id="${c.id}" style="flex:1;">Enroll with PayPal</button>
+        <div class="card-actions">
+          <a href="/courses/${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-secondary btn-sm" style="flex:1;">View syllabus</a>
+          <button class="btn btn-primary btn-sm enroll-btn" data-id="${c.id}" style="flex:1;">Enroll</button>
         </div>
       </div>
     `).join('');
@@ -239,8 +239,7 @@ const App = {
 
     body.innerHTML = `
       <div style="text-align:center; margin-bottom:1.5rem;">
-        <div style="font-size:2.8rem; color:var(--accent-emerald); margin-bottom:0.4rem;">✓</div>
-        <h3 style="font-size:1.3rem; font-weight:700; color:#ffffff;">Payment Verified</h3>
+        <h3 style="font-size:1.3rem; font-weight:700; color:#ffffff; margin-bottom:0.25rem;">Payment Verified</h3>
         <p style="color:var(--text-secondary); font-size:0.85rem; font-family:var(--font-mono);">PayPal Transaction Completed</p>
       </div>
       <div style="background:var(--bg-tertiary); border:1px solid var(--border-subtle); padding:1.25rem; border-radius:var(--radius-sm); font-size:0.88rem; line-height:1.9;">

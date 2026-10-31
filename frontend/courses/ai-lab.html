@@ -99,6 +99,12 @@ fn main(@builtin(global_invocation_id) global_id : vec3&lt;u32&gt;) {
 }</code></pre>
         </div>
 
+        <!-- Hands-On Interactive 3D Synaptic Visualizer -->
+        <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Interactive 3D Synaptic Constellation</h2>
+        <div style="background:#06080d; border:1px solid var(--border-subtle); border-radius:var(--radius-sm); position:relative; height:420px; overflow:hidden;">
+          <canvas id="neural3dCanvas" style="width:100%; height:100%; display:block;"></canvas>
+        </div>
+
         <!-- Hands-On Capstone Project -->
         <h2 style="font-size:1.8rem; font-weight:800; margin:2.5rem 0 1rem;">Capstone Engineering Project</h2>
         <div class="card" style="border-left:4px solid var(--accent-cyan);">
@@ -183,6 +189,7 @@ fn main(@builtin(global_invocation_id) global_id : vec3&lt;u32&gt;) {
     </div>
   </footer>
 
+  <script src="/assets/js/three-neural.js"></script>
   <script src="/assets/js/app.js"></script>
 </body>
 </html>

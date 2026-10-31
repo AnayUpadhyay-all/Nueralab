@@ -1,5 +1,158 @@
 [
   {
+    "id": "log_1793422010305_cb772e86",
+    "timestamp": "2026-10-31T04:46:50.305Z",
+    "action": "USER_ENROLLED_BY_ADMIN",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Enrolled user student@neuralab.dev in track \"Rust Core: Memory Safety & Systems Concurrency\"",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010285_56d3a6ed",
+    "timestamp": "2026-10-31T04:46:50.286Z",
+    "action": "COURSE_UPDATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Updated course: \"Rust Core: Memory Safety & Systems Concurrency\" (rust-core)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010247_6b0c0383",
+    "timestamp": "2026-10-31T04:46:50.247Z",
+    "action": "PAYPAL_ORDER_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created PayPal order PAYPAL_ORD_1793422010247_F097E64AD0C4 for course \"Rust Core: Memory Safety & Systems Concurrency\" ($169)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010223_839e9faf",
+    "timestamp": "2026-10-31T04:46:50.224Z",
+    "action": "PAYPAL_PAYMENT_CAPTURED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Payment captured for course \"C++ Systems & Low-Level Foundations\" ($149) with TX TX_1793422010221_6A8AFE28",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010209_d3d0ede7",
+    "timestamp": "2026-10-31T04:46:50.209Z",
+    "action": "PAYPAL_ORDER_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created PayPal order PAYPAL_ORD_1793422010209_390D60CE5C17 for course \"C++ Systems & Low-Level Foundations\" ($149)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010193_e427db1b",
+    "timestamp": "2026-10-31T04:46:50.194Z",
+    "action": "COURSE_DELETED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Deleted course: \"Automated Test Course\" (automated-test-course)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010179_99e9c23b",
+    "timestamp": "2026-10-31T04:46:50.180Z",
+    "action": "COURSE_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created new course: \"Automated Test Course\" (automated-test-course)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793422010155_cc8041b6",
+    "timestamp": "2026-10-31T04:46:50.156Z",
+    "action": "AUTH_SUCCESS",
+    "performedBy": "usr_admin_01",
+    "details": "User signed in: admin@neuralab.dev",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032332_ff45f4c0",
+    "timestamp": "2026-10-31T04:30:32.332Z",
+    "action": "USER_ENROLLED_BY_ADMIN",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Enrolled user student@neuralab.dev in track \"Rust Core: Memory Safety & Systems Concurrency\"",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032318_945ccc84",
+    "timestamp": "2026-10-31T04:30:32.319Z",
+    "action": "COURSE_UPDATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Updated course: \"Rust Core: Memory Safety & Systems Concurrency\" (rust-core)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032245_e6452f5b",
+    "timestamp": "2026-10-31T04:30:32.245Z",
+    "action": "PAYPAL_ORDER_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created PayPal order PAYPAL_ORD_1793421032245_DF11C1E23231 for course \"Rust Core: Memory Safety & Systems Concurrency\" ($169)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032228_43c33548",
+    "timestamp": "2026-10-31T04:30:32.228Z",
+    "action": "PAYPAL_PAYMENT_CAPTURED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Payment captured for course \"C++ Systems & Low-Level Foundations\" ($149) with TX TX_1793421032223_946A7FC4",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032192_fba5b843",
+    "timestamp": "2026-10-31T04:30:32.192Z",
+    "action": "PAYPAL_ORDER_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created PayPal order PAYPAL_ORD_1793421032192_07700A723B24 for course \"C++ Systems & Low-Level Foundations\" ($149)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032163_1ce83fa6",
+    "timestamp": "2026-10-31T04:30:32.163Z",
+    "action": "COURSE_DELETED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Deleted course: \"Automated Test Course\" (automated-test-course)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032151_376a3583",
+    "timestamp": "2026-10-31T04:30:32.151Z",
+    "action": "COURSE_CREATED",
+    "performedBy": "admin@neuralab.dev",
+    "details": "Created new course: \"Automated Test Course\" (automated-test-course)",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793421032118_fba7d65b",
+    "timestamp": "2026-10-31T04:30:32.118Z",
+    "action": "AUTH_SUCCESS",
+    "performedBy": "usr_admin_01",
+    "details": "User signed in: admin@neuralab.dev",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
+    "id": "log_1793420365035_1266c27b",
+    "timestamp": "2026-10-31T04:19:25.035Z",
+    "action": "AUTH_SUCCESS",
+    "performedBy": "usr_admin_01",
+    "details": "User signed in: admin@neuralab.dev",
+    "ip": "127.0.0.1",
+    "status": "SUCCESS"
+  },
+  {
     "id": "log_1793420154864_26bfe9b3",
     "timestamp": "2026-10-31T04:15:54.865Z",
     "action": "USER_ENROLLED_BY_ADMIN",
