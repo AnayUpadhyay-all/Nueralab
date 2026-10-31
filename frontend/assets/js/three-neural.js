@@ -257,14 +257,12 @@
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1.0;
 
-      // Draw Label if hovered or core in front
-      if (node.isCore && (isHovered || (proj.rawZ < 50 && proj.scale > 0.85))) {
-        ctx.font = isHovered 
-          ? '600 11px "Geist Mono", "JetBrains Mono", ui-monospace, monospace' 
-          : '500 10px "Geist Mono", "JetBrains Mono", ui-monospace, monospace';
-        ctx.fillStyle = isHovered ? '#34d399' : 'rgba(248, 250, 252, 0.85)';
+      // Draw Label ONLY if actively hovered
+      if (isHovered && node.title) {
+        ctx.font = '600 11px "Geist Mono", "JetBrains Mono", ui-monospace, monospace';
+        ctx.fillStyle = '#34d399';
         ctx.textAlign = 'center';
-        ctx.fillText(node.title, proj.x, proj.y - (r + 7));
+        ctx.fillText(node.title, proj.x, proj.y - (r + 8));
       }
     }
 
