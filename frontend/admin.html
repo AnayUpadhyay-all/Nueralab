@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Command Center | Neuralab Matrix</title>
   <meta name="description" content="Unified administrative control center for curriculum management, student CRM, revenue ledger, and platform telemetry.">
-  <link rel="stylesheet" href="/assets/css/neuralab.css">
+  <link rel="stylesheet" href="assets/css/neuralab.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
 </head>
 <body style="background:var(--bg-primary);">
 
   <!-- Admin Navbar -->
   <header class="navbar">
-    <a href="/" class="nav-brand">
+    <a href="index.html" class="nav-brand">
       <div class="brand-icon" style="background:linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));">🛡️</div>
       <span>Neuralab Admin Matrix</span>
     </a>
     <div style="display:flex; align-items:center; gap:1.25rem;">
-      <a href="/" class="btn btn-secondary btn-sm" target="_blank">View Public Portal ↗</a>
+      <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">View Public Portal ↗</a>
       <span style="font-size:0.85rem; color:var(--text-secondary);">Logged in as: <strong id="adminUserName" style="color:#fff;">Admin</strong></span>
-      <button id="adminLogoutBtn" class="btn btn-secondary btn-sm" onclick="localStorage.removeItem('neuralab_jwt'); localStorage.removeItem('neuralab_csrf'); window.location.href='/login.html';">Sign Out</button>
+      <button id="adminLogoutBtn" class="btn btn-secondary btn-sm" onclick="localStorage.removeItem('neuralab_jwt'); localStorage.removeItem('neuralab_csrf'); window.location.href='login.html';">Sign Out</button>
     </div>
   </header>
 
@@ -485,6 +485,6 @@
     </div>
   </div>
 
-  <script src="/assets/js/admin.js"></script>
+  <script src="assets/js/admin.js"></script>
 </body>
 </html>

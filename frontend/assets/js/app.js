@@ -13,6 +13,14 @@ const App = {
     selectedCourse: null
   },
 
+  getBasePath() {
+    return window.location.pathname.includes('/courses/') ? '../' : './';
+  },
+
+  getCoursesPath() {
+    return window.location.pathname.includes('/courses/') ? '' : 'courses/';
+  },
+
   async init() {
     this.setupAuthUI();
     await this.fetchCurrentUser();
@@ -39,12 +47,24 @@ const App = {
         this.state.user = data.user;
         this.state.csrfToken = data.csrfToken;
         localStorage.setItem('neuralab_csrf', data.csrfToken);
+        localStorage.setItem('neuralab_user', JSON.stringify(data.user));
         this.setupAuthUI();
-      } else {
+        return;
+      } else if (res.status === 401) {
         this.logout(false);
+        return;
       }
     } catch (e) {
-      console.warn('Could not verify session:', e);
+      console.warn('Could not verify session via API:', e);
+    }
+
+    // Static / demo session fallback
+    const cached = localStorage.getItem('neuralab_user');
+    if (cached) {
+      try {
+        this.state.user = JSON.parse(cached);
+        this.setupAuthUI();
+      } catch (e) {}
     }
   },
 
@@ -52,12 +72,13 @@ const App = {
     const navActions = document.getElementById('navActions');
     if (!navActions) return;
 
+    const base = this.getBasePath();
     if (this.state.user) {
       const isAdmin = this.state.user.role === 'admin';
       navActions.innerHTML = `
         <div style="display:flex; align-items:center; gap: 0.75rem;">
-          ${isAdmin ? `<a href="/admin.html" class="btn btn-secondary btn-sm">Admin Panel</a>` : ''}
-          <a href="/neural-platform.html" class="btn btn-secondary btn-sm">Dashboard</a>
+          ${isAdmin ? `<a href="${base}admin.html" class="btn btn-secondary btn-sm">Admin Panel</a>` : ''}
+          <a href="${base}neural-platform.html" class="btn btn-secondary btn-sm">Dashboard</a>
           <span style="font-size:0.85rem; color:var(--text-secondary);">${this.escapeHTML(this.state.user.name)}</span>
           <button id="logoutBtn" class="btn btn-secondary btn-sm" style="padding:0.35rem 0.65rem;">Sign Out</button>
         </div>
@@ -65,8 +86,8 @@ const App = {
       document.getElementById('logoutBtn')?.addEventListener('click', () => this.logout());
     } else {
       navActions.innerHTML = `
-        <a href="/login.html" class="btn btn-secondary btn-sm">Sign In</a>
-        <a href="/login.html?tab=register" class="btn btn-primary btn-sm">Get Started</a>
+        <a href="${base}login.html" class="btn btn-secondary btn-sm">Sign In</a>
+        <a href="${base}login.html?tab=register" class="btn btn-primary btn-sm">Get Started</a>
       `;
     }
   },
@@ -77,17 +98,55 @@ const App = {
       grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted);">Loading curriculum...</div>';
     }
 
+    let loadedCourses = null;
+
+    // 1. Try server API
     try {
       const res = await fetch(`/api/courses${query}`);
-      const data = await res.json();
-      this.state.courses = data.courses || [];
-      if (grid) {
-        this.renderCourses(this.state.courses);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.courses && data.courses.length > 0) {
+          loadedCourses = data.courses;
+        }
       }
     } catch (err) {
-      if (grid) {
-        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--accent-red);">Failed to connect to Neuralab core.</div>';
+      // API not reachable
+    }
+
+    // 2. Fallback to static courses data (for GitHub Pages & offline previews)
+    if (!loadedCourses) {
+      try {
+        const basePath = this.getBasePath();
+        const staticRes = await fetch(`${basePath}assets/data/courses.json`);
+        if (staticRes.ok) {
+          let list = await staticRes.json();
+          if (query) {
+            const params = new URLSearchParams(query.replace('?', ''));
+            const search = (params.get('search') || '').toLowerCase();
+            const category = params.get('category');
+            if (search) {
+              list = list.filter(c => 
+                (c.title && c.title.toLowerCase().includes(search)) || 
+                (c.description && c.description.toLowerCase().includes(search)) ||
+                (c.category && c.category.toLowerCase().includes(search))
+              );
+            }
+            if (category && category !== 'all') {
+              list = list.filter(c => c.category && c.category.toLowerCase() === category.toLowerCase());
+            }
+          }
+          loadedCourses = list;
+        }
+      } catch (e) {
+        console.warn('Could not load static courses fallback:', e);
       }
+    }
+
+    if (loadedCourses && loadedCourses.length > 0) {
+      this.state.courses = loadedCourses;
+      if (grid) this.renderCourses(this.state.courses);
+    } else if (grid) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--accent-red);">Failed to connect to Neuralab core.</div>';
     }
   },
 
@@ -100,6 +159,7 @@ const App = {
       return;
     }
 
+    const coursesPath = this.getCoursesPath();
     grid.innerHTML = courses.map(c => `
       <div class="card" data-id="${c.id}">
         <div class="card-header">
@@ -113,7 +173,7 @@ const App = {
           <div class="card-price">$${c.price} USD</div>
         </div>
         <div class="card-actions">
-          <a href="/courses/${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-secondary btn-sm" style="flex:1;">View syllabus</a>
+          <a href="${coursesPath}${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-secondary btn-sm" style="flex:1;">View syllabus</a>
           <button class="btn btn-primary btn-sm enroll-btn" data-id="${c.id}" style="flex:1;">Enroll</button>
         </div>
       </div>
@@ -129,9 +189,10 @@ const App = {
   },
 
   async openPayPalCheckout(courseId) {
+    const base = this.getBasePath();
     if (!this.state.user) {
       this.showToast('Please sign in to enroll in this course.', 'error');
-      setTimeout(() => { window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.pathname)}`; }, 1000);
+      setTimeout(() => { window.location.href = `${base}login.html?redirect=${encodeURIComponent(window.location.pathname)}`; }, 1000);
       return;
     }
 
@@ -258,8 +319,8 @@ const App = {
         <div><strong style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Timestamp:</strong> <span style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.8rem;">${new Date(receipt.date).toLocaleString()}</span></div>
       </div>
       <div style="margin-top:1.5rem; display:flex; gap:0.75rem;">
-        <a href="/courses/${encodeURIComponent(course.file || course.slug + '.html')}" class="btn btn-primary" style="flex:1;">Access Course Syllabus</a>
-        <a href="/neural-platform.html" class="btn btn-secondary" style="flex:1;">View in Dashboard</a>
+        <a href="${this.getCoursesPath()}${encodeURIComponent(course.file || course.slug + '.html')}" class="btn btn-primary" style="flex:1;">Access Course Syllabus</a>
+        <a href="${this.getBasePath()}neural-platform.html" class="btn btn-secondary" style="flex:1;">View in Dashboard</a>
       </div>
     `;
     modal.classList.add('active');
@@ -335,8 +396,8 @@ const App = {
           <p style="color:#a1a1aa; font-size:0.9rem; max-width:580px; margin:0 auto 1.5rem; line-height:1.6;">
             Deep implementation walkthroughs, zero-allocation memory benchmarks, and capstone tests are decrypted after enrollment.
           </p>
-          <div style="display:flex; justify-content:center; gap:0.75rem;">
-            <a href="/login.html?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-secondary btn-sm">Sign In</a>
+          <div style="display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap;">
+            <a href="${this.getBasePath()}login.html?redirect=${encodeURIComponent(window.location.pathname)}" class="btn btn-secondary btn-sm">Sign In</a>
             <button class="btn btn-primary btn-sm" onclick="App.openPayPalCheckout('${courseId}')">Enroll to Decrypt Track</button>
           </div>
         </div>
@@ -395,13 +456,14 @@ const App = {
   logout(redirect = true) {
     localStorage.removeItem('neuralab_jwt');
     localStorage.removeItem('neuralab_csrf');
+    localStorage.removeItem('neuralab_user');
     this.state.token = null;
     this.state.user = null;
     this.state.csrfToken = null;
     this.setupAuthUI();
     this.showToast('You have been logged out.', 'info');
     if (redirect && window.location.pathname.includes('admin')) {
-      window.location.href = '/login.html';
+      window.location.href = `${this.getBasePath()}login.html`;
     }
   },
 

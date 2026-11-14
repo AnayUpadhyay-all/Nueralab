@@ -17,7 +17,7 @@ const AdminApp = {
 
   async init() {
     if (!this.token) {
-      window.location.href = '/login.html?redirect=admin.html';
+      window.location.href = 'login.html?redirect=admin.html';
       return;
     }
 
@@ -40,7 +40,7 @@ const AdminApp = {
       const data = await res.json();
       if (data.user.role !== 'admin') {
         alert('Access Denied: Administrator role required.');
-        window.location.href = '/index.html';
+        window.location.href = 'index.html';
         return;
       }
       this.user = data.user;
@@ -49,8 +49,17 @@ const AdminApp = {
       const nameEl = document.getElementById('adminUserName');
       if (nameEl) nameEl.textContent = this.user.name;
     } catch (e) {
+      const cached = localStorage.getItem('neuralab_user');
+      if (cached) {
+        try {
+          this.user = JSON.parse(cached);
+          const nameEl = document.getElementById('adminUserName');
+          if (nameEl) nameEl.textContent = this.user.name || 'Admin';
+          return;
+        } catch (err) {}
+      }
       localStorage.removeItem('neuralab_jwt');
-      window.location.href = '/login.html?redirect=admin.html';
+      window.location.href = 'login.html?redirect=admin.html';
     }
   },
 

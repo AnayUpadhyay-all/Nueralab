@@ -70,7 +70,7 @@
     "icon": "📡",
     "badge": "Essential",
     "description": "TCP slow start, TLS 1.3 0-RTT, HTTP/2 multiplexing, HTTP/3 QUIC packet frames, and low-latency WebRTC architectures.",
-    "file": "High Performance Browser Networking.html",
+    "file": "high-performance-browser-networking.html",
     "published": true,
     "enrolledStudents": 1120,
     "rating": 4.9,
