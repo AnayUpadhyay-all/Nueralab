@@ -364,17 +364,73 @@ const AdminApp = {
      2. STUDENT & USER CRM
      ========================================================================== */
   async loadUsers() {
+    let usersList = [];
     try {
       const res = await fetch('/api/admin/users', {
         headers: { 'Authorization': `Bearer ${this.token}` }
       });
       if (res.ok) {
         const data = await res.json();
-        this.users = data.users || [];
-        this.renderUserTable(this.users);
+        usersList = data.users || [];
       }
     } catch (e) {
-      console.error('Failed to load users:', e);
+      console.warn('Local users API skipped');
+    }
+
+    // Query live registered users from Firebase Firestore Database
+    if (window.firebase && window.firebase.firestore) {
+      try {
+        const snap = await firebase.firestore().collection('users').get();
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (!usersList.some(u => u.email === d.email || u.id === doc.id)) {
+            usersList.push({
+              id: doc.id,
+              name: d.name || 'Engineer',
+              email: d.email,
+              role: d.role || 'student',
+              enrolledCourses: d.enrolledCourses || [],
+              createdAt: d.createdAt || d.lastLoginAt || new Date().toISOString()
+            });
+          }
+        });
+      } catch (err) {
+        console.warn('Firestore admin users query notice:', err.message);
+      }
+    }
+
+    // Query live registered users from Firebase Realtime Database
+    if (window.firebase && window.firebase.database) {
+      try {
+        const snap = await firebase.database().ref('users').once('value');
+        const val = snap.val();
+        if (val) {
+          Object.keys(val).forEach(uid => {
+            const d = val[uid];
+            if (!usersList.some(u => u.email === d.email || u.id === uid)) {
+              usersList.push({
+                id: uid,
+                name: d.name || 'Engineer',
+                email: d.email,
+                role: d.role || 'student',
+                enrolledCourses: d.enrolledCourses || [],
+                createdAt: d.lastLoginAt || new Date().toISOString()
+              });
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Realtime DB admin users query notice:', err.message);
+      }
+    }
+
+    if (usersList.length > 0) {
+      this.users = usersList;
+      this.renderUserTable(this.users);
+      const statTotal = document.getElementById('statTotalStudents');
+      if (statTotal) statTotal.textContent = this.users.length;
+    } else {
+      this.renderUserTable([]);
     }
   },
 

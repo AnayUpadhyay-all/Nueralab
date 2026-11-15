@@ -6,6 +6,13 @@
   <title>Student Learning OS | Neuralab</title>
   <link rel="stylesheet" href="assets/css/neuralab.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="assets/js/firebase-auth.js"></script>
 </head>
 <body style="background:var(--bg-primary);">
 
@@ -88,22 +95,42 @@
   <script src="assets/js/app.js"></script>
   <script>
     window.addEventListener('DOMContentLoaded', async () => {
-      const token = localStorage.getItem('neuralab_jwt');
-      if (!token) {
-        window.location.href = 'login.html?redirect=neural-platform.html';
-        return;
-      }
-
       const grid = document.getElementById('enrolledTracksGrid');
       const count = document.getElementById('enrolledCount');
       const userEl = document.getElementById('welcomeUser');
 
-      const cachedUser = localStorage.getItem('neuralab_user');
-      if (cachedUser) {
-        try {
-          const u = JSON.parse(cachedUser);
-          if (u.name) userEl.textContent = `${u.name}'s Systems Mastery Track`;
-        } catch (e) {}
+      function updateUserUI(u) {
+        if (!u) return;
+        const name = u.name || u.displayName || 'Engineer';
+        userEl.innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            ${u.photoURL ? `<img src="${u.photoURL}" style="width:38px; height:38px; border-radius:50%; border:2px solid #3b82f6;" alt="${name}">` : ''}
+            <span>${name}'s Systems Mastery Track</span>
+          </div>
+        `;
+      }
+
+      // 1. Check cached session first for instant render
+      const cached = localStorage.getItem('neuralab_user') || localStorage.getItem('nuerlab_user');
+      if (cached) {
+        try { updateUserUI(JSON.parse(cached)); } catch (e) {}
+      }
+
+      // 2. Listen to live Firebase User
+      if (window.NeuralabFirebase) {
+        window.NeuralabFirebase.onUserChange((fbUser) => {
+          if (fbUser) {
+            updateUserUI(fbUser);
+          } else if (!localStorage.getItem('neuralab_jwt')) {
+            window.location.href = 'login.html?redirect=neural-platform.html';
+          }
+        });
+      }
+
+      const token = localStorage.getItem('neuralab_jwt');
+      if (!token && !window.NeuralabFirebase?.currentUser) {
+        window.location.href = 'login.html?redirect=neural-platform.html';
+        return;
       }
 
       let enrollments = [];

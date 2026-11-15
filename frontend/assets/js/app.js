@@ -23,6 +23,26 @@ const App = {
 
   async init() {
     this.setupAuthUI();
+
+    // Hook Firebase Auth state and database listener
+    if (window.NeuralabFirebase) {
+      try {
+        await window.NeuralabFirebase.init();
+        window.NeuralabFirebase.onUserChange((user) => {
+          if (user) {
+            this.state.user = user;
+            this.state.token = 'fb_' + user.uid;
+          } else {
+            this.state.user = null;
+            this.state.token = null;
+          }
+          this.setupAuthUI();
+        });
+      } catch (err) {
+        console.warn('Firebase init caught in App:', err);
+      }
+    }
+
     await this.fetchCurrentUser();
     await this.fetchCourses();
     this.bindEvents();
@@ -75,11 +95,19 @@ const App = {
     const base = this.getBasePath();
     if (this.state.user) {
       const isAdmin = this.state.user.role === 'admin';
+      const userName = this.state.user.name || this.state.user.displayName || 'Engineer';
+      const avatarImg = this.state.user.photoURL 
+        ? `<img src="${this.state.user.photoURL}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; border:1px solid #3b82f6;" alt="${this.escapeHTML(userName)}">` 
+        : `<span style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:#27272a; color:#fff; font-size:0.75rem; font-weight:700;">${userName.charAt(0).toUpperCase()}</span>`;
+
       navActions.innerHTML = `
         <div style="display:flex; align-items:center; gap: 0.75rem;">
           ${isAdmin ? `<a href="${base}admin.html" class="btn btn-secondary btn-sm">Admin Panel</a>` : ''}
           <a href="${base}neural-platform.html" class="btn btn-secondary btn-sm">Dashboard</a>
-          <span style="font-size:0.85rem; color:var(--text-secondary);">${this.escapeHTML(this.state.user.name)}</span>
+          <div style="display:flex; align-items:center; gap:0.45rem;">
+            ${avatarImg}
+            <span style="font-size:0.85rem; color:#fff; font-weight:600;">${this.escapeHTML(userName)}</span>
+          </div>
           <button id="logoutBtn" class="btn btn-secondary btn-sm" style="padding:0.35rem 0.65rem;">Sign Out</button>
         </div>
       `;
@@ -453,10 +481,14 @@ const App = {
     }
   },
 
-  logout(redirect = true) {
+  async logout(redirect = true) {
+    if (window.NeuralabFirebase) {
+      try { await window.NeuralabFirebase.logout(); } catch (e) {}
+    }
     localStorage.removeItem('neuralab_jwt');
     localStorage.removeItem('neuralab_csrf');
     localStorage.removeItem('neuralab_user');
+    localStorage.removeItem('nuerlab_user');
     this.state.token = null;
     this.state.user = null;
     this.state.csrfToken = null;

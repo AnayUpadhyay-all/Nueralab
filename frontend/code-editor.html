@@ -118,6 +118,7 @@
         <option value="js">JavaScript (V8 Engine)</option>
       </select>
       <button id="runCodeBtn" class="btn btn-primary btn-sm">▶ Execute / Compile</button>
+      <span id="studioUserName" style="font-size:0.82rem; color:var(--text-secondary); font-family:var(--font-mono);"></span>
       <a href="index.html" class="btn btn-secondary btn-sm">Exit Studio</a>
     </div>
   </header>
@@ -319,6 +320,16 @@ console.log("[GC] Scavenge Young Generation: 0ms pauses.");`
     }
 
     loadFile('main.cpp');
+
+    // Display authenticated engineer from Firebase session
+    try {
+      const cached = localStorage.getItem('neuralab_user') || localStorage.getItem('nuerlab_user');
+      if (cached) {
+        const u = JSON.parse(cached);
+        const nameEl = document.getElementById('studioUserName');
+        if (nameEl && u.name) nameEl.textContent = `// ${u.name}`;
+      }
+    } catch (e) {}
 
     document.querySelectorAll('.file-item').forEach(el => {
       el.addEventListener('click', () => {
