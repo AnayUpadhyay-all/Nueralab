@@ -206,6 +206,19 @@
             document.getElementById('accessCourseBtn').href = `courses/${encodeURIComponent(courseSlug)}.html`;
           }
 
+          // Update cached user session so unlocking is immediate across all tabs & pages
+          try {
+            const rawUser = localStorage.getItem('neuralab_user');
+            if (rawUser && targetCourse) {
+              const u = JSON.parse(rawUser);
+              if (!u.enrolledCourses) u.enrolledCourses = [];
+              if (!u.enrolledCourses.includes(targetCourse)) {
+                u.enrolledCourses.push(targetCourse);
+                localStorage.setItem('neuralab_user', JSON.stringify(u));
+              }
+            }
+          } catch (e) {}
+
           // Clear pending order
           sessionStorage.removeItem('pending_paypal_order');
           sessionStorage.removeItem('pending_paypal_capture');

@@ -474,7 +474,7 @@ const server = http.createServer(async (req, res) => {
       if (pathname === '/api/auth/me' && method === 'GET') {
         const authUser = getAuthUser(req);
         if (!authUser) return sendError(res, 401, 'Unauthorized');
-        const user = DB.users.find(u => u.id === authUser.id);
+        const user = DB.users.find(u => (authUser.id && u.id === authUser.id) || (authUser.email && u.email.toLowerCase() === authUser.email.toLowerCase()));
         if (!user) return sendError(res, 404, 'User not found');
 
         const csrfToken = generateCsrfToken(user.id);
@@ -532,7 +532,7 @@ const server = http.createServer(async (req, res) => {
         const course = DB.courses.find(c => c.id === courseId || c.slug === courseId);
         if (!course) return sendError(res, 404, 'Course not found in registry.');
 
-        const user = DB.users.find(u => u.id === authUser.id);
+        const user = DB.users.find(u => (authUser.id && u.id === authUser.id) || (authUser.email && u.email.toLowerCase() === authUser.email.toLowerCase()));
         const isEnrolled = user && (user.role === 'admin' || (user.enrolledCourses && user.enrolledCourses.includes(course.id)));
 
         if (!isEnrolled) {
@@ -1414,7 +1414,7 @@ async function capturePayPalOrder(orderId, course, authUser) {
         const authUser = getAuthUser(req);
         if (!authUser) return sendError(res, 401, 'Unauthorized');
 
-        const user = DB.users.find(u => u.id === authUser.id);
+        const user = DB.users.find(u => (authUser.id && u.id === authUser.id) || (authUser.email && u.email.toLowerCase() === authUser.email.toLowerCase()));
         if (!user) return sendError(res, 404, 'User not found');
 
         const enrolledIds = user.enrolledCourses || [];
