@@ -182,9 +182,16 @@
             })
           });
 
-          const data = await res.json();
-          if (!res.ok || !data.success) {
-            throw new Error(data.message || 'Payment capture failed or was rejected by PayPal.');
+          let data = null;
+          try {
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              data = await res.json();
+            }
+          } catch (e) {}
+
+          if (!res.ok || !data || !data.success) {
+            throw new Error((data && data.message) || 'Payment capture failed or verification endpoint not reachable.');
           }
 
           // Successfully captured or already verified!

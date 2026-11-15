@@ -56,21 +56,32 @@ const App = {
     }
   },
 
+  async parseJsonResponse(res) {
+    if (!res || !res.ok) return null;
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) return null;
+    try {
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  },
+
   async fetchCurrentUser() {
     if (!this.state.token) return;
     try {
       const res = await fetch('/api/auth/me', {
         headers: { 'Authorization': `Bearer ${this.state.token}` }
       });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await this.parseJsonResponse(res);
+      if (data && data.user) {
         this.state.user = data.user;
         this.state.csrfToken = data.csrfToken;
         localStorage.setItem('neuralab_csrf', data.csrfToken);
         localStorage.setItem('neuralab_user', JSON.stringify(data.user));
         this.setupAuthUI();
         return;
-      } else if (res.status === 401) {
+      } else if (res && res.status === 401) {
         this.logout(false);
         return;
       }
@@ -338,6 +349,8 @@ const App = {
         }
 
         sdkContainer.innerHTML = '';
+        if (payBtn) payBtn.style.display = 'none'; // Hide fallback button when official PayPal Smart Button renders
+
         try {
           window.paypal.Buttons({
             style: {
@@ -357,10 +370,8 @@ const App = {
                   },
                   body: JSON.stringify({ courseId: course.id })
                 });
-                if (res.ok) {
-                  const d = await res.json();
-                  if (d.orderId) return d.orderId;
-                }
+                const d = await App.parseJsonResponse(res);
+                if (d && d.orderId) return d.orderId;
               } catch (e) {}
 
               // 2. Client-side PayPal Sandbox order creation (works directly on GitHub Pages!)
@@ -391,14 +402,12 @@ const App = {
                   },
                   body: JSON.stringify({ orderId: data.orderID, courseId: course.id })
                 });
-                if (capRes.ok) {
-                  const capData = await capRes.json();
-                  if (capData.success) {
-                    captureId = capData.transactionId;
-                    if (capData.receipt) {
-                      buyerName = capData.receipt.buyerName || buyerName;
-                      buyerEmail = capData.receipt.buyerEmail || buyerEmail;
-                    }
+                const capData = await App.parseJsonResponse(capRes);
+                if (capData && capData.success) {
+                  captureId = capData.transactionId;
+                  if (capData.receipt) {
+                    buyerName = capData.receipt.buyerName || buyerName;
+                    buyerEmail = capData.receipt.buyerEmail || buyerEmail;
                   }
                 }
               } catch (e) {}
@@ -424,6 +433,7 @@ const App = {
           }).render('#paypalSmartButtons');
         } catch (renderErr) {
           console.warn('Could not render PayPal button:', renderErr);
+          if (payBtn) payBtn.style.display = 'block';
         }
       };
 
@@ -498,9 +508,10 @@ const App = {
     const course = this.state.selectedCourse;
     if (!course) return;
 
-    if (!this.state.token) {
-      this.showToast('Please sign in before completing checkout.', 'error');
-      window.location.href = `login.html?redirect=index.html&courseId=${encodeURIComponent(course.id)}`;
+    // If official PayPal Smart Button is rendered, guide buyer to it
+    const smartButton = document.querySelector('#paypalSmartButtons iframe, #paypalSmartButtons .paypal-buttons');
+    if (smartButton) {
+      this.showToast('Please click the yellow PayPal button above to complete checkout.', 'info');
       return;
     }
 
@@ -511,25 +522,23 @@ const App = {
     }
 
     try {
-      // 1. Create order on backend (Server verifies price against DB & generates genuine PayPal Sandbox order)
-      const createRes = await fetch('/api/payments/paypal/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.state.token}`
-        },
-        body: JSON.stringify({ courseId: course.id })
-      });
-
-      const orderData = await createRes.json();
-      if (!createRes.ok || !orderData.orderId) {
-        throw new Error(orderData.message || 'PayPal order creation failed.');
-      }
+      // 1. Try server-side order creation if backend is reachable
+      let orderData = null;
+      try {
+        const createRes = await fetch('/api/payments/paypal/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.state.token}`
+          },
+          body: JSON.stringify({ courseId: course.id })
+        });
+        orderData = await this.parseJsonResponse(createRes);
+      } catch (e) {}
 
       // If PayPal Sandbox approveUrl was returned, redirect student to official PayPal Sandbox checkout!
-      if (orderData.approveUrl) {
+      if (orderData && orderData.approveUrl) {
         this.showToast('Redirecting to official PayPal Sandbox checkout...', 'info');
-        // Store pending order details in sessionStorage for seamless callback matching
         sessionStorage.setItem('pending_paypal_order', JSON.stringify({
           orderId: orderData.orderId,
           courseId: course.id,
@@ -542,38 +551,15 @@ const App = {
         return;
       }
 
-      // Fallback: in-situ capture if direct capture requested
-      const captureRes = await fetch('/api/payments/paypal/capture-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.state.token}`
-        },
-        body: JSON.stringify({
-          orderId: orderData.orderId,
-          courseId: course.id
-        })
-      });
-
-      const captureData = await captureRes.json();
-      if (!captureRes.ok || !captureData.success) {
-        throw new Error(captureData.message || 'Payment capture failed.');
-      }
-
-      // Success! Render receipt & unlock course
-      this.closePayPalModal();
-      this.showReceiptModal(captureData.receipt, course, captureData.transactionId);
-      this.showToast(`Enrolled in "${course.title}" successfully!`, 'success');
-
-      if (!this.state.user.enrolledCourses) this.state.user.enrolledCourses = [];
-      this.state.user.enrolledCourses.push(course.id);
-
+      // If on static site (e.g. GitHub Pages) and no backend order returned,
+      // prompt student to click the PayPal Smart Button
+      this.showToast('Please click the yellow PayPal button above to proceed with checkout.', 'info');
     } catch (err) {
-      this.showToast(err.message, 'error');
+      this.showToast(err.message || 'PayPal checkout error.', 'error');
     } finally {
       if (payBtn) {
         payBtn.disabled = false;
-        payBtn.textContent = 'Proceed to PayPal Sandbox Checkout →';
+        payBtn.textContent = 'Proceed with PayPal Sandbox →';
       }
     }
   },
