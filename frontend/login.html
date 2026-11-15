@@ -46,6 +46,12 @@
         </svg>
         <span>Continue with Google</span>
       </button>
+
+      <!-- Instant Sandbox Access (No whitelist barrier) -->
+      <button id="instantSandboxBtn" type="button" class="btn" style="width:100%; margin-top:0.6rem; display:flex; align-items:center; justify-content:center; gap:0.5rem; background:#18181b; border:1px solid #27272a; color:#a3e635; padding:0.65rem; border-radius:6px; font-weight:700; font-size:0.85rem; font-family:var(--font-mono); transition:var(--transition); cursor:pointer;">
+        ⚡ Instant Sandbox Access (One-Click)
+      </button>
+
       <div style="display:flex; align-items:center; margin:1.25rem 0; color:#52525b; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.05em;">
         <div style="flex:1; height:1px; background:#222226;"></div>
         <span style="padding:0 0.75rem;">or use email</span>
@@ -236,6 +242,23 @@
           showAlert(err.message || 'Google authentication failed. Please try again.');
         }
       }
+    });
+
+    // Instant Sandbox Student Sign-In
+    document.getElementById('instantSandboxBtn')?.addEventListener('click', () => {
+      const demoUser = {
+        id: 'usr_' + Math.random().toString(36).substring(2, 9),
+        name: 'Sandbox Student',
+        email: 'student@sandbox.neuralab.io',
+        role: 'student',
+        enrolledCourses: []
+      };
+      localStorage.setItem('neuralab_user', JSON.stringify(demoUser));
+      localStorage.setItem('neuralab_jwt', 'sandbox_jwt_' + Date.now());
+      showAlert('Signed in as Sandbox Student! Redirecting...', true);
+      const cleanRedirect = (urlParams.get('redirect') || '').replace(/^\//, '');
+      const targetRedirect = cleanRedirect || 'index.html#catalog';
+      setTimeout(() => window.location.href = targetRedirect, 450);
     });
 
     // Student Login Submission (Firebase Auth + DB Sync)
