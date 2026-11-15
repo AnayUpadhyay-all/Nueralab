@@ -142,11 +142,9 @@ const App = {
     // 1. Try server API
     try {
       const res = await fetch(`/api/courses${query}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.courses && data.courses.length > 0) {
-          loadedCourses = data.courses;
-        }
+      const data = await this.parseJsonResponse(res);
+      if (data && data.courses && data.courses.length > 0) {
+        loadedCourses = data.courses;
       }
     } catch (err) {
       // API not reachable
@@ -157,24 +155,25 @@ const App = {
       try {
         const basePath = this.getBasePath();
         const staticRes = await fetch(`${basePath}assets/data/courses.json`);
-        if (staticRes.ok) {
-          let list = await staticRes.json();
+        const list = await this.parseJsonResponse(staticRes);
+        if (list && Array.isArray(list)) {
+          let filtered = list;
           if (query) {
             const params = new URLSearchParams(query.replace('?', ''));
             const search = (params.get('search') || '').toLowerCase();
             const category = params.get('category');
             if (search) {
-              list = list.filter(c => 
+              filtered = filtered.filter(c => 
                 (c.title && c.title.toLowerCase().includes(search)) || 
                 (c.description && c.description.toLowerCase().includes(search)) ||
                 (c.category && c.category.toLowerCase().includes(search))
               );
             }
             if (category && category !== 'all') {
-              list = list.filter(c => c.category && c.category.toLowerCase() === category.toLowerCase());
+              filtered = filtered.filter(c => c.category && c.category.toLowerCase() === category.toLowerCase());
             }
           }
-          loadedCourses = list;
+          loadedCourses = filtered;
         }
       } catch (e) {
         console.warn('Could not load static courses fallback:', e);
@@ -259,8 +258,8 @@ const App = {
     if (!course) {
       try {
         const res = await fetch(`/api/courses/${encodeURIComponent(courseId)}`);
-        if (res.ok) {
-          const data = await res.json();
+        const data = await this.parseJsonResponse(res);
+        if (data && data.course) {
           course = data.course;
         }
       } catch (err) {}
@@ -313,34 +312,30 @@ const App = {
               Official PayPal Sandbox Active
             </strong>
           </div>
-          <p style="color:#a1a1aa; font-size:0.8rem; margin:0; line-height:1.4;">
-            Live PayPal Sandbox test mode. Pay using your PayPal Sandbox buyer account to unlock lifetime curriculum access.
+          <p style="color:#a1a1aa; font-size:0.8rem; margin:0 0 0.5rem; line-height:1.4;">
+            Official PayPal Sandbox Test Mode.
           </p>
+          <div style="background:#1c1917; border:1px solid #44403c; padding:0.55rem 0.75rem; border-radius:4px; font-size:0.75rem; color:#fde047; line-height:1.4;">
+            💡 <strong>Sandbox Test Account:</strong> Log in with your PayPal Sandbox Personal (Buyer) test account. You do <strong>not</strong> need to provide any real debit or credit card, CVV, or phone number.
+          </div>
         </div>
       `;
     }
 
     if (payBtn) {
-      payBtn.style.display = 'block';
-      payBtn.disabled = false;
-      payBtn.textContent = 'Proceed with PayPal Sandbox →';
+      payBtn.style.display = 'none'; // The official PayPal button is the only checkout button
     }
 
     // Try fetching active backend configuration if available
     try {
       const cfgRes = await fetch('/api/payments/paypal/config');
-      if (cfgRes.ok) {
-        const cfg = await cfgRes.json();
-        if (cfg.clientId) clientId = cfg.clientId;
-        if (cfg.environment) environment = cfg.environment;
-      }
-    } catch (e) {
-      // Backend not running on static site (e.g. GitHub Pages) - uses clientId fallback
-    }
+      const cfg = await this.parseJsonResponse(cfgRes);
+      if (cfg && cfg.clientId) clientId = cfg.clientId;
+    } catch (e) {}
 
     // Mount official PayPal Smart Buttons SDK
     if (sdkContainer) {
-      sdkContainer.innerHTML = '<div style="text-align:center; padding:0.6rem; font-size:0.8rem; color:#a3e635; font-family:var(--font-mono);">⚡ Initializing PayPal Smart Buttons...</div>';
+      sdkContainer.innerHTML = '<div style="text-align:center; padding:0.6rem; font-size:0.8rem; color:#a3e635; font-family:var(--font-mono);">⚡ Loading PayPal Sandbox Button...</div>';
 
       const renderButtons = () => {
         if (!window.paypal || !window.paypal.Buttons) {
@@ -349,37 +344,22 @@ const App = {
         }
 
         sdkContainer.innerHTML = '';
-        if (payBtn) payBtn.style.display = 'none'; // Hide fallback button when official PayPal Smart Button renders
+        if (payBtn) payBtn.style.display = 'none';
 
         try {
-          window.paypal.Buttons({
+          const buttonConfig = {
             style: {
               layout: 'vertical',
               color: 'gold',
               shape: 'rect',
               label: 'paypal'
             },
-            createOrder: async (data, actions) => {
-              // 1. Try server-side order creation if backend is reachable
-              try {
-                const res = await fetch('/api/payments/paypal/create-order', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${App.state.token}`
-                  },
-                  body: JSON.stringify({ courseId: course.id })
-                });
-                const d = await App.parseJsonResponse(res);
-                if (d && d.orderId) return d.orderId;
-              } catch (e) {}
-
-              // 2. Client-side PayPal Sandbox order creation (works directly on GitHub Pages!)
+            createOrder: (data, actions) => {
+              // Direct client-side PayPal Sandbox order creation (completely eliminates 404 & JSON.parse issues)
               return actions.order.create({
                 intent: 'CAPTURE',
                 purchase_units: [{
                   description: `Neuralab: ${course.title}`,
-                  custom_id: `${App.state.user?.id || 'guest'}|${App.state.user?.email || 'buyer@sandbox.io'}`,
                   amount: {
                     currency_code: 'USD',
                     value: Number(course.price || 149).toFixed(2)
@@ -388,52 +368,35 @@ const App = {
               });
             },
             onApprove: async (data, actions) => {
-              let captureId = null;
+              let captureId = data.orderID;
               let buyerName = 'PayPal Sandbox Buyer';
               let buyerEmail = 'buyer@sandbox.paypal.com';
 
-              // Try backend capture first
               try {
-                const capRes = await fetch('/api/payments/paypal/capture-order', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${App.state.token}`
-                  },
-                  body: JSON.stringify({ orderId: data.orderID, courseId: course.id })
-                });
-                const capData = await App.parseJsonResponse(capRes);
-                if (capData && capData.success) {
-                  captureId = capData.transactionId;
-                  if (capData.receipt) {
-                    buyerName = capData.receipt.buyerName || buyerName;
-                    buyerEmail = capData.receipt.buyerEmail || buyerEmail;
-                  }
-                }
-              } catch (e) {}
-
-              // Client-side capture if running statically (GitHub Pages)
-              if (!captureId && actions && actions.order) {
-                try {
-                  const details = await actions.order.capture();
-                  captureId = details.id || details.purchase_units?.[0]?.payments?.captures?.[0]?.id || data.orderID;
-                  const payer = details.payer || {};
-                  buyerName = `${payer.name?.given_name || ''} ${payer.name?.surname || ''}`.trim() || buyerName;
-                  buyerEmail = payer.email_address || buyerEmail;
-                } catch (err) {
-                  captureId = data.orderID;
-                }
+                const details = await actions.order.capture();
+                captureId = details.id || (details.purchase_units && details.purchase_units[0]?.payments?.captures?.[0]?.id) || data.orderID;
+                const payer = details.payer || {};
+                buyerName = (payer.name && payer.name.given_name) ? `${payer.name.given_name} ${payer.name.surname || ''}`.trim() : buyerName;
+                buyerEmail = payer.email_address || buyerEmail;
+              } catch (err) {
+                console.warn('Capture details notice:', err);
               }
 
-              App.unlockAndEnroll(course, captureId || data.orderID, data.orderID, buyerName, buyerEmail);
+              App.unlockAndEnroll(course, captureId, data.orderID, buyerName, buyerEmail);
             },
             onError: (err) => {
               console.warn('PayPal Buttons Event:', err);
             }
-          }).render('#paypalSmartButtons');
+          };
+
+          // If funding option exists, force PayPal wallet only to prevent debit card prompts
+          if (window.paypal.FUNDING && window.paypal.FUNDING.PAYPAL) {
+            buttonConfig.fundingSource = window.paypal.FUNDING.PAYPAL;
+          }
+
+          window.paypal.Buttons(buttonConfig).render('#paypalSmartButtons');
         } catch (renderErr) {
           console.warn('Could not render PayPal button:', renderErr);
-          if (payBtn) payBtn.style.display = 'block';
         }
       };
 
