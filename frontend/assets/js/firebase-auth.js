@@ -99,37 +99,43 @@ const NeuralabFirebase = {
       ...extra
     };
 
-    // Save directly to Firestore database
-    if (this.firestore) {
-      try {
-        await this.firestore.collection('users').doc(fbUser.uid).set(userData, { merge: true });
-        console.log('[Firebase] User name and profile saved to Firestore:', userData.name);
-      } catch (err) {
-        console.warn('[Firebase] Firestore write notice:', err.message);
-      }
-    }
+    // Cache locally immediately so the user can proceed without delay
+    this.cacheUserLocally(userData);
 
-    // Save directly to Realtime Database
-    if (this.database) {
-      try {
-        await this.database.ref('users/' + fbUser.uid).update(userData);
-        console.log('[Firebase] User name saved to Realtime Database:', userData.name);
-      } catch (err) {
-        console.warn('[Firebase] Realtime DB write notice:', err.message);
-      }
-    }
-
-    // Try to get fresh persisted document from Firestore
-    if (this.firestore) {
-      try {
-        const doc = await this.firestore.collection('users').doc(fbUser.uid).get();
-        if (doc.exists) {
-          const data = doc.data();
-          if (data && data.name) userData.name = data.name;
-          if (data && data.role) userData.role = data.role;
+    // Save asynchronously to databases without blocking UI redirect
+    const savePromise = (async () => {
+      // 1. Save to Cloud Firestore
+      if (this.firestore) {
+        try {
+          await Promise.race([
+            this.firestore.collection('users').doc(fbUser.uid).set(userData, { merge: true }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 3000))
+          ]);
+          console.log('[Firebase] User name saved to Firestore:', userData.name);
+        } catch (err) {
+          console.warn('[Firebase] Firestore write notice:', err.message);
         }
-      } catch (e) {}
-    }
+      }
+
+      // 2. Save to Realtime Database
+      if (this.database) {
+        try {
+          await Promise.race([
+            this.database.ref('users/' + fbUser.uid).update(userData),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('RTDB timeout')), 3000))
+          ]);
+          console.log('[Firebase] User name saved to Realtime Database:', userData.name);
+        } catch (err) {
+          console.warn('[Firebase] Realtime DB write notice:', err.message);
+        }
+      }
+    })();
+
+    // Do not await database writes if they take longer than 800ms
+    await Promise.race([
+      savePromise,
+      new Promise(resolve => setTimeout(resolve, 800))
+    ]);
 
     return userData;
   },
@@ -138,7 +144,25 @@ const NeuralabFirebase = {
     await this.init();
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await this.auth.signInWithPopup(provider);
+    
+    // Attempt popup sign in with fallback awareness
+    let result;
+    try {
+      result = await this.auth.signInWithPopup(provider);
+    } catch (popupErr) {
+      console.error('[Firebase] signInWithPopup error:', popupErr);
+      if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/cancelled-popup-request') {
+        console.warn('[Firebase] Popup blocked, attempting signInWithRedirect...');
+        await this.auth.signInWithRedirect(provider);
+        return null;
+      }
+      throw popupErr;
+    }
+
+    if (!result || !result.user) {
+      throw new Error('Google identity provider returned no user credential.');
+    }
+
     const userProfile = await this.syncAndFetchUser(result.user);
     this.currentUser = userProfile;
     this.cacheUserLocally(userProfile);

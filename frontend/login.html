@@ -28,7 +28,7 @@
 
     <!-- Tab Selector -->
     <div style="display:flex; background:#141417; padding:0.25rem; border-radius:6px; margin-bottom:1.75rem; border:1px solid #222226;">
-      <button id="tabLogin" class="btn" style="flex:1; background:#ffffff; color:#000000; border-radius:4px; font-size:0.85rem; font-weight:600; padding:0.45rem;">Sign In</button>
+      <button id="tabLogin" class="btn" style="flex:1; background:#a3e635; color:#000000; border-radius:4px; font-size:0.85rem; font-weight:700; padding:0.45rem;">Sign In</button>
       <button id="tabRegister" class="btn" style="flex:1; background:transparent; color:#71717a; border-radius:4px; font-size:0.85rem; padding:0.45rem;">Register</button>
     </div>
 
@@ -151,16 +151,16 @@
 
     function showAlert(msg, isSuccess = false) {
       authAlert.style.display = 'block';
-      authAlert.style.background = isSuccess ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
-      authAlert.style.border = `1px solid ${isSuccess ? '#10b981' : '#ef4444'}`;
-      authAlert.style.color = isSuccess ? '#34d399' : '#f87171';
+      authAlert.style.background = isSuccess ? 'rgba(163, 230, 53, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+      authAlert.style.border = `1px solid ${isSuccess ? '#a3e635' : '#ef4444'}`;
+      authAlert.style.color = isSuccess ? '#bef264' : '#f87171';
       authAlert.textContent = msg;
     }
 
     tabLogin.addEventListener('click', () => {
-      tabLogin.style.background = '#ffffff';
+      tabLogin.style.background = '#a3e635';
       tabLogin.style.color = '#000000';
-      tabLogin.style.fontWeight = '600';
+      tabLogin.style.fontWeight = '700';
       tabRegister.style.background = 'transparent';
       tabRegister.style.color = '#71717a';
       tabRegister.style.fontWeight = 'normal';
@@ -170,9 +170,9 @@
     });
 
     tabRegister.addEventListener('click', () => {
-      tabRegister.style.background = '#ffffff';
+      tabRegister.style.background = '#a3e635';
       tabRegister.style.color = '#000000';
-      tabRegister.style.fontWeight = '600';
+      tabRegister.style.fontWeight = '700';
       tabLogin.style.background = 'transparent';
       tabLogin.style.color = '#71717a';
       tabLogin.style.fontWeight = 'normal';
@@ -186,6 +186,28 @@
       tabRegister.click();
     }
 
+    // Check for redirect result on return from Google Auth redirect
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (window.NeuralabFirebase) {
+          await window.NeuralabFirebase.init();
+          if (window.NeuralabFirebase.auth) {
+            const res = await window.NeuralabFirebase.auth.getRedirectResult();
+            if (res && res.user) {
+              const u = await window.NeuralabFirebase.syncAndFetchUser(res.user);
+              showAlert(`Welcome back, ${u.name}! Synchronized with Firebase. Redirecting...`, true);
+              const cleanRedirect = (urlParams.get('redirect') || '').replace(/^\//, '');
+              const targetRedirect = cleanRedirect || (u.role === 'admin' ? 'admin.html' : 'neural-platform.html');
+              setTimeout(() => window.location.href = targetRedirect, 600);
+              return;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Redirect auth check notice:', err);
+      }
+    });
+
     // Google Identity Provider Sign In
     document.getElementById('googleSignInBtn')?.addEventListener('click', async () => {
       showAlert('Connecting to Google Identity...', true);
@@ -195,15 +217,24 @@
 
       try {
         const user = await window.NeuralabFirebase.loginWithGoogle();
-        showAlert(`Authenticated as ${user.name}. Name saved to Firebase Database! Redirecting...`, true);
-        const cleanRedirect = (urlParams.get('redirect') || '').replace(/^\//, '');
-        const targetRedirect = cleanRedirect || (user.role === 'admin' ? 'admin.html' : 'neural-platform.html');
-        setTimeout(() => window.location.href = targetRedirect, 700);
+        if (user) {
+          showAlert(`Authenticated as ${user.name}. Name saved to Firebase Database! Redirecting...`, true);
+          const cleanRedirect = (urlParams.get('redirect') || '').replace(/^\//, '');
+          const targetRedirect = cleanRedirect || (user.role === 'admin' ? 'admin.html' : 'neural-platform.html');
+          setTimeout(() => window.location.href = targetRedirect, 600);
+        }
       } catch (err) {
         console.error('Google Sign In Error:', err);
-        showAlert(err.message || 'Google authentication failed. Please try again.');
         btn.style.opacity = '1';
         btn.style.pointerEvents = 'auto';
+
+        if (err.code === 'auth/unauthorized-domain') {
+          showAlert(`Domain authorization required: Add "${window.location.hostname}" in Firebase Console > Authentication > Settings > Authorized Domains. Alternatively, use Email Sign In below.`);
+        } else if (err.code === 'auth/popup-closed-by-user') {
+          showAlert('Sign-in cancelled. Click "Continue with Google" to retry.');
+        } else {
+          showAlert(err.message || 'Google authentication failed. Please try again.');
+        }
       }
     });
 
