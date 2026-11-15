@@ -1,0 +1,24 @@
+# Environment variables and secrets (NEVER LEAK TO GITHUB)
+.env
+.env.*
+*.env
+*.env.local
+backend/.env
+backend/.env.*
+
+# Node dependencies
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data & logs
+logs/
+*.log
+
+# Editor & System files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
