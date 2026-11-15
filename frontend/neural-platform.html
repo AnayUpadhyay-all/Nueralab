@@ -90,6 +90,34 @@
         <a href="courses/databases.html" class="btn btn-secondary btn-sm" style="margin-top:1rem;">Launch Lab Module</a>
       </div>
     </div>
+
+    <!-- PayPal Transactions & Receipts -->
+    <div style="margin-top:3.5rem; margin-bottom:2rem;">
+      <div style="margin-bottom:1.25rem;">
+        <h2 style="font-size:1.5rem; margin-bottom:0.25rem;">Billing & PayPal Transactions</h2>
+        <p style="color:var(--text-secondary); font-size:0.85rem;">Official PayPal Sandbox transaction receipts, verified capture IDs, and enrollment audit trail.</p>
+      </div>
+      <div class="card" style="padding:1.5rem; background:#0d0d10; border:1px solid #222226; border-radius:8px; overflow-x:auto;">
+        <table style="width:100%; text-align:left; border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:1px solid #222226;">
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Env</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Capture ID</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">PayPal Order ID</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Course Track</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Amount</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Status</th>
+              <th style="padding:0.75rem; color:#71717a; font-size:0.75rem; font-family:var(--font-mono); text-transform:uppercase;">Date</th>
+            </tr>
+          </thead>
+          <tbody id="studentTransactionsBody">
+            <tr>
+              <td colspan="7" style="padding:2rem; text-align:center; color:#71717a; font-size:0.85rem;">Loading verified transactions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script src="assets/js/app.js"></script>
@@ -184,6 +212,45 @@
           <a href="courses/${encodeURIComponent(c.file || c.slug + '.html')}" class="btn btn-primary btn-sm" style="margin-top:1.25rem;">Resume Course Material →</a>
         </div>
       `).join('');
+
+      // 3. Load Student PayPal Transaction History
+      const txBody = document.getElementById('studentTransactionsBody');
+      try {
+        const txRes = await fetch('/api/payments/transactions', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (txRes.ok) {
+          const txData = await txRes.json();
+          const orders = txData.orders || [];
+          if (orders.length === 0) {
+            txBody.innerHTML = '<tr><td colspan="7" style="padding:2rem; text-align:center; color:#71717a; font-size:0.85rem;">No PayPal transactions recorded yet. Complete track checkout to populate ledger.</td></tr>';
+          } else {
+            txBody.innerHTML = orders.map(o => {
+              const isSandbox = (o.environment || 'sandbox').toLowerCase() === 'sandbox';
+              const envBadge = isSandbox
+                ? '<span style="background:rgba(163,230,53,0.15); color:#a3e635; border:1px solid rgba(163,230,53,0.3); padding:0.15rem 0.45rem; border-radius:4px; font-size:0.7rem; font-family:var(--font-mono); font-weight:700;">SANDBOX</span>'
+                : '<span style="background:rgba(59,130,246,0.15); color:#3b82f6; border:1px solid rgba(59,130,246,0.3); padding:0.15rem 0.45rem; border-radius:4px; font-size:0.7rem; font-family:var(--font-mono); font-weight:700;">LIVE</span>';
+
+              return `
+                <tr style="border-bottom:1px solid #1a1a1f;">
+                  <td style="padding:0.75rem;">${envBadge}</td>
+                  <td style="padding:0.75rem; font-family:var(--font-mono); font-size:0.8rem; color:#a3e635; font-weight:600;">${o.id || 'N/A'}</td>
+                  <td style="padding:0.75rem; font-family:var(--font-mono); font-size:0.75rem; color:#71717a;">${o.paypalOrderId || 'N/A'}</td>
+                  <td style="padding:0.75rem; color:#ffffff; font-weight:600; font-size:0.88rem;">${o.courseTitle || o.courseId}</td>
+                  <td style="padding:0.75rem; font-family:var(--font-mono); font-weight:700; color:#bef264;">$${Number(o.amount).toFixed(2)} ${o.currency || 'USD'}</td>
+                  <td style="padding:0.75rem;"><span style="background:rgba(163,230,53,0.1); color:#a3e635; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700; font-family:var(--font-mono);">COMPLETED</span></td>
+                  <td style="padding:0.75rem; color:#71717a; font-size:0.8rem;">${new Date(o.timestamp).toLocaleString()}</td>
+                </tr>
+              `;
+            }).join('');
+          }
+        } else {
+          txBody.innerHTML = '<tr><td colspan="7" style="padding:1.5rem; text-align:center; color:#71717a; font-size:0.85rem;">Sign in to view transaction history.</td></tr>';
+        }
+      } catch (err) {
+        console.warn('Could not load transactions:', err);
+        txBody.innerHTML = '<tr><td colspan="7" style="padding:1.5rem; text-align:center; color:#71717a; font-size:0.85rem;">Offline preview mode.</td></tr>';
+      }
     });
   </script>
 </body>

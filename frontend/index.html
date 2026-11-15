@@ -155,6 +155,7 @@
         <button id="closePaypalModalBtn" class="modal-close" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
+        <div id="paypalModalNotice"></div>
         <div style="background:#141417; padding:1.25rem; border-radius:6px; border:1px solid #28282e; margin-bottom:1.25rem;">
           <div style="font-size:0.75rem; text-transform:uppercase; color:#71717a; font-family:var(--font-mono); letter-spacing:0.05em;">Selected Track</div>
           <h4 id="paypalCourseTitle" style="font-size:1.15rem; color:#ffffff; margin:0.35rem 0 0.75rem;">Loading course...</h4>
@@ -165,12 +166,14 @@
         </div>
 
         <div style="border:1px solid #28282e; background:#0d0d10; padding:1rem; border-radius:6px; font-size:0.85rem; color:#a1a1aa; margin-bottom:1.5rem;">
-          Server-verified transaction. Includes lifetime curriculum access, repository source code, and interactive sandbox environments.
+          Official PayPal Sandbox verification. Includes lifetime curriculum access, repository source code, and interactive sandbox environments.
         </div>
+
+        <div id="paypalSmartButtons" style="margin-bottom:0.75rem;"></div>
 
         <div id="paypalButtonContainer">
           <button id="confirmPaypalBtn" class="btn btn-primary btn-lg" style="width:100%;">
-            Complete PayPal Checkout
+            Proceed to PayPal Sandbox Checkout →
           </button>
         </div>
       </div>

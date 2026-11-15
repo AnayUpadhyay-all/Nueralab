@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Verification — Neuralab</title>
+  <meta name="description" content="PayPal Sandbox Payment Verification and Course Enrollment Confirmation.">
+  <link rel="stylesheet" href="assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000%22/><text y=%22.75em%22 x=%2250%25%22 text-anchor=%22middle%22 font-size=%2260%22 fill=%22%23a3e635%22 font-family=%22sans-serif%22 font-weight=%22bold%22>N</text></svg>">
+</head>
+<body style="min-height:100vh; display:flex; flex-direction:column; justify-content:space-between; background:#000000;">
+
+  <!-- Simple Brand Navbar -->
+  <header style="border-bottom:1px solid #1f1f23; padding:1.25rem 2rem; background:#09090b;">
+    <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
+      <a href="index.html" style="text-decoration:none; color:#ffffff; font-weight:800; font-size:1.3rem; letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem;">
+        <span style="display:inline-block; width:12px; height:12px; background:#a3e635; border-radius:2px;"></span>
+        Neuralab
+      </a>
+      <a href="neural-platform.html" style="color:#a1a1aa; text-decoration:none; font-size:0.85rem; font-family:var(--font-mono);">
+        Student Dashboard &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- Verification Container -->
+  <main style="flex:1; display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem;">
+    <div class="card" style="max-width:580px; width:100%; padding:2.5rem 2rem; background:#0d0d10; border:1px solid #222226; border-radius:8px;">
+      
+      <!-- Processing State -->
+      <div id="processingState" style="text-align:center; padding:2rem 1rem;">
+        <div style="display:inline-block; width:48px; height:48px; border:3px solid #222226; border-top-color:#a3e635; border-radius:50%; animation:spin 1s linear infinite; margin-bottom:1.5rem;"></div>
+        <h2 style="font-size:1.4rem; font-weight:700; color:#ffffff; margin-bottom:0.5rem;">Verifying PayPal Payment...</h2>
+        <p style="color:#71717a; font-size:0.9rem; line-height:1.5;">
+          Communicating with PayPal Sandbox REST API to capture transaction and grant syllabus enrollment.
+        </p>
+      </div>
+
+      <!-- Success State -->
+      <div id="successState" style="display:none;">
+        <div style="text-align:center; margin-bottom:1.75rem;">
+          <div style="display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; background:rgba(163,230,53,0.15); border:1px solid rgba(163,230,53,0.4); border-radius:50%; margin-bottom:1rem; color:#a3e635; font-size:1.6rem;">
+            ✓
+          </div>
+          <div style="display:inline-block; background:rgba(163,230,53,0.1); border:1px solid rgba(163,230,53,0.3); color:#bef264; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; padding:0.25rem 0.6rem; border-radius:4px; text-transform:uppercase; margin-bottom:0.75rem;">
+            PayPal Sandbox Verified
+          </div>
+          <h2 style="font-size:1.5rem; font-weight:700; color:#ffffff; margin-bottom:0.35rem;">Enrollment Confirmed</h2>
+          <p style="color:#a1a1aa; font-size:0.88rem;">Your course access has been activated in the Neuralab Matrix.</p>
+        </div>
+
+        <div style="background:#141417; border:1px solid #222226; border-radius:6px; padding:1.25rem; margin-bottom:1.75rem; font-size:0.88rem; line-height:1.8;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1f1f23; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Course Track</span>
+            <span id="receiptCourseTitle" style="color:#ffffff; font-weight:600; text-align:right;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1f1f23; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Amount Paid</span>
+            <span id="receiptAmount" style="color:#a3e635; font-weight:700; font-family:var(--font-mono);">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1f1f23; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">PayPal Transaction ID</span>
+            <span id="receiptTxId" style="color:#ffffff; font-family:var(--font-mono); font-size:0.8rem; word-break:break-all;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1f1f23; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">PayPal Order Reference</span>
+            <span id="receiptOrderId" style="color:#71717a; font-family:var(--font-mono); font-size:0.8rem;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid #1f1f23; padding-bottom:0.5rem; margin-bottom:0.5rem;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Payer Account</span>
+            <span id="receiptPayer" style="color:#a1a1aa; font-size:0.82rem;">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:#71717a; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase;">Timestamp</span>
+            <span id="receiptTimestamp" style="color:#71717a; font-family:var(--font-mono); font-size:0.8rem;">-</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          <a id="accessCourseBtn" href="neural-platform.html" class="btn btn-primary" style="text-align:center; padding:0.85rem; font-weight:700; background:#a3e635; color:#000000; border-radius:6px; text-decoration:none;">
+            Launch Course Syllabus & Labs &rarr;
+          </a>
+          <a href="neural-platform.html" class="btn" style="text-align:center; padding:0.75rem; background:#141417; border:1px solid #28282e; color:#ffffff; border-radius:6px; text-decoration:none; font-size:0.85rem;">
+            Go to Student Dashboard
+          </a>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" style="display:none; text-align:center; padding:1.5rem 0.5rem;">
+        <div style="display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:50%; margin-bottom:1rem; color:#ef4444; font-size:1.6rem;">
+          ✕
+        </div>
+        <h2 style="font-size:1.4rem; font-weight:700; color:#ffffff; margin-bottom:0.5rem;">Verification Issue</h2>
+        <p id="errorMessage" style="color:#ef4444; font-size:0.88rem; margin-bottom:1.5rem; line-height:1.5;">
+          We could not verify the PayPal transaction.
+        </p>
+        <div style="display:flex; gap:0.75rem; justify-content:center;">
+          <button id="retryBtn" class="btn btn-primary" style="background:#a3e635; color:#000000;">Try Again</button>
+          <a href="index.html" class="btn" style="background:#141417; border:1px solid #28282e; color:#ffffff; text-decoration:none;">Back to Tracks</a>
+        </div>
+      </div>
+
+      <!-- Auth Required State -->
+      <div id="authRequiredState" style="display:none; text-align:center; padding:1.5rem 0.5rem;">
+        <div style="font-size:2.2rem; margin-bottom:0.75rem;">🔐</div>
+        <h2 style="font-size:1.35rem; font-weight:700; color:#ffffff; margin-bottom:0.5rem;">Sign In Required</h2>
+        <p style="color:#a1a1aa; font-size:0.88rem; margin-bottom:1.5rem; line-height:1.5;">
+          Please sign in to connect this verified PayPal transaction to your Neuralab engineer account.
+        </p>
+        <a id="signInRedirectBtn" href="login.html" class="btn btn-primary" style="background:#a3e635; color:#000000; text-decoration:none; display:inline-block; padding:0.75rem 1.75rem; font-weight:700;">
+          Sign In to Claim Track
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer style="border-top:1px solid #1f1f23; padding:1.5rem 2rem; text-align:center; color:#52525b; font-size:0.8rem; background:#09090b;">
+    Neuralab &bull; Systems Engineering &bull; Official PayPal Sandbox Gateway
+  </footer>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    (async function initReturnVerification() {
+      const params = new URLSearchParams(window.location.search);
+      // PayPal returns ?token=ORDER_ID&PayerID=PAYER_ID
+      const orderId = params.get('token') || params.get('orderId');
+      const courseId = params.get('courseId');
+      const payerId = params.get('PayerID');
+
+      const processingState = document.getElementById('processingState');
+      const successState = document.getElementById('successState');
+      const errorState = document.getElementById('errorState');
+      const authRequiredState = document.getElementById('authRequiredState');
+      const errorMessage = document.getElementById('errorMessage');
+
+      if (!orderId) {
+        processingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorMessage.textContent = 'No PayPal order reference (token) found in return callback URL.';
+        return;
+      }
+
+      // Check authentication
+      const token = localStorage.getItem('neuralab_jwt');
+      if (!token) {
+        // Save state in sessionStorage and redirect to login
+        sessionStorage.setItem('pending_paypal_capture', JSON.stringify({
+          orderId,
+          courseId,
+          payerId,
+          fullUrl: window.location.href
+        }));
+        processingState.style.display = 'none';
+        authRequiredState.style.display = 'block';
+        document.getElementById('signInRedirectBtn').href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+        return;
+      }
+
+      async function attemptCapture() {
+        processingState.style.display = 'block';
+        successState.style.display = 'none';
+        errorState.style.display = 'none';
+
+        try {
+          const res = await fetch('/api/payments/paypal/capture-order', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              orderId,
+              courseId,
+              payerId
+            })
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.message || 'Payment capture failed or was rejected by PayPal.');
+          }
+
+          // Successfully captured or already verified!
+          processingState.style.display = 'none';
+          successState.style.display = 'block';
+
+          const receipt = data.receipt || {};
+          document.getElementById('receiptCourseTitle').textContent = receipt.item || data.courseId || 'Systems Track';
+          document.getElementById('receiptAmount').textContent = receipt.amount || '$39.00 USD';
+          document.getElementById('receiptTxId').textContent = data.transactionId || receipt.transactionId || orderId;
+          document.getElementById('receiptOrderId').textContent = orderId;
+          document.getElementById('receiptPayer').textContent = receipt.buyerName || receipt.buyerEmail || 'PayPal Verified Buyer';
+          document.getElementById('receiptTimestamp').textContent = receipt.date ? new Date(receipt.date).toLocaleString() : new Date().toLocaleString();
+
+          // If course link exists, configure button
+          const targetCourse = data.courseId || courseId;
+          if (targetCourse) {
+            const courseSlug = targetCourse.replace('.html', '');
+            document.getElementById('accessCourseBtn').href = `courses/${encodeURIComponent(courseSlug)}.html`;
+          }
+
+          // Clear pending order
+          sessionStorage.removeItem('pending_paypal_order');
+          sessionStorage.removeItem('pending_paypal_capture');
+
+        } catch (err) {
+          processingState.style.display = 'none';
+          errorState.style.display = 'block';
+          errorMessage.textContent = err.message;
+        }
+      }
+
+      document.getElementById('retryBtn')?.addEventListener('click', attemptCapture);
+      await attemptCapture();
+    })();
+  </script>
+</body>
+</html>

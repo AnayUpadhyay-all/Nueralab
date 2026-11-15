@@ -242,11 +242,24 @@ const App = {
       return;
     }
 
+    // Require authentication before checkout
+    if (!this.state.token) {
+      sessionStorage.setItem('pending_course', course.id);
+      this.showToast('Please sign in to enroll in tracks.', 'info');
+      setTimeout(() => {
+        window.location.href = `login.html?redirect=index.html&courseId=${encodeURIComponent(course.id)}`;
+      }, 700);
+      return;
+    }
+
     this.state.selectedCourse = course;
     const modal = document.getElementById('paypalModal');
     const modalTitle = document.getElementById('paypalCourseTitle');
     const modalPrice = document.getElementById('paypalCoursePrice');
     const modalDuration = document.getElementById('paypalCourseDuration');
+    const noticeEl = document.getElementById('paypalModalNotice');
+    const payBtn = document.getElementById('confirmPaypalBtn');
+    const sdkContainer = document.getElementById('paypalSmartButtons');
 
     if (modal && modalTitle && modalPrice) {
       modalTitle.textContent = course.title;
@@ -254,20 +267,129 @@ const App = {
       if (modalDuration) modalDuration.textContent = course.duration || 'Self-Paced';
       modal.classList.add('active');
     }
+
+    // Check PayPal Gateway Configuration
+    if (noticeEl) {
+      noticeEl.innerHTML = `<div style="font-size:0.8rem; color:#71717a; padding:0.5rem; background:#141417; border-radius:4px; border:1px solid #222226;">Checking PayPal gateway status...</div>`;
+    }
+
+    try {
+      const cfgRes = await fetch('/api/payments/paypal/config');
+      const cfg = await cfgRes.json();
+
+      if (noticeEl) {
+        if (cfg.isConfigured) {
+          const isSandbox = cfg.environment === 'sandbox';
+          noticeEl.innerHTML = `
+            <div style="background:${isSandbox ? 'rgba(163,230,53,0.1)' : 'rgba(59,130,246,0.1)'}; border:1px solid ${isSandbox ? 'rgba(163,230,53,0.3)' : 'rgba(59,130,246,0.3)'}; padding:0.75rem 1rem; border-radius:6px; margin-bottom:1rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${isSandbox ? '#a3e635' : '#3b82f6'};"></span>
+                <strong style="color:#ffffff; font-size:0.85rem; font-family:var(--font-mono); text-transform:uppercase;">
+                  Official PayPal ${cfg.environment.toUpperCase()} Active
+                </strong>
+              </div>
+              <p style="color:#a1a1aa; font-size:0.8rem; margin:0; line-height:1.4;">
+                ${isSandbox 
+                  ? 'Real PayPal Sandbox checkout. You will sign in with your Sandbox buyer credentials or test account to complete the transaction.' 
+                  : 'Official PayPal Live checkout. Real payment processing.'}
+              </p>
+            </div>
+          `;
+          if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.textContent = `Proceed to PayPal ${isSandbox ? 'Sandbox' : ''} Checkout →`;
+          }
+
+          // Optional: Load official PayPal JS SDK if client ID is provided
+          if (cfg.clientId && sdkContainer && !window.paypalSdkLoaded) {
+            sdkContainer.innerHTML = '<div style="text-align:center; padding:0.5rem; font-size:0.8rem; color:#71717a;">Loading PayPal Smart Buttons...</div>';
+            const script = document.createElement('script');
+            script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(cfg.clientId)}&currency=USD&intent=capture`;
+            script.async = true;
+            script.onload = () => {
+              window.paypalSdkLoaded = true;
+              sdkContainer.innerHTML = '';
+              if (window.paypal && window.paypal.Buttons) {
+                window.paypal.Buttons({
+                  createOrder: async () => {
+                    const res = await fetch('/api/payments/paypal/create-order', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${NeuralabApp.state.token}`
+                      },
+                      body: JSON.stringify({ courseId: course.id })
+                    });
+                    const d = await res.json();
+                    if (!res.ok) throw new Error(d.message || 'Order creation failed');
+                    return d.orderId;
+                  },
+                  onApprove: async (data) => {
+                    const res = await fetch('/api/payments/paypal/capture-order', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${NeuralabApp.state.token}`
+                      },
+                      body: JSON.stringify({ orderId: data.orderID, courseId: course.id })
+                    });
+                    const captureData = await res.json();
+                    if (!res.ok || !captureData.success) throw new Error(captureData.message || 'Capture failed');
+                    NeuralabApp.closePayPalModal();
+                    NeuralabApp.showReceiptModal(captureData.receipt, course, captureData.transactionId);
+                    NeuralabApp.showToast(`Enrolled in "${course.title}" successfully!`, 'success');
+                  },
+                  onError: (err) => {
+                    NeuralabApp.showToast(`PayPal SDK Error: ${err.message || 'Payment failed'}`, 'error');
+                  }
+                }).render('#paypalSmartButtons');
+              }
+            };
+            script.onerror = () => {
+              sdkContainer.innerHTML = ''; // Silently fall back to redirect button
+            };
+            document.head.appendChild(script);
+          }
+        } else {
+          noticeEl.innerHTML = `
+            <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:0.75rem 1rem; border-radius:6px; margin-bottom:1rem;">
+              <strong style="color:#ef4444; font-size:0.85rem; display:block; margin-bottom:0.25rem;">
+                ⚠️ PayPal Sandbox Credentials Required
+              </strong>
+              <p style="color:#a1a1aa; font-size:0.8rem; margin:0; line-height:1.4;">
+                To process genuine test transactions, please add <code style="color:#fff;">PAYPAL_CLIENT_ID</code> and <code style="color:#fff;">PAYPAL_CLIENT_SECRET</code> to <code style="color:#fff;">backend/.env</code>.
+              </p>
+            </div>
+          `;
+          if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = 'PayPal Gateway Not Configured';
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Could not load PayPal config:', err);
+    }
   },
 
   async executePayPalPayment() {
     const course = this.state.selectedCourse;
     if (!course) return;
 
+    if (!this.state.token) {
+      this.showToast('Please sign in before completing checkout.', 'error');
+      window.location.href = `login.html?redirect=index.html&courseId=${encodeURIComponent(course.id)}`;
+      return;
+    }
+
     const payBtn = document.getElementById('confirmPaypalBtn');
     if (payBtn) {
       payBtn.disabled = true;
-      payBtn.textContent = 'Processing with PayPal...';
+      payBtn.textContent = 'Connecting to PayPal Sandbox API...';
     }
 
     try {
-      // 1. Create order on backend (Server verifies price against DB)
+      // 1. Create order on backend (Server verifies price against DB & generates genuine PayPal Sandbox order)
       const createRes = await fetch('/api/payments/paypal/create-order', {
         method: 'POST',
         headers: {
@@ -279,10 +401,26 @@ const App = {
 
       const orderData = await createRes.json();
       if (!createRes.ok || !orderData.orderId) {
-        throw new Error(orderData.message || 'Order creation failed.');
+        throw new Error(orderData.message || 'PayPal order creation failed.');
       }
 
-      // 2. Capture payment on backend
+      // If PayPal Sandbox approveUrl was returned, redirect student to official PayPal Sandbox checkout!
+      if (orderData.approveUrl) {
+        this.showToast('Redirecting to official PayPal Sandbox checkout...', 'info');
+        // Store pending order details in sessionStorage for seamless callback matching
+        sessionStorage.setItem('pending_paypal_order', JSON.stringify({
+          orderId: orderData.orderId,
+          courseId: course.id,
+          title: course.title,
+          amount: course.price
+        }));
+        setTimeout(() => {
+          window.location.href = orderData.approveUrl;
+        }, 600);
+        return;
+      }
+
+      // Fallback: in-situ capture if direct capture requested
       const captureRes = await fetch('/api/payments/paypal/capture-order', {
         method: 'POST',
         headers: {
@@ -300,7 +438,7 @@ const App = {
         throw new Error(captureData.message || 'Payment capture failed.');
       }
 
-      // 3. Success! Render receipt & unlock course
+      // Success! Render receipt & unlock course
       this.closePayPalModal();
       this.showReceiptModal(captureData.receipt, course, captureData.transactionId);
       this.showToast(`Enrolled in "${course.title}" successfully!`, 'success');
@@ -313,7 +451,7 @@ const App = {
     } finally {
       if (payBtn) {
         payBtn.disabled = false;
-        payBtn.textContent = 'Complete PayPal Checkout';
+        payBtn.textContent = 'Proceed to PayPal Sandbox Checkout →';
       }
     }
   },

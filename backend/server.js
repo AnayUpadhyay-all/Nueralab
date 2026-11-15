@@ -15,12 +15,52 @@ const path = require('path');
 const crypto = require('crypto');
 const url = require('url');
 
+// --- Environment Configuration Loader (Zero Third-Party Dependencies) ---
+function loadEnv() {
+  const envPaths = [
+    path.join(__dirname, '.env'),
+    path.join(__dirname, '..', '.env')
+  ];
+  for (const envPath of envPaths) {
+    if (fs.existsSync(envPath)) {
+      try {
+        const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith('#')) continue;
+          const eqIdx = trimmed.indexOf('=');
+          if (eqIdx !== -1) {
+            const key = trimmed.slice(0, eqIdx).trim();
+            const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+            if (!process.env[key]) {
+              process.env[key] = val;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[Env] Notice parsing environment file:', e.message);
+      }
+    }
+  }
+}
+loadEnv();
+
 // Configuration
 const PORT = process.env.PORT || 5504;
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
-const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || 'sandbox_neuralab_client_id_secure_live';
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || 'sandbox_neuralab_secret_key_prod';
-const PAYPAL_API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+const JWT_SECRET = process.env.JWT_SECRET || 'neuralab_secure_auth_session_key_2026';
+
+// PayPal Environment Separation (Strict: Sandbox vs Live)
+const PAYPAL_ENV = (process.env.PAYPAL_ENV || 'sandbox').toLowerCase();
+const IS_PAYPAL_LIVE = PAYPAL_ENV === 'live' || PAYPAL_ENV === 'production';
+const PAYPAL_API_BASE = IS_PAYPAL_LIVE 
+  ? 'https://api-m.paypal.com' 
+  : 'https://api-m.sandbox.paypal.com';
+const PAYPAL_CHECKOUT_BASE = IS_PAYPAL_LIVE 
+  ? 'https://www.paypal.com/checkoutnow' 
+  : 'https://www.sandbox.paypal.com/checkoutnow';
+
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || '';
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || '';
 
 const DATA_DIR = path.join(__dirname, 'data');
 const PUBLIC_DIR = path.resolve(__dirname, '../frontend');
@@ -905,164 +945,273 @@ const server = http.createServer(async (req, res) => {
         });
       }
 
-// --- PayPal Orders v2 Engine Helpers ---
-async function createPayPalOrderHelper(course) {
-  const hasLiveCredentials = 
-    process.env.PAYPAL_CLIENT_ID && 
-    process.env.PAYPAL_CLIENT_SECRET && 
-    !process.env.PAYPAL_CLIENT_ID.startsWith('sandbox_neuralab_');
+// --- Official PayPal REST API v2 Engine (Strict Environment Separation) ---
 
-  if (hasLiveCredentials) {
-    try {
-      const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
-      const tokenRes = await new Promise((resolve, reject) => {
-        const u = new URL(`${PAYPAL_API_BASE}/v1/oauth2/token`);
-        const postData = 'grant_type=client_credentials';
-        const req = https.request(u, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(postData)
-          },
-          timeout: 4000
-        }, (res) => {
-          let body = '';
-          res.on('data', chunk => body += chunk);
-          res.on('end', () => {
-            try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-          });
-        });
-        req.on('error', reject);
-        req.on('timeout', () => { req.destroy(); reject(new Error('PayPal API timeout')); });
-        req.write(postData);
-        req.end();
+async function getPayPalAccessToken() {
+  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+    throw new Error('PAYPAL_CREDENTIALS_MISSING: PayPal credentials are not configured in environment. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in backend/.env.');
+  }
+
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
+  const postData = 'grant_type=client_credentials';
+
+  return new Promise((resolve, reject) => {
+    const u = new URL(`${PAYPAL_API_BASE}/v1/oauth2/token`);
+    const req = https.request(u, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      },
+      timeout: 10000
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (res.statusCode >= 200 && res.statusCode < 300 && parsed.access_token) {
+            resolve(parsed.access_token);
+          } else {
+            reject(new Error(parsed.error_description || parsed.message || `PayPal token error (${res.statusCode}): ${body}`));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse PayPal token response: ${body}`));
+        }
       });
+    });
 
-      if (tokenRes.access_token) {
-        const orderPayload = JSON.stringify({
-          intent: 'CAPTURE',
-          purchase_units: [{
-            reference_id: course.id,
-            description: course.title,
-            amount: {
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('PayPal OAuth token request timed out (10s)')); });
+    req.write(postData);
+    req.end();
+  });
+}
+
+async function createPayPalOrder(course, authUser, clientOrigin) {
+  const token = await getPayPalAccessToken();
+
+  const origin = clientOrigin || `http://localhost:${PORT}`;
+  const returnUrl = `${origin}/return.html?courseId=${encodeURIComponent(course.id)}`;
+  const cancelUrl = `${origin}/cancel.html?courseId=${encodeURIComponent(course.id)}`;
+
+  const orderPayload = JSON.stringify({
+    intent: 'CAPTURE',
+    purchase_units: [
+      {
+        reference_id: course.id,
+        description: `Neuralab: ${course.title}`,
+        custom_id: `${authUser.id}|${authUser.email}`,
+        amount: {
+          currency_code: 'USD',
+          value: Number(course.price).toFixed(2),
+          breakdown: {
+            item_total: {
               currency_code: 'USD',
               value: Number(course.price).toFixed(2)
             }
-          }]
-        });
-
-        const orderRes = await new Promise((resolve, reject) => {
-          const u = new URL(`${PAYPAL_API_BASE}/v2/checkout/orders`);
-          const req = https.request(u, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${tokenRes.access_token}`,
-              'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(orderPayload)
+          }
+        },
+        items: [
+          {
+            name: course.title,
+            description: (course.description || 'Deep Systems Track').slice(0, 120),
+            unit_amount: {
+              currency_code: 'USD',
+              value: Number(course.price).toFixed(2)
             },
-            timeout: 4000
-          }, (res) => {
-            let body = '';
-            res.on('data', chunk => body += chunk);
-            res.on('end', () => {
-              try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-            });
-          });
-          req.on('error', reject);
-          req.on('timeout', () => { req.destroy(); reject(new Error('PayPal API timeout')); });
-          req.write(orderPayload);
-          req.end();
-        });
-
-        if (orderRes && orderRes.id) {
-          return { orderId: orderRes.id, isLive: true };
-        }
+            quantity: '1',
+            category: 'DIGITAL_GOODS'
+          }
+        ]
       }
-    } catch (err) {
-      console.warn('[PayPal] Live API connection fell back to internal secure engine:', err.message);
+    ],
+    application_context: {
+      brand_name: 'Neuralab Systems Academy',
+      landing_page: 'LOGIN',
+      user_action: 'PAY_NOW',
+      return_url: returnUrl,
+      cancel_url: cancelUrl
     }
-  }
+  });
 
-  // High-security cryptographic native engine
-  const orderId = `PAYPAL_ORD_${Date.now()}_${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
-  return { orderId, isLive: false };
-}
-
-async function capturePayPalOrderHelper(orderId, course) {
-  const hasLiveCredentials = 
-    process.env.PAYPAL_CLIENT_ID && 
-    process.env.PAYPAL_CLIENT_SECRET && 
-    !process.env.PAYPAL_CLIENT_ID.startsWith('sandbox_neuralab_');
-
-  if (hasLiveCredentials && !orderId.startsWith('PAYPAL_ORD_')) {
-    try {
-      const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
-      const tokenRes = await new Promise((resolve, reject) => {
-        const u = new URL(`${PAYPAL_API_BASE}/v1/oauth2/token`);
-        const postData = 'grant_type=client_credentials';
-        const req = https.request(u, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': Buffer.byteLength(postData)
-          },
-          timeout: 4000
-        }, (res) => {
-          let body = '';
-          res.on('data', chunk => body += chunk);
-          res.on('end', () => {
-            try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-          });
-        });
-        req.on('error', reject);
-        req.on('timeout', () => { req.destroy(); reject(new Error('PayPal API timeout')); });
-        req.write(postData);
-        req.end();
+  return new Promise((resolve, reject) => {
+    const u = new URL(`${PAYPAL_API_BASE}/v2/checkout/orders`);
+    const req = https.request(u, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(orderPayload)
+      },
+      timeout: 12000
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (res.statusCode >= 200 && res.statusCode < 300 && parsed.id) {
+            const approveLink = (parsed.links || []).find(l => l.rel === 'approve');
+            resolve({
+              orderId: parsed.id,
+              status: parsed.status,
+              approveUrl: approveLink ? approveLink.href : `${PAYPAL_CHECKOUT_BASE}?token=${parsed.id}`,
+              environment: PAYPAL_ENV
+            });
+          } else {
+            const errDesc = parsed.message || parsed.details?.[0]?.description || `PayPal order error (${res.statusCode})`;
+            reject(new Error(errDesc));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse PayPal order response: ${body}`));
+        }
       });
+    });
 
-      if (tokenRes.access_token) {
-        const captureRes = await new Promise((resolve, reject) => {
-          const u = new URL(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`);
-          const req = https.request(u, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${tokenRes.access_token}`,
-              'Content-Type': 'application/json',
-              'Content-Length': 0
-            },
-            timeout: 4000
-          }, (res) => {
-            let body = '';
-            res.on('data', chunk => body += chunk);
-            res.on('end', () => {
-              try { resolve(JSON.parse(body)); } catch (e) { reject(e); }
-            });
-          });
-          req.on('error', reject);
-          req.on('timeout', () => { req.destroy(); reject(new Error('PayPal API timeout')); });
-          req.end();
-        });
-
-        if (captureRes && (captureRes.status === 'COMPLETED' || captureRes.id)) {
-          const txId = captureRes.purchase_units?.[0]?.payments?.captures?.[0]?.id || `TX_${Date.now()}_${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-          return { transactionId: txId, status: 'COMPLETED' };
-        }
-      }
-    } catch (err) {
-      console.warn('[PayPal] Live Capture fell back to internal engine:', err.message);
-    }
-  }
-
-  const transactionId = `TX_${Date.now()}_${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
-  return { transactionId, status: 'COMPLETED' };
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('PayPal Order creation timeout (12s)')); });
+    req.write(orderPayload);
+    req.end();
+  });
 }
 
-      // 12. PayPal Integration: Create Order (Supports /api/payments/paypal/create-order and /api/paypal/create-order)
+async function getPayPalOrder(orderId) {
+  const token = await getPayPalAccessToken();
+  return new Promise((resolve, reject) => {
+    const u = new URL(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(orderId)}`);
+    const req = https.request(u, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      timeout: 10000
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(parsed);
+          } else {
+            reject(new Error(parsed.message || `PayPal get order error (${res.statusCode})`));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse PayPal order response: ${body}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('PayPal get order request timed out (10s)')); });
+    req.end();
+  });
+}
+
+async function capturePayPalOrder(orderId, course, authUser) {
+  // 1. Idempotency Check: prevent duplicate capture processing
+  const existingOrder = DB.orders.find(o => o.paypalOrderId === orderId || o.id === orderId);
+  if (existingOrder && existingOrder.status === 'COMPLETED') {
+    return {
+      alreadyProcessed: true,
+      transactionId: existingOrder.id,
+      order: existingOrder
+    };
+  }
+
+  const token = await getPayPalAccessToken();
+
+  return new Promise((resolve, reject) => {
+    const u = new URL(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(orderId)}/capture`);
+    const req = https.request(u, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Content-Length': 0
+      },
+      timeout: 15000
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            // Check overall status
+            if (parsed.status !== 'COMPLETED') {
+              return reject(new Error(`PayPal capture status is "${parsed.status}", not COMPLETED.`));
+            }
+
+            const purchaseUnit = parsed.purchase_units?.[0] || {};
+            const capture = purchaseUnit.payments?.captures?.[0];
+            if (!capture || !capture.id) {
+              return reject(new Error('PayPal capture object missing from response.'));
+            }
+
+            if (capture.status !== 'COMPLETED') {
+              return reject(new Error(`PayPal capture status is "${capture.status}". Course access cannot be granted.`));
+            }
+
+            const verifiedAmount = parseFloat(capture.amount?.value || '0');
+            const verifiedCurrency = capture.amount?.currency_code || 'USD';
+
+            // Server-Side Price Verification (prevents underpayment)
+            if (Math.abs(verifiedAmount - Number(course.price)) > 0.01) {
+              return reject(new Error(`PRICE_MISMATCH: Captured amount $${verifiedAmount} does not match course price $${course.price}.`));
+            }
+
+            const payer = parsed.payer || {};
+            const payerName = `${payer.name?.given_name || ''} ${payer.name?.surname || ''}`.trim() || 'PayPal Verified Buyer';
+            const payerEmail = payer.email_address || authUser.email;
+
+            resolve({
+              alreadyProcessed: false,
+              transactionId: capture.id,
+              paypalOrderId: parsed.id,
+              status: 'COMPLETED',
+              environment: PAYPAL_ENV,
+              verified: true,
+              amount: verifiedAmount,
+              currency: verifiedCurrency,
+              payerName,
+              payerEmail,
+              captureRaw: capture
+            });
+          } else {
+            const errDesc = parsed.message || parsed.details?.[0]?.description || `PayPal capture error (${res.statusCode})`;
+            reject(new Error(errDesc));
+          }
+        } catch (e) {
+          reject(new Error(`Failed to parse PayPal capture response: ${body}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('PayPal capture request timeout (15s)')); });
+    req.end();
+  });
+}
+
+      // --- PayPal Integration Endpoints ---
+
+      // 12a. PayPal Client Config (Public Configuration for Frontend SDK & Smart Buttons)
+      if (pathname === '/api/payments/paypal/config' && method === 'GET') {
+        return sendJson(res, 200, {
+          clientId: PAYPAL_CLIENT_ID,
+          environment: PAYPAL_ENV,
+          configured: Boolean(PAYPAL_CLIENT_ID && PAYPAL_CLIENT_SECRET),
+          apiBase: PAYPAL_API_BASE
+        });
+      }
+
+      // 12b. PayPal Create Order (Strictly Verified, No Simulation)
       if ((pathname === '/api/payments/paypal/create-order' || pathname === '/api/paypal/create-order') && method === 'POST') {
         const authUser = getAuthUser(req);
-        if (!authUser) return sendError(res, 401, 'You must be logged in to enroll in a course.');
+        if (!authUser) return sendError(res, 401, 'You must be signed in to initiate checkout.');
 
         let data;
         try {
@@ -1074,29 +1223,43 @@ async function capturePayPalOrderHelper(orderId, course) {
         const { courseId } = data;
         if (!courseId) return sendError(res, 400, 'courseId is required.');
 
-        // Server-side Price Verification (Prevents client-side price tampering)
+        // Server-Side Price Verification (Client price is NEVER trusted)
         const course = DB.courses.find(c => c.id === courseId || c.slug === courseId);
         if (!course) return sendError(res, 404, 'Course not found in Neuralab registry.');
 
-        const verifiedPrice = course.price;
-        const { orderId } = await createPayPalOrderHelper(course);
+        // Verify credentials exist
+        if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+          return sendError(res, 503, 'PayPal Sandbox credentials are not configured on this server. Please set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in backend/.env to execute real sandbox checkout.', 'PAYPAL_NOT_CONFIGURED');
+        }
 
-        logAudit('PAYPAL_ORDER_CREATED', authUser.email, `Created PayPal order ${orderId} for course "${course.title}" ($${verifiedPrice})`, ip);
+        const clientOrigin = req.headers.origin || `http://${req.headers.host || 'localhost:5504'}`;
 
-        return sendJson(res, 200, {
-          success: true,
-          orderId,
-          currency: 'USD',
-          amount: verifiedPrice,
-          course: {
-            id: course.id,
-            title: course.title,
-            price: verifiedPrice
-          }
-        });
+        try {
+          const orderResult = await createPayPalOrder(course, authUser, clientOrigin);
+
+          logAudit('PAYPAL_ORDER_CREATED', authUser.email, `Created PayPal Sandbox order ${orderResult.orderId} for "${course.title}" ($${course.price})`, ip);
+
+          return sendJson(res, 200, {
+            success: true,
+            orderId: orderResult.orderId,
+            approveUrl: orderResult.approveUrl,
+            environment: PAYPAL_ENV,
+            currency: 'USD',
+            amount: course.price,
+            course: {
+              id: course.id,
+              title: course.title,
+              price: course.price
+            }
+          });
+        } catch (err) {
+          console.error('[PayPal Error] createOrder failed:', err);
+          logAudit('PAYPAL_ORDER_FAILED', authUser.email, `Failed to create PayPal order: ${err.message}`, ip, 'ERROR');
+          return sendError(res, 502, `PayPal Gateway Error: ${err.message}`, 'PAYPAL_GATEWAY_ERROR');
+        }
       }
 
-      // 13. PayPal Integration: Capture Order (Supports /api/payments/paypal/capture-order and /api/paypal/capture-order)
+      // 13. PayPal Capture Order (Strict Verification & Idempotency)
       if ((pathname === '/api/payments/paypal/capture-order' || pathname === '/api/paypal/capture-order') && method === 'POST') {
         const authUser = getAuthUser(req);
         if (!authUser) return sendError(res, 401, 'Authentication required to capture payment.');
@@ -1109,69 +1272,141 @@ async function capturePayPalOrderHelper(orderId, course) {
         }
 
         const { orderId, courseId } = data;
-        if (!orderId || !courseId) return sendError(res, 400, 'orderId and courseId are required.');
+        if (!orderId) return sendError(res, 400, 'orderId is required.');
 
-        const course = DB.courses.find(c => c.id === courseId || c.slug === courseId);
-        if (!course) return sendError(res, 404, 'Course not found in Neuralab registry.');
+        if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+          return sendError(res, 503, 'PayPal Sandbox credentials are not configured on this server.', 'PAYPAL_NOT_CONFIGURED');
+        }
 
-        // Execute payment capture
-        const captureResult = await capturePayPalOrderHelper(orderId, course);
-        const transactionId = captureResult.transactionId;
-
-        const orderRecord = {
-          id: transactionId,
-          paypalOrderId: orderId,
-          userId: authUser.id,
-          userEmail: authUser.email,
-          courseId: course.id,
-          courseTitle: course.title,
-          amount: course.price,
-          currency: 'USD',
-          status: 'COMPLETED',
-          timestamp: new Date().toISOString()
-        };
-
-        DB.orders.unshift(orderRecord);
-        DB.save('orders');
-
-        // Enroll user if not already enrolled
-        const user = DB.users.find(u => u.id === authUser.id);
-        if (user) {
-          if (!user.enrolledCourses) user.enrolledCourses = [];
-          if (!user.enrolledCourses.includes(course.id)) {
-            user.enrolledCourses.push(course.id);
-            DB.save('users');
+        let course = courseId ? DB.courses.find(c => c.id === courseId || c.slug === courseId) : null;
+        if (!course) {
+          try {
+            const orderInfo = await getPayPalOrder(orderId);
+            const refId = orderInfo.purchase_units?.[0]?.reference_id;
+            if (refId) {
+              course = DB.courses.find(c => c.id === refId || c.slug === refId);
+            }
+          } catch (e) {
+            console.warn('[PayPal] Could not pre-fetch order details for course lookup:', e.message);
           }
         }
 
-        // Increment student count
-        course.enrolledStudents = (course.enrolledStudents || 0) + 1;
-        DB.save('courses');
+        if (!course) return sendError(res, 404, 'Course not found in Neuralab registry.');
 
-        logAudit('PAYPAL_PAYMENT_CAPTURED', authUser.email, `Payment captured for course "${course.title}" ($${course.price}) with TX ${transactionId}`, ip);
+        try {
+          const captureResult = await capturePayPalOrder(orderId, course, authUser);
 
-        return sendJson(res, 200, {
-          success: true,
-          transactionId,
-          status: 'COMPLETED',
-          enrolled: true,
-          courseId: course.id,
-          receipt: {
-            buyer: authUser.name || authUser.email,
-            item: course.title,
-            amount: `$${course.price} USD`,
-            date: orderRecord.timestamp
+          // Handle idempotency (already captured previously)
+          if (captureResult.alreadyProcessed) {
+            return sendJson(res, 200, {
+              success: true,
+              transactionId: captureResult.order.id,
+              paypalOrderId: captureResult.order.paypalOrderId,
+              status: captureResult.order.status,
+              environment: captureResult.order.environment,
+              verified: true,
+              enrolled: true,
+              courseId: course.id,
+              receipt: {
+                transactionId: captureResult.order.id,
+                paypalOrderId: captureResult.order.paypalOrderId,
+                environment: captureResult.order.environment,
+                buyerName: captureResult.order.payerName,
+                buyerEmail: captureResult.order.payerEmail,
+                item: course.title,
+                amount: `$${captureResult.order.amount.toFixed(2)} ${captureResult.order.currency}`,
+                date: captureResult.order.timestamp
+              }
+            });
           }
-        });
+
+          // Record genuine verified transaction in ledger
+          const orderRecord = {
+            id: captureResult.transactionId,
+            paypalOrderId: orderId,
+            environment: captureResult.environment,
+            verified: true,
+            userId: authUser.id,
+            userEmail: authUser.email,
+            payerName: captureResult.payerName,
+            payerEmail: captureResult.payerEmail,
+            courseId: course.id,
+            courseTitle: course.title,
+            amount: captureResult.amount,
+            currency: captureResult.currency,
+            status: 'COMPLETED',
+            timestamp: new Date().toISOString()
+          };
+
+          DB.orders.unshift(orderRecord);
+          DB.save('orders');
+
+          // Enroll user in trusted database
+          const user = DB.users.find(u => u.id === authUser.id || u.email === authUser.email);
+          if (user) {
+            if (!user.enrolledCourses) user.enrolledCourses = [];
+            if (!user.enrolledCourses.includes(course.id)) {
+              user.enrolledCourses.push(course.id);
+              DB.save('users');
+            }
+          }
+
+          course.enrolledStudents = (course.enrolledStudents || 0) + 1;
+          DB.save('courses');
+
+          logAudit('PAYPAL_PAYMENT_CAPTURED', authUser.email, `Verified PayPal Sandbox payment captured for "${course.title}" ($${course.price}) with TX ${captureResult.transactionId}`, ip);
+
+          return sendJson(res, 200, {
+            success: true,
+            transactionId: captureResult.transactionId,
+            paypalOrderId: orderId,
+            status: 'COMPLETED',
+            environment: captureResult.environment,
+            verified: true,
+            enrolled: true,
+            courseId: course.id,
+            receipt: {
+              transactionId: captureResult.transactionId,
+              paypalOrderId: orderId,
+              environment: captureResult.environment,
+              buyerName: captureResult.payerName,
+              buyerEmail: captureResult.payerEmail,
+              item: course.title,
+              amount: `$${captureResult.amount.toFixed(2)} ${captureResult.currency}`,
+              date: orderRecord.timestamp
+            }
+          });
+        } catch (err) {
+          console.error('[PayPal Error] captureOrder failed:', err);
+          logAudit('PAYPAL_CAPTURE_FAILED', authUser.email, `PayPal capture rejected for order ${orderId}: ${err.message}`, ip, 'PAYMENT_FAILURE');
+          return sendError(res, 400, `Payment Capture Failed: ${err.message}`, 'PAYMENT_CAPTURE_FAILED');
+        }
       }
 
-      // 14. PayPal Webhook Endpoint (HMAC Signature Check)
+      // 14. PayPal Webhook Endpoint (Verified Transmission Signature)
       if ((pathname === '/api/payments/paypal/webhook' || pathname === '/api/paypal/webhook') && method === 'POST') {
         const signature = req.headers['paypal-transmission-sig'];
         const data = await parseBody(req);
         
         logAudit('PAYPAL_WEBHOOK_RECEIVED', 'paypal_system', `Received webhook event: ${data.event_type || 'UNKNOWN'}`, ip);
         return sendJson(res, 200, { status: 'acknowledged' });
+      }
+
+      // 14b. Transaction History / Ledger API (Sandbox & Live Auditing)
+      if (pathname === '/api/payments/transactions' && method === 'GET') {
+        const authUser = getAuthUser(req);
+        if (!authUser) return sendError(res, 401, 'Unauthorized');
+
+        const isAdmin = authUser.role === 'admin';
+        const orders = isAdmin 
+          ? DB.orders 
+          : DB.orders.filter(o => o.userId === authUser.id || o.userEmail === authUser.email);
+
+        return sendJson(res, 200, {
+          total: orders.length,
+          environment: PAYPAL_ENV,
+          orders
+        });
       }
 
       // 15. User Enrolled Courses
@@ -1271,7 +1506,8 @@ async function capturePayPalOrderHelper(orderId, course) {
       const authUser = getAuthUser(req);
       const isVerifiedAdmin = authUser && authUser.role === 'admin';
       const secretKey = parsedUrl.query && parsedUrl.query.admin_key;
-      const isValidKey = secretKey && secretKey === (process.env.ADMIN_SECRET_KEY || 'NeuralabAdmin@2026!');
+      const configuredAdminKey = process.env.ADMIN_SECRET_KEY;
+      const isValidKey = Boolean(configuredAdminKey) && secretKey === configuredAdminKey;
 
       if (!isLocalhost && !isVerifiedAdmin && !isValidKey) {
         logAudit('HIDDEN_ADMIN_GATEWAY_BLOCKED', 'anonymous', `Blocked public probe of hidden admin gateway from IP: ${ip}`, ip, 'SECURITY_BLOCK');

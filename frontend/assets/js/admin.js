@@ -604,23 +604,32 @@ const AdminApp = {
     if (!tbody) return;
 
     if (!orders || orders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--text-muted);">No verified transactions found in ledger.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--text-muted);">No verified transactions found in ledger.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = orders.map(o => `
+    tbody.innerHTML = orders.map(o => {
+      const isSandbox = (o.environment || 'sandbox').toLowerCase() === 'sandbox';
+      const envBadge = isSandbox 
+        ? '<span style="background:rgba(163,230,53,0.15); color:#a3e635; border:1px solid rgba(163,230,53,0.3); padding:0.15rem 0.45rem; border-radius:4px; font-size:0.7rem; font-family:var(--font-mono); font-weight:700;">SANDBOX</span>'
+        : '<span style="background:rgba(59,130,246,0.15); color:#3b82f6; border:1px solid rgba(59,130,246,0.3); padding:0.15rem 0.45rem; border-radius:4px; font-size:0.7rem; font-family:var(--font-mono); font-weight:700;">LIVE</span>';
+
+      return `
       <tr>
-        <td style="font-family:var(--font-mono); font-size:0.8rem; color:var(--accent-cyan);">${this.escapeHTML(o.id || o.paypalOrderId)}</td>
-        <td style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary);">${this.escapeHTML(o.userEmail || 'N/A')}</td>
+        <td>${envBadge}</td>
+        <td style="font-family:var(--font-mono); font-size:0.8rem; color:var(--accent-cyan); font-weight:600;">${this.escapeHTML(o.id || 'N/A')}</td>
+        <td style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">${this.escapeHTML(o.paypalOrderId || 'N/A')}</td>
+        <td style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary);">${this.escapeHTML(o.userEmail || o.payerEmail || 'N/A')}</td>
         <td style="font-weight:600; color:#fff;">${this.escapeHTML(o.courseTitle || o.courseId)}</td>
-        <td style="font-weight:700; color:var(--accent-emerald); font-family:var(--font-mono);">$${o.amount} ${o.currency || 'USD'}</td>
+        <td style="font-weight:700; color:var(--accent-emerald); font-family:var(--font-mono);">$${Number(o.amount).toFixed(2)} ${o.currency || 'USD'}</td>
         <td><span class="badge badge-green">COMPLETED</span></td>
         <td style="font-size:0.8rem; color:var(--text-secondary);">${new Date(o.timestamp).toLocaleString()}</td>
         <td style="text-align:right;">
           <button class="btn btn-secondary btn-sm view-receipt-btn" data-tx="${o.id}">Receipt</button>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
 
     tbody.querySelectorAll('.view-receipt-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {

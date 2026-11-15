@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Cancelled — Neuralab</title>
+  <meta name="description" content="PayPal Checkout Cancellation Notice.">
+  <link rel="stylesheet" href="assets/css/neuralab.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23000%22/><text y=%22.75em%22 x=%2250%25%22 text-anchor=%22middle%22 font-size=%2260%22 fill=%22%23a3e635%22 font-family=%22sans-serif%22 font-weight=%22bold%22>N</text></svg>">
+</head>
+<body style="min-height:100vh; display:flex; flex-direction:column; justify-content:space-between; background:#000000;">
+
+  <!-- Simple Brand Navbar -->
+  <header style="border-bottom:1px solid #1f1f23; padding:1.25rem 2rem; background:#09090b;">
+    <div style="max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
+      <a href="index.html" style="text-decoration:none; color:#ffffff; font-weight:800; font-size:1.3rem; letter-spacing:-0.02em; display:flex; align-items:center; gap:0.5rem;">
+        <span style="display:inline-block; width:12px; height:12px; background:#a3e635; border-radius:2px;"></span>
+        Neuralab
+      </a>
+      <a href="index.html" style="color:#a1a1aa; text-decoration:none; font-size:0.85rem; font-family:var(--font-mono);">
+        &larr; Return to Curriculum
+      </a>
+    </div>
+  </header>
+
+  <!-- Cancellation Container -->
+  <main style="flex:1; display:flex; align-items:center; justify-content:center; padding:2rem 1.5rem;">
+    <div class="card" style="max-width:540px; width:100%; padding:2.5rem 2rem; background:#0d0d10; border:1px solid #222226; border-radius:8px; text-align:center;">
+      
+      <div style="display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; background:rgba(234,179,8,0.12); border:1px solid rgba(234,179,8,0.3); border-radius:50%; margin-bottom:1.25rem; color:#eab308; font-size:1.5rem;">
+        ⏸
+      </div>
+
+      <div style="display:inline-block; background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.25); color:#fde047; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; padding:0.25rem 0.6rem; border-radius:4px; text-transform:uppercase; margin-bottom:1rem;">
+        PayPal Sandbox Checkout Cancelled
+      </div>
+
+      <h2 style="font-size:1.5rem; font-weight:700; color:#ffffff; margin-bottom:0.5rem;">No Charges Were Made</h2>
+      <p style="color:#a1a1aa; font-size:0.9rem; line-height:1.6; margin-bottom:1.75rem;">
+        You cancelled the checkout session on PayPal. No funds were debited from your PayPal Sandbox account, and your enrollment has not been activated.
+      </p>
+
+      <div id="cancelledCourseBox" style="display:none; background:#141417; border:1px solid #222226; border-radius:6px; padding:1rem; margin-bottom:1.75rem; text-align:left;">
+        <div style="font-size:0.75rem; color:#71717a; text-transform:uppercase; font-family:var(--font-mono); margin-bottom:0.25rem;">Cancelled Order</div>
+        <div id="courseNameText" style="color:#ffffff; font-weight:600; font-size:1rem;">-</div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <a id="retryCourseBtn" href="index.html" class="btn btn-primary" style="padding:0.85rem; font-weight:700; background:#a3e635; color:#000000; border-radius:6px; text-decoration:none;">
+          Resume Track Enrollment &rarr;
+        </a>
+        <a href="index.html" class="btn" style="padding:0.75rem; background:#141417; border:1px solid #28282e; color:#ffffff; border-radius:6px; text-decoration:none; font-size:0.85rem;">
+          Browse All Engineering Tracks
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer style="border-top:1px solid #1f1f23; padding:1.5rem 2rem; text-align:center; color:#52525b; font-size:0.8rem; background:#09090b;">
+    Neuralab &bull; Systems Engineering &bull; Official PayPal Sandbox Gateway
+  </footer>
+
+  <script>
+    (function initCancel() {
+      const params = new URLSearchParams(window.location.search);
+      const courseId = params.get('courseId');
+      
+      // Check if we have pending order info in sessionStorage
+      let pending = null;
+      try {
+        const stored = sessionStorage.getItem('pending_paypal_order');
+        if (stored) pending = JSON.parse(stored);
+      } catch (e) {}
+
+      const track = courseId || (pending && pending.courseId);
+      const title = (pending && pending.title) || track;
+
+      if (track) {
+        document.getElementById('cancelledCourseBox').style.display = 'block';
+        document.getElementById('courseNameText').textContent = title || track;
+        document.getElementById('retryCourseBtn').href = `index.html#catalog`;
+      }
+    })();
+  </script>
+</body>
+</html>
